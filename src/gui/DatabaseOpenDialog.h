@@ -39,6 +39,7 @@ public:
         None,
         AutoType,
         Merge,
+        MergeRemote,
         Browser
     };
 
