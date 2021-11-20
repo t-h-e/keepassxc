@@ -56,6 +56,7 @@
 #include "gui/tag/TagsEdit.h"
 #include "gui/wizard/NewDatabaseWizard.h"
 #include "keys/FileKey.h"
+#include "mock/MockRemoteProcess.h"
 
 #define TEST_MODAL_NO_WAIT(TEST_CODE)                                                                                  \
     bool dialogFinished = false;                                                                                       \
@@ -332,6 +333,46 @@ void TestGui::testMergeDatabase()
     QTest::keyClick(editPasswordMerge, Qt::Key_Enter);
 
     QTRY_COMPARE(dbMergeSpy.count(), 1);
+    QTRY_VERIFY(m_tabWidget->tabText(m_tabWidget->currentIndex()).contains("*"));
+
+    m_db = m_tabWidget->currentDatabaseWidget()->database();
+
+    // there are seven child groups of the root group
+    QCOMPARE(m_db->rootGroup()->children().size(), 7);
+    // the merged group should contain an entry
+    QCOMPARE(m_db->rootGroup()->children().at(6)->entries().size(), 1);
+    // the General group contains one entry merged from the other db
+    QCOMPARE(m_db->rootGroup()->findChildByName("General")->entries().size(), 1);
+}
+
+void TestGui::testRemoteSyncDatabase()
+{
+    QString sourceToMerge = "user@server:Database.kdbx";
+    m_tabWidget->setCreateRemoteProcessFunc([this, sourceToMerge]() {
+        return new MockRemoteProcess(this, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), sourceToMerge);
+    });
+
+    // It is safe to ignore the warning this line produces
+    QSignalSpy dbSyncSpy(m_dbWidget.data(), SIGNAL(databaseSynced(QSharedPointer<Database>)));
+    QApplication::processEvents();
+
+    triggerAction("actionRemoteDatabaseSync");
+
+    // set URL to merge from
+    auto* remoteSettingsDialog = m_dbWidget->findChild<QWidget*>("remoteSettingsDialog");
+    auto* urlEdit = remoteSettingsDialog->findChild<QLineEdit*>("url");
+    QVERIFY(urlEdit != nullptr);
+    urlEdit->setText(sourceToMerge);
+    QTest::keyClick(urlEdit, Qt::Key_Enter);
+
+    QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
+    auto* editPasswordSync = QApplication::focusWidget();
+    QVERIFY(editPasswordSync->isVisible());
+
+    QTest::keyClicks(editPasswordSync, "a");
+    QTest::keyClick(editPasswordSync, Qt::Key_Enter);
+
+    QTRY_COMPARE(dbSyncSpy.count(), 1);
     QTRY_VERIFY(m_tabWidget->tabText(m_tabWidget->currentIndex()).contains("*"));
 
     m_db = m_tabWidget->currentDatabaseWidget()->database();
