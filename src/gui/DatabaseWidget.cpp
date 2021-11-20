@@ -49,6 +49,7 @@
 #include "gui/entry/EntryView.h"
 #include "gui/group/EditGroupWidget.h"
 #include "gui/group/GroupView.h"
+#include "gui/remote/RemoteSettingsDialog.h"
 #include "gui/reports/ReportsDialog.h"
 #include "gui/tag/TagModel.h"
 #include "keeshare/KeeShare.h"
@@ -78,6 +79,7 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     , m_historyEditEntryWidget(new EditEntryWidget(this))
     , m_reportsDialog(new ReportsDialog(this))
     , m_databaseSettingDialog(new DatabaseSettingsDialog(this))
+    , m_remoteSettingDialog(new RemoteSettingsDialog(this))
     , m_databaseOpenWidget(new DatabaseOpenWidget(this))
     , m_keepass1OpenWidget(new KeePass1OpenWidget(this))
     , m_opVaultOpenWidget(new OpVaultOpenWidget(this))
@@ -180,6 +182,7 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     m_csvImportWizard->setObjectName("csvImportWizard");
     m_reportsDialog->setObjectName("reportsDialog");
     m_databaseSettingDialog->setObjectName("databaseSettingsDialog");
+    m_remoteSettingDialog->setObjectName("remoteSettingsDialog");
     m_databaseOpenWidget->setObjectName("databaseOpenWidget");
     m_keepass1OpenWidget->setObjectName("keepass1OpenWidget");
     m_opVaultOpenWidget->setObjectName("opVaultOpenWidget");
@@ -189,6 +192,7 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     addChildWidget(m_editGroupWidget);
     addChildWidget(m_reportsDialog);
     addChildWidget(m_databaseSettingDialog);
+    addChildWidget(m_remoteSettingDialog);
     addChildWidget(m_historyEditEntryWidget);
     addChildWidget(m_databaseOpenWidget);
     addChildWidget(m_csvImportWizard);
@@ -222,6 +226,8 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     connect(m_editGroupWidget, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
     connect(m_reportsDialog, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
     connect(m_databaseSettingDialog, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
+    connect(m_remoteSettingDialog, SIGNAL(cancel(bool)), SLOT(switchToMainView(bool)));
+    connect(m_remoteSettingDialog, SIGNAL(syncWithRemote(RemoteProgramParams*)), SLOT(syncWithRemoteAndSwitchToMainView(RemoteProgramParams*)));
     connect(m_databaseOpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
     connect(m_keepass1OpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
     connect(m_opVaultOpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
@@ -1017,6 +1023,12 @@ int DatabaseWidget::addChildWidget(QWidget* w)
     return index;
 }
 
+void DatabaseWidget::syncWithRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams)
+{
+    switchToMainView(true);
+    emit syncWithRemote(remoteProgramParams);
+}
+
 void DatabaseWidget::switchToMainView(bool previousDialogAccepted)
 {
     setCurrentWidget(m_mainWidget);
@@ -1199,6 +1211,46 @@ void DatabaseWidget::mergeDatabase(bool accepted)
     emit databaseMerged(m_db);
 }
 
+void DatabaseWidget::syncDatabase(bool accepted)
+{
+    if (accepted) {
+        if (!m_db) {
+            showMessage(tr("No current database."), MessageWidget::Error);
+            return;
+        }
+
+        auto* senderDialog = qobject_cast<DatabaseOpenDialog*>(sender());
+
+        Q_ASSERT(senderDialog);
+        if (!senderDialog) {
+            return;
+        }
+        auto srcDb = senderDialog->database();
+
+        if (!srcDb) {
+            showMessage(tr("No source database, nothing to do."), MessageWidget::Error);
+            return;
+        }
+
+        Merger mergerToRemote(m_db.data(), srcDb.data());
+        Merger mergerFromRemote(srcDb.data(), m_db.data());
+        QStringList changeList = mergerToRemote.merge() + mergerFromRemote.merge();
+
+        if (!changeList.isEmpty()) {
+            showMessage(tr("Successfully merged the database files."), MessageWidget::Information);
+
+            // Save synced database
+            QString error;
+            srcDb->save(Database::Atomic, {}, &error);
+        } else {
+            showMessage(tr("Database was not modified by merge operation."), MessageWidget::Information);
+        }
+    }
+
+    switchToMainView();
+    emit databaseSynced(m_db);
+}
+
 /**
  * Unlock the database.
  *
@@ -1215,9 +1267,14 @@ void DatabaseWidget::unlockDatabase(bool accepted)
         return;
     }
 
-    if (senderDialog && senderDialog->intent() == DatabaseOpenDialog::Intent::Merge) {
-        mergeDatabase(accepted);
-        return;
+    if (senderDialog) {
+        if (senderDialog->intent() == DatabaseOpenDialog::Intent::Merge) {
+            mergeDatabase(accepted);
+            return;
+        } else if (senderDialog->intent() == DatabaseOpenDialog::Intent::RemoteSync) {
+            syncDatabase(accepted);
+            return;
+        }
     }
 
     QSharedPointer<Database> db;
@@ -1315,6 +1372,12 @@ void DatabaseWidget::switchToDatabaseSettings()
 {
     m_databaseSettingDialog->load(m_db);
     setCurrentWidget(m_databaseSettingDialog);
+}
+
+void DatabaseWidget::switchToRemoteSettings()
+{
+    m_remoteSettingDialog->load(m_db);
+    setCurrentWidget(m_remoteSettingDialog);
 }
 
 void DatabaseWidget::switchToOpenDatabase()

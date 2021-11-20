@@ -19,20 +19,22 @@
 #ifndef KEEPASSX_DATABASEWIDGET_H
 #define KEEPASSX_DATABASEWIDGET_H
 
+#include "DatabaseOpenDialog.h"
 #include <QFileSystemWatcher>
 #include <QListView>
 #include <QStackedWidget>
 
-#include "DatabaseOpenDialog.h"
 #include "config-keepassx.h"
 #include "gui/MessageWidget.h"
 #include "gui/csvImport/CsvImportWizard.h"
 #include "gui/entry/EntryModel.h"
+#include "gui/remote/RemoteProgramParams.h"
 
 class DatabaseOpenWidget;
 class KeePass1OpenWidget;
 class OpVaultOpenWidget;
 class DatabaseSettingsDialog;
+class RemoteSettingsDialog;
 class ReportsDialog;
 class Database;
 class FileWatcher;
@@ -141,6 +143,8 @@ signals:
     void
     requestOpenDatabase(const QString& filePath, bool inBackground, const QString& password, const QString& keyFile);
     void databaseMerged(QSharedPointer<Database> mergedDb);
+    void databaseSynced(QSharedPointer<Database> syncedDb);
+    void syncWithRemote(RemoteProgramParams* remoteProgramParams);
     void groupContextMenuRequested(const QPoint& globalPos);
     void entryContextMenuRequested(const QPoint& globalPos);
     void listModeAboutToActivate();
@@ -198,6 +202,7 @@ public slots:
     void createGroup();
     void cloneGroup();
     void deleteGroup();
+    void syncWithRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams);
     void switchToMainView(bool previousDialogAccepted = false);
     void switchToEntryEdit();
     void switchToGroupEdit();
@@ -206,6 +211,7 @@ public slots:
     void switchToDatabaseSecurity();
     void switchToDatabaseReports();
     void switchToDatabaseSettings();
+    void switchToRemoteSettings();
     void switchToOpenDatabase();
     void switchToOpenDatabase(const QString& filePath);
     void switchToOpenDatabase(const QString& filePath, const QString& password, const QString& keyFile);
@@ -250,6 +256,7 @@ private slots:
     void loadDatabase(bool accepted);
     void unlockDatabase(bool accepted);
     void mergeDatabase(bool accepted);
+    void syncDatabase(bool accepted);
     void emitCurrentModeChanged();
     // Database autoreload slots
     void reloadDatabaseFile();
@@ -279,6 +286,7 @@ private:
     QPointer<EditEntryWidget> m_historyEditEntryWidget;
     QPointer<ReportsDialog> m_reportsDialog;
     QPointer<DatabaseSettingsDialog> m_databaseSettingDialog;
+    QPointer<RemoteSettingsDialog> m_remoteSettingDialog;
     QPointer<DatabaseOpenWidget> m_databaseOpenWidget;
     QPointer<KeePass1OpenWidget> m_keepass1OpenWidget;
     QPointer<OpVaultOpenWidget> m_opVaultOpenWidget;
