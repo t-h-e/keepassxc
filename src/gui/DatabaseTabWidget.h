@@ -20,6 +20,7 @@
 
 #include "DatabaseOpenDialog.h"
 #include "gui/MessageWidget.h"
+#include "gui/remote/RemoteProgramParams.h"
 
 #include <QTabWidget>
 
@@ -36,6 +37,7 @@ public:
     explicit DatabaseTabWidget(QWidget* parent = nullptr);
     ~DatabaseTabWidget() override;
     void mergeDatabase(const QString& filePath);
+    void mergeRemoteDatabase(const QString& filePath);
 
     QString tabName(int index);
     DatabaseWidget* currentDatabaseWidget();
@@ -63,6 +65,8 @@ public slots:
     DatabaseWidget* newDatabase();
     void openDatabase();
     void mergeDatabase();
+    void mergeDatabaseRemote(RemoteProgramParams* RemoteProgramParams);
+    void handleMergedDatabaseRemote(const QSharedPointer<Database>&);
     void importCsv();
     void importKeePass1Database();
     void importOpVaultDatabase();
@@ -81,6 +85,7 @@ public slots:
     void showDatabaseSecurity();
     void showDatabaseReports();
     void showDatabaseSettings();
+    void showRemoteMergeSettings();
     void performGlobalAutoType(const QString& search);
     void performBrowserUnlock();
 
@@ -113,6 +118,8 @@ private:
     QPointer<DatabaseWidgetStateSync> m_dbWidgetStateSync;
     QPointer<DatabaseWidget> m_dbWidgetPendingLock;
     QPointer<DatabaseOpenDialog> m_databaseOpenDialog;
+
+    RemoteProgramParams* m_remoteProgramParams;
 };
 
 #endif // KEEPASSX_DATABASETABWIDGET_H

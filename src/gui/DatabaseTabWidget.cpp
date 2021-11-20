@@ -17,7 +17,10 @@
 
 #include "DatabaseTabWidget.h"
 
+#include <QDebug>
 #include <QFileInfo>
+#include <QProcess>
+#include <QTemporaryDir>
 
 #include "autotype/AutoType.h"
 #include "core/Tools.h"
@@ -41,6 +44,7 @@ DatabaseTabWidget::DatabaseTabWidget(QWidget* parent)
     , m_dbWidgetStateSync(new DatabaseWidgetStateSync(this))
     , m_dbWidgetPendingLock(nullptr)
     , m_databaseOpenDialog(new DatabaseOpenDialog(this))
+    , m_remoteProgramParams(nullptr)
 {
     auto* tabBar = new DragTabBar(this);
     setTabBar(tabBar);
@@ -239,6 +243,8 @@ void DatabaseTabWidget::addDatabaseTab(DatabaseWidget* dbWidget, bool inBackgrou
     connect(dbWidget, SIGNAL(databaseUnlocked()), SLOT(emitDatabaseLockChanged()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(updateTabName()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(emitDatabaseLockChanged()));
+    connect(dbWidget, SIGNAL(databaseMergedRemote(QSharedPointer<Database>)), SLOT(handleMergedDatabaseRemote(QSharedPointer<Database>)));
+    connect(dbWidget, SIGNAL(mergeWithRemote(RemoteProgramParams*)), SLOT(mergeDatabaseRemote(RemoteProgramParams*)));
 }
 
 void DatabaseTabWidget::importCsv()
@@ -275,9 +281,59 @@ void DatabaseTabWidget::mergeDatabase()
     }
 }
 
+void DatabaseTabWidget::mergeDatabaseRemote(RemoteProgramParams* remoteProgramParams)
+{
+    QString tempPath = QDir::tempPath();
+    m_remoteProgramParams = remoteProgramParams;
+    QString destination = tempPath + "/RemoteDatabase.kdbx";
+    auto* remoteProcess = new QProcess(this);
+    remoteProcess->start(remoteProgramParams->getProgram(), remoteProgramParams->getArgumentsForDownload(destination));
+    bool finished = remoteProcess->waitForFinished(10000);
+    int statusCode = remoteProcess->exitCode();
+    if (finished && statusCode == 0) {
+        mergeRemoteDatabase(destination);
+    } else {
+        QStringList command;
+        command << remoteProgramParams->getProgram() << remoteProgramParams->getArgumentsForDownload(destination);
+        if (finished) {
+            currentDatabaseWidget()->showErrorMessage(
+                tr("%1 with command `%2` exited with status code: %3").arg(remoteProgramParams->getProgram()).arg(command.join(" ")).arg(statusCode));
+        } else {
+            remoteProcess->kill();
+            currentDatabaseWidget()->showErrorMessage(tr("%1 with command `%2` did not finish in time. Process was killed.").arg(remoteProgramParams->getProgram()).arg(command.join(" ")));
+        }
+    }
+}
+
+void DatabaseTabWidget::handleMergedDatabaseRemote(const QSharedPointer<Database>& remoteMergedDb)
+{
+    auto* remoteProcess = new QProcess(this);
+    remoteProcess->start(m_remoteProgramParams->getProgram(), m_remoteProgramParams->getArgumentsForUpload(remoteMergedDb->filePath()));
+    bool finished = remoteProcess->waitForFinished(10000);
+    int statusCode = remoteProcess->exitCode();
+    if (!finished || statusCode != 0) {
+        QStringList command;
+        command << m_remoteProgramParams->getProgram() << m_remoteProgramParams->getArgumentsForUpload(remoteMergedDb->filePath());
+        if (finished) {
+            currentDatabaseWidget()->showErrorMessage(
+                tr("Failed to upload merged database. %1 with command `%2` exited with status code: %3").arg(m_remoteProgramParams->getProgram()).arg(command.join(" ")).arg(statusCode));
+        } else {
+            remoteProcess->kill();
+            currentDatabaseWidget()->showErrorMessage(
+                tr("Failed to upload merged database. %1 with command `%2` did not finish in time. Process was killed.").arg(m_remoteProgramParams->getProgram()).arg(command.join(" ")).arg(statusCode));
+        }
+    }
+    m_remoteProgramParams = nullptr;
+}
+
 void DatabaseTabWidget::mergeDatabase(const QString& filePath)
 {
     unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::Merge, filePath);
+}
+
+void DatabaseTabWidget::mergeRemoteDatabase(const QString& filePath)
+{
+    unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::MergeRemote, filePath);
 }
 
 void DatabaseTabWidget::importKeePass1Database()
@@ -513,6 +569,11 @@ void DatabaseTabWidget::showDatabaseSettings()
     currentDatabaseWidget()->switchToDatabaseSettings();
 }
 
+void DatabaseTabWidget::showRemoteMergeSettings()
+{
+    currentDatabaseWidget()->switchToRemoteMergeSettings();
+}
+
 bool DatabaseTabWidget::isReadOnly(int index) const
 {
     if (count() == 0) {
@@ -741,7 +802,7 @@ void DatabaseTabWidget::handleDatabaseUnlockDialogFinished(bool accepted, Databa
 {
     // change the active tab to the database that was just unlocked in the dialog
     auto intent = m_databaseOpenDialog->intent();
-    if (accepted && intent != DatabaseOpenDialog::Intent::Merge) {
+    if (accepted && intent != DatabaseOpenDialog::Intent::Merge && intent != DatabaseOpenDialog::Intent::MergeRemote) {
         int index = indexOf(dbWidget);
         if (index != -1) {
             setCurrentIndex(index);

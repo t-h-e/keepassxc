@@ -161,6 +161,9 @@ set(keepassx_SOURCES
         gui/dbsettings/DatabaseSettingsWidgetMetaDataSimple.cpp
         gui/dbsettings/DatabaseSettingsWidgetEncryption.cpp
         gui/dbsettings/DatabaseSettingsWidgetDatabaseKey.cpp
+        gui/remote/ScpParams.cpp
+        gui/remote/RemoteMergeSettingsDialog.cpp
+        gui/remote/RemoteMergeSettingsWidgetScp.cpp
         gui/reports/ReportsWidget.cpp
         gui/reports/ReportsDialog.cpp
         gui/reports/ReportsWidgetHealthcheck.cpp
