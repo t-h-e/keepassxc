@@ -2318,6 +2318,26 @@ This is definitely a bug, please report it to the developers.</source>
         <comment>Database tab name modifier</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No URL set. Cannot sync database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 with command `%2` exited with status code: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 with command `%2` did not finish in time. Process was killed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to upload merged database. %1 with command `%2` exited with status code: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to upload merged database. %1 with command `%2` did not finish in time. Process was killed.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DatabaseWidget</name>
@@ -3664,11 +3684,6 @@ This may cause the affected plugins to malfunction.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Attachment &quot;%1&quot; already exists. 
-Would you like to overwrite the existing attachment?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Confirm Attachment</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3695,6 +3710,11 @@ Do you want to save the changes to your database?</source>
     <message>
         <source>Saving updated attachment failed.
 Error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attachment &quot;%1&quot; already exists.
+Would you like to overwrite the existing attachment?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5508,6 +5528,14 @@ We recommend you use the AppImage available on our downloads page.</source>
     </message>
     <message>
         <source>Quit KeePassXC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Remote Sync…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote sync</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
@@ -8284,6 +8312,44 @@ Kernel: %3 %4</source>
     </message>
     <message>
         <source>Internal zlib error: </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RemoteSettingsDialog</name>
+    <message>
+        <source>scp</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RemoteSettingsWidgetScp</name>
+    <message>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation type="unfinished">URL:</translation>
+    </message>
+    <message>
+        <source>URL field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Key file:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Key File field</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
