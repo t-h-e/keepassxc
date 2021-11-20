@@ -18,7 +18,10 @@
 #include "DatabaseTabWidget.h"
 
 #include <QFileInfo>
+#include <QProcess>
 #include <QTabBar>
+#include <QTemporaryDir>
+#include <utility>
 
 #include "autotype/AutoType.h"
 #include "core/Tools.h"
@@ -41,12 +44,14 @@ DatabaseTabWidget::DatabaseTabWidget(QWidget* parent)
     , m_dbWidgetStateSync(new DatabaseWidgetStateSync(this))
     , m_dbWidgetPendingLock(nullptr)
     , m_databaseOpenDialog(new DatabaseOpenDialog(this))
+    , m_remoteProgramParams(nullptr)
 {
     auto* tabBar = new QTabBar(this);
     tabBar->setAcceptDrops(true);
     tabBar->setChangeCurrentOnDrag(true);
     setTabBar(tabBar);
     setDocumentMode(true);
+    setCreateRemoteProcessFunc([this]() { return new RemoteProcess(this); });
 
     // clang-format off
     connect(this, SIGNAL(tabCloseRequested(int)), SLOT(closeDatabaseTab(int)));
@@ -247,6 +252,10 @@ void DatabaseTabWidget::addDatabaseTab(DatabaseWidget* dbWidget, bool inBackgrou
     connect(dbWidget, SIGNAL(databaseUnlocked()), SLOT(emitDatabaseLockChanged()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(updateTabName()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(emitDatabaseLockChanged()));
+    connect(dbWidget,
+            SIGNAL(databaseSynced(QSharedPointer<Database>)),
+            SLOT(handleSyncedDatabaseRemote(QSharedPointer<Database>)));
+    connect(dbWidget, SIGNAL(syncWithRemote(RemoteProgramParams*)), SLOT(syncDatabaseWithRemote(RemoteProgramParams*)));
 }
 
 void DatabaseTabWidget::importCsv()
@@ -283,9 +292,76 @@ void DatabaseTabWidget::mergeDatabase()
     }
 }
 
+void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgramParams)
+{
+    if (remoteProgramParams->getUrl().isEmpty()) {
+        currentDatabaseWidget()->showErrorMessage(tr("No URL set. Cannot sync database."));
+        return;
+    }
+
+    auto* remoteProcess = m_createRemoteProcess();
+    QString destination = remoteProcess->getTempFileLocation();
+    m_remoteProgramParams = remoteProgramParams;
+    remoteProcess->start(remoteProgramParams->getProgram(), remoteProgramParams->getArgumentsForDownload(destination));
+    bool finished = remoteProcess->waitForFinished(10000);
+    int statusCode = remoteProcess->exitCode();
+    if (finished && statusCode == 0) {
+        remoteSyncDatabase(destination);
+    } else {
+        QStringList command;
+        command << remoteProgramParams->getProgram() << remoteProgramParams->getArgumentsForDownload(destination);
+        if (finished) {
+            currentDatabaseWidget()->showErrorMessage(tr("%1 with command `%2` exited with status code: %3")
+                                                          .arg(remoteProgramParams->getProgram())
+                                                          .arg(command.join(" "))
+                                                          .arg(statusCode));
+        } else {
+            remoteProcess->kill();
+            currentDatabaseWidget()->showErrorMessage(
+                tr("%1 with command `%2` did not finish in time. Process was killed.")
+                    .arg(remoteProgramParams->getProgram())
+                    .arg(command.join(" ")));
+        }
+    }
+}
+
+void DatabaseTabWidget::handleSyncedDatabaseRemote(const QSharedPointer<Database>& remoteSyncedDb)
+{
+    auto* remoteProcess = m_createRemoteProcess();
+    remoteProcess->start(m_remoteProgramParams->getProgram(),
+                         m_remoteProgramParams->getArgumentsForUpload(remoteSyncedDb->filePath()));
+    bool finished = remoteProcess->waitForFinished(10000);
+    int statusCode = remoteProcess->exitCode();
+    if (!finished || statusCode != 0) {
+        QStringList command;
+        command << m_remoteProgramParams->getProgram()
+                << m_remoteProgramParams->getArgumentsForUpload(remoteSyncedDb->filePath());
+        if (finished) {
+            currentDatabaseWidget()->showErrorMessage(
+                tr("Failed to upload merged database. %1 with command `%2` exited with status code: %3")
+                    .arg(m_remoteProgramParams->getProgram())
+                    .arg(command.join(" "))
+                    .arg(statusCode));
+        } else {
+            remoteProcess->kill();
+            currentDatabaseWidget()->showErrorMessage(
+                tr("Failed to upload merged database. %1 with command `%2` did not finish in time. Process was killed.")
+                    .arg(m_remoteProgramParams->getProgram())
+                    .arg(command.join(" "))
+                    .arg(statusCode));
+        }
+    }
+    m_remoteProgramParams = nullptr;
+}
+
 void DatabaseTabWidget::mergeDatabase(const QString& filePath)
 {
     unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::Merge, filePath);
+}
+
+void DatabaseTabWidget::remoteSyncDatabase(const QString& filePath)
+{
+    unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::RemoteSync, filePath);
 }
 
 void DatabaseTabWidget::importKeePass1Database()
@@ -555,6 +631,11 @@ void DatabaseTabWidget::showDatabaseSettings()
     currentDatabaseWidget()->switchToDatabaseSettings();
 }
 
+void DatabaseTabWidget::showRemoteSettings()
+{
+    currentDatabaseWidget()->switchToRemoteSettings();
+}
+
 bool DatabaseTabWidget::isModified(int index) const
 {
     if (count() == 0) {
@@ -777,7 +858,7 @@ void DatabaseTabWidget::handleDatabaseUnlockDialogFinished(bool accepted, Databa
 {
     // change the active tab to the database that was just unlocked in the dialog
     auto intent = m_databaseOpenDialog->intent();
-    if (accepted && intent != DatabaseOpenDialog::Intent::Merge) {
+    if (accepted && intent != DatabaseOpenDialog::Intent::Merge && intent != DatabaseOpenDialog::Intent::RemoteSync) {
         int index = indexOf(dbWidget);
         if (index != -1) {
             setCurrentIndex(index);
@@ -893,4 +974,9 @@ void DatabaseTabWidget::performBrowserUnlock()
     if (dbWidget && dbWidget->isLocked()) {
         unlockAnyDatabaseInDialog(DatabaseOpenDialog::Intent::Browser);
     }
+}
+
+void DatabaseTabWidget::setCreateRemoteProcessFunc(std::function<RemoteProcess*()> createRemoteProcessFunc)
+{
+    m_createRemoteProcess = std::move(createRemoteProcessFunc);
 }

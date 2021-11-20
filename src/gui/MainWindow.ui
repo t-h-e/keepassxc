@@ -263,6 +263,7 @@
     <addaction name="actionDatabaseSecurity"/>
     <addaction name="separator"/>
     <addaction name="actionDatabaseMerge"/>
+    <addaction name="actionRemoteDatabaseSync"/>
     <addaction name="menuImport"/>
     <addaction name="menuExport"/>
     <addaction name="separator"/>
@@ -615,6 +616,20 @@
    </property>
    <property name="toolTip">
     <string>Database settings</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionRemoteDatabaseSync">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Remote Sync…</string>
+   </property>
+   <property name="toolTip">
+    <string>Remote sync</string>
    </property>
    <property name="menuRole">
     <enum>QAction::NoRole</enum>
