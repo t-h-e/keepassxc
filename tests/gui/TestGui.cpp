@@ -55,6 +55,7 @@
 #include "gui/group/GroupView.h"
 #include "gui/wizard/NewDatabaseWizard.h"
 #include "keys/FileKey.h"
+#include "gui/tag/TagsEdit.h"
 
 #define TEST_MODAL_NO_WAIT(TEST_CODE)                                                                                  \
     bool dialogFinished = false;                                                                                       \
@@ -447,6 +448,19 @@ void TestGui::testEditEntry()
     QCOMPARE(entry->historyItems().size(), ++editCount);
     QVERIFY(entry->excludeFromReports());
 
+    // Test tags
+    auto * tags = editEntryWidget->findChild<TagsEdit *>("tagsList");
+    QTest::keyClicks(tags, "_tag1");
+    QTest::keyClick(tags, Qt::Key_Space);
+    QCOMPARE(tags->tags().last(), QString("_tag1"));
+    QTest::keyClick(tags, Qt::Key_Space);
+    QTest::keyClicks(tags, "_tag2"); // adds another tag
+    QCOMPARE(tags->tags().last(), QString("_tag2"));
+    QTest::keyClick(tags, Qt::Key_Backspace); // Back into editing last tag
+    QTest::keyClicks(tags, "gers");
+    QTest::keyClick(tags, Qt::Key_Space);
+    QCOMPARE(tags->tags().last(), QString("_taggers"));
+
     // Test entry colors (simulate choosing a color)
     editEntryWidget->setCurrentPage(1);
     auto fgColor = QString("#FF0000");
@@ -561,6 +575,7 @@ void TestGui::testSearchEditEntry()
     // Check the path in header is "parent-group > entry"
     QCOMPARE(m_dbWidget->findChild<EditEntryWidget*>("editEntryWidget")->findChild<QLabel*>("headerLabel")->text(),
              QStringLiteral("Good \u2022 Doggy \u2022 Edit entry"));
+
 }
 
 void TestGui::testAddEntry()
@@ -872,6 +887,16 @@ void TestGui::testSearch()
     QTRY_VERIFY(m_dbWidget->isSearchActive());
     QTRY_COMPARE(entryView->model()->rowCount(), 0);
     // Press the search clear button
+    searchTextEdit->clear();
+    QTRY_VERIFY(searchTextEdit->text().isEmpty());
+    QTRY_VERIFY(searchTextEdit->hasFocus());
+
+    // Test tag search
+    searchTextEdit->clear();
+    QTest::keyClicks(searchTextEdit, "tag: testTag");
+    QTRY_VERIFY(m_dbWidget->isSearchActive());
+    QTRY_COMPARE(entryView->model()->rowCount(), 1);
+
     searchTextEdit->clear();
     QTRY_VERIFY(searchTextEdit->text().isEmpty());
     QTRY_VERIFY(searchTextEdit->hasFocus());
@@ -1736,6 +1761,8 @@ void TestGui::addCannedEntries()
     // Add entry "test" and confirm added
     QTest::mouseClick(entryNewWidget, Qt::LeftButton);
     QTest::keyClicks(titleEdit, "test");
+    auto* editEntryWidgetTagsEdit = editEntryWidget->findChild<TagsEdit*>("tagsList");
+    editEntryWidgetTagsEdit->tags(QStringList() << "testTag");
     auto* editEntryWidgetButtonBox = editEntryWidget->findChild<QDialogButtonBox*>("buttonBox");
     QTest::mouseClick(editEntryWidgetButtonBox->button(QDialogButtonBox::Ok), Qt::LeftButton);
 
