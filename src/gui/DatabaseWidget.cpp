@@ -21,7 +21,6 @@
 #include <QApplication>
 #include <QBoxLayout>
 #include <QCheckBox>
-#include <QDebug>
 #include <QDesktopServices>
 #include <QHostInfo>
 #include <QKeyEvent>
@@ -50,7 +49,7 @@
 #include "gui/entry/EntryView.h"
 #include "gui/group/EditGroupWidget.h"
 #include "gui/group/GroupView.h"
-#include "gui/remote/RemoteMergeSettingsDialog.h"
+#include "gui/remote/RemoteSettingsDialog.h"
 #include "gui/reports/ReportsDialog.h"
 #include "keeshare/KeeShare.h"
 
@@ -78,7 +77,7 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     , m_historyEditEntryWidget(new EditEntryWidget(this))
     , m_reportsDialog(new ReportsDialog(this))
     , m_databaseSettingDialog(new DatabaseSettingsDialog(this))
-    , m_remoteMergeSettingDialog(new RemoteMergeSettingsDialog(this))
+    , m_remoteMergeSettingDialog(new RemoteSettingsDialog(this))
     , m_databaseOpenWidget(new DatabaseOpenWidget(this))
     , m_keepass1OpenWidget(new KeePass1OpenWidget(this))
     , m_opVaultOpenWidget(new OpVaultOpenWidget(this))
@@ -196,7 +195,7 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     connect(m_reportsDialog, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
     connect(m_databaseSettingDialog, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
     connect(m_remoteMergeSettingDialog, SIGNAL(cancel(bool)), SLOT(switchToMainView(bool)));
-    connect(m_remoteMergeSettingDialog, SIGNAL(mergeWithRemote(RemoteProgramParams*)), SLOT(mergeWithRemoteAndSwitchToMainView(RemoteProgramParams*)));
+    connect(m_remoteMergeSettingDialog, SIGNAL(syncWithRemote(RemoteProgramParams*)), SLOT(syncWithRemoteAndSwitchToMainView(RemoteProgramParams*)));
     connect(m_databaseOpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
     connect(m_keepass1OpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
     connect(m_opVaultOpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
@@ -973,9 +972,9 @@ int DatabaseWidget::addChildWidget(QWidget* w)
     return index;
 }
 
-void DatabaseWidget::mergeWithRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams) {
+void DatabaseWidget::syncWithRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams) {
     switchToMainView(true);
-    emit mergeWithRemote(remoteProgramParams);
+    emit syncWithRemote(remoteProgramParams);
 }
 
 void DatabaseWidget::switchToMainView(bool previousDialogAccepted)
@@ -1137,7 +1136,7 @@ void DatabaseWidget::mergeDatabase(bool accepted)
     emit databaseMerged(m_db);
 }
 
-void DatabaseWidget::mergeRemoteDatabase(bool accepted)
+void DatabaseWidget::syncDatabase(bool accepted)
 {
     if (accepted) {
         if (!m_db) {
@@ -1163,20 +1162,18 @@ void DatabaseWidget::mergeRemoteDatabase(bool accepted)
         QStringList changeList = mergerToRemote.merge() + mergerFromRemote.merge();
 
         if (!changeList.isEmpty()) {
-
             showMessage(tr("Successfully merged the database files."), MessageWidget::Information);
 
+            // Save synced database
             QString error;
             srcDb->save(Database::Atomic, {}, &error);
-            qDebug() << error;
-            qDebug() << "Successfully merged the database files.";
         } else {
             showMessage(tr("Database was not modified by merge operation."), MessageWidget::Information);
         }
     }
 
     switchToMainView();
-    emit databaseMergedRemote(m_db);
+    emit databaseSynced(m_db);
 }
 
 /**
@@ -1198,8 +1195,8 @@ void DatabaseWidget::unlockDatabase(bool accepted)
     if (senderDialog) {
         if (senderDialog->intent() == DatabaseOpenDialog::Intent::Merge) {
             mergeDatabase(accepted);
-        } else if (senderDialog->intent() == DatabaseOpenDialog::Intent::MergeRemote) {
-            mergeRemoteDatabase(accepted);
+        } else if (senderDialog->intent() == DatabaseOpenDialog::Intent::RemoteSync) {
+            syncDatabase(accepted);
         }
         return;
     }

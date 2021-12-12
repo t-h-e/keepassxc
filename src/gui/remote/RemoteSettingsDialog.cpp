@@ -1,6 +1,5 @@
 /*
- *  Copyright (C) 2018 KeePassXC Team <team@keepassxc.org>
- *  Copyright (C) 2012 Felix Geyer <debfx@fobos.de>
+ *  Copyright (C) 2021 KeePassXC Team <team@keepassxc.org>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,29 +15,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "RemoteMergeSettingsDialog.h"
-#include "ui_RemoteMergeSettingsDialog.h"
+#include "RemoteSettingsDialog.h"
+#include "ui_RemoteSettingsDialog.h"
 
-#include "RemoteMergeSettingsWidgetScp.h"
+#include "RemoteSettingsWidgetScp.h"
 
 #include "core/Database.h"
 #include "core/Global.h"
 #include "gui/Icons.h"
 
 #include <QScrollArea>
-#include <QDebug>
 
-RemoteMergeSettingsDialog::RemoteMergeSettingsDialog(QWidget* parent)
+RemoteSettingsDialog::RemoteSettingsDialog(QWidget* parent)
     : DialogyWidget(parent)
-    , m_ui(new Ui::RemoteMergeSettingsDialog())
-    , m_remoteScpWidget(new RemoteMergeSettingsWidgetScp(this))
+    , m_ui(new Ui::RemoteSettingsDialog())
+    , m_remoteScpWidget(new RemoteSettingsWidgetScp(this))
 {
     m_ui->setupUi(this);
 
     connect(m_ui->buttonBox, SIGNAL(accepted()), SLOT(save()));
     connect(m_ui->buttonBox, SIGNAL(rejected()), SLOT(reject()));
 
-    m_ui->categoryList->addCategory(tr("scp"), icons()->icon("database-merge"));
+    m_ui->categoryList->addCategory(tr("scp"), icons()->icon("web"));
     m_ui->stackedWidget->addWidget(m_remoteScpWidget);
 
     auto* scrollArea = new QScrollArea(parent);
@@ -55,11 +53,11 @@ RemoteMergeSettingsDialog::RemoteMergeSettingsDialog(QWidget* parent)
     pageChanged();
 }
 
-RemoteMergeSettingsDialog::~RemoteMergeSettingsDialog()
+RemoteSettingsDialog::~RemoteSettingsDialog()
 {
 }
 
-void RemoteMergeSettingsDialog::load(const QSharedPointer<Database>& db)
+void RemoteSettingsDialog::load(const QSharedPointer<Database>& db)
 {
     m_ui->categoryList->setCurrentCategory(0);
     m_remoteScpWidget->load(db);
@@ -67,7 +65,7 @@ void RemoteMergeSettingsDialog::load(const QSharedPointer<Database>& db)
     m_db = db;
 }
 
-void RemoteMergeSettingsDialog::addSettingsPage(IRemoteMergeSettingsPage* page)
+void RemoteSettingsDialog::addSettingsPage(IRemoteSettingsPage* page)
 {
     const int category = m_ui->categoryList->currentCategory();
     QWidget* widget = page->createWidget();
@@ -77,16 +75,16 @@ void RemoteMergeSettingsDialog::addSettingsPage(IRemoteMergeSettingsPage* page)
     m_ui->categoryList->setCurrentCategory(category);
 }
 
-void RemoteMergeSettingsDialog::save()
+void RemoteSettingsDialog::save()
 {
-    emit mergeWithRemote(m_remoteScpWidget->getRemoteProgramParams());
+    emit syncWithRemote(m_remoteScpWidget->getRemoteProgramParams());
 }
 
-void RemoteMergeSettingsDialog::reject()
+void RemoteSettingsDialog::reject()
 {
     emit cancel(false);
 }
 
-void RemoteMergeSettingsDialog::pageChanged()
+void RemoteSettingsDialog::pageChanged()
 {
 }

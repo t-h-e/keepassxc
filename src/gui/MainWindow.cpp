@@ -384,7 +384,7 @@ MainWindow::MainWindow()
     m_ui->actionLockAllDatabases->setIcon(icons()->icon("database-lock-all"));
     m_ui->actionQuit->setIcon(icons()->icon("application-exit"));
     m_ui->actionDatabaseMerge->setIcon(icons()->icon("database-merge"));
-    m_ui->actionRemoteDatabaseMerge->setIcon(icons()->icon("database-merge"));
+    m_ui->actionRemoteDatabaseSync->setIcon(icons()->icon("web"));
     m_ui->menuImport->setIcon(icons()->icon("document-import"));
     m_ui->menuExport->setIcon(icons()->icon("document-export"));
 
@@ -465,7 +465,7 @@ MainWindow::MainWindow()
     connect(m_ui->actionDatabaseSaveBackup, SIGNAL(triggered()), m_ui->tabWidget, SLOT(saveDatabaseBackup()));
     connect(m_ui->actionDatabaseClose, SIGNAL(triggered()), m_ui->tabWidget, SLOT(closeCurrentDatabaseTab()));
     connect(m_ui->actionDatabaseMerge, SIGNAL(triggered()), m_ui->tabWidget, SLOT(mergeDatabase()));
-    connect(m_ui->actionRemoteDatabaseMerge, SIGNAL(triggered()), m_ui->tabWidget, SLOT(showRemoteMergeSettings()));
+    connect(m_ui->actionRemoteDatabaseSync, SIGNAL(triggered()), m_ui->tabWidget, SLOT(showRemoteMergeSettings()));
     connect(m_ui->actionDatabaseSecurity, SIGNAL(triggered()), m_ui->tabWidget, SLOT(showDatabaseSecurity()));
     connect(m_ui->actionReports, SIGNAL(triggered()), m_ui->tabWidget, SLOT(showDatabaseReports()));
     connect(m_ui->actionDatabaseSettings, SIGNAL(triggered()), m_ui->tabWidget, SLOT(showDatabaseSettings()));
@@ -794,7 +794,7 @@ void MainWindow::setMenuActionState(DatabaseWidget::Mode mode)
     bool inDatabaseTabWidgetOrWelcomeWidget = inDatabaseTabWidget || inWelcomeWidget;
 
     m_ui->actionDatabaseMerge->setEnabled(inDatabaseTabWidget);
-    m_ui->actionRemoteDatabaseMerge->setEnabled(inDatabaseTabWidget);
+    m_ui->actionRemoteDatabaseSync->setEnabled(inDatabaseTabWidget);
     m_ui->actionDatabaseNew->setEnabled(inDatabaseTabWidgetOrWelcomeWidget);
     m_ui->actionDatabaseOpen->setEnabled(inDatabaseTabWidgetOrWelcomeWidget);
     m_ui->menuRecentDatabases->setEnabled(inDatabaseTabWidgetOrWelcomeWidget);
@@ -888,7 +888,7 @@ void MainWindow::setMenuActionState(DatabaseWidget::Mode mode)
             m_ui->actionExportCsv->setEnabled(true);
             m_ui->actionExportHtml->setEnabled(true);
             m_ui->actionDatabaseMerge->setEnabled(m_ui->tabWidget->currentIndex() != -1);
-            m_ui->actionRemoteDatabaseMerge->setEnabled(m_ui->tabWidget->currentIndex() != -1);
+            m_ui->actionRemoteDatabaseSync->setEnabled(m_ui->tabWidget->currentIndex() != -1);
 #ifdef WITH_XC_SSHAGENT
             bool singleEntryHasSshKey =
                 singleEntrySelected && sshAgent()->isEnabled() && dbWidget->currentEntryHasSshKey();
@@ -945,7 +945,7 @@ void MainWindow::setMenuActionState(DatabaseWidget::Mode mode)
             m_ui->actionExportCsv->setEnabled(false);
             m_ui->actionExportHtml->setEnabled(false);
             m_ui->actionDatabaseMerge->setEnabled(false);
-            m_ui->actionRemoteDatabaseMerge->setEnabled(false);
+            m_ui->actionRemoteDatabaseSync->setEnabled(false);
             // Only disable the action in the database menu so that the
             // menu remains active in the toolbar, if necessary
             m_ui->actionLockDatabase->setEnabled(false);
@@ -979,7 +979,7 @@ void MainWindow::setMenuActionState(DatabaseWidget::Mode mode)
         m_ui->actionExportCsv->setEnabled(false);
         m_ui->actionExportHtml->setEnabled(false);
         m_ui->actionDatabaseMerge->setEnabled(false);
-        m_ui->actionRemoteDatabaseMerge->setEnabled(false);
+        m_ui->actionRemoteDatabaseSync->setEnabled(false);
 
         m_searchWidgetAction->setEnabled(false);
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RemoteMergeSettingsDialog</class>
- <widget class="QWidget" name="RemoteMergeSettingsDialog">
+ <class>RemoteSettingsDialog</class>
+ <widget class="QWidget" name="RemoteSettingsDialog">
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">

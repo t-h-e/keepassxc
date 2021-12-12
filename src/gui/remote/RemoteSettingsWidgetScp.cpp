@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018 KeePassXC Team <team@keepassxc.org>
+ *  Copyright (C) 2021 KeePassXC Team <team@keepassxc.org>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -15,46 +15,44 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "RemoteMergeSettingsWidgetScp.h"
-#include "ui_RemoteMergeSettingsWidgetScp.h"
+#include "RemoteSettingsWidgetScp.h"
+#include "ui_RemoteSettingsWidgetScp.h"
 
-#include "core/Group.h"
-#include "core/Metadata.h"
 #include "ScpParams.h"
-#include <QDebug>
 
-RemoteMergeSettingsWidgetScp::RemoteMergeSettingsWidgetScp(QWidget* parent)
-    : DatabaseSettingsWidget(parent)
-    , m_ui(new Ui::RemoteMergeSettingsWidgetScp())
+RemoteSettingsWidgetScp::RemoteSettingsWidgetScp(QWidget* parent)
+    : RemoteSettingsWidget(parent)
+    , m_ui(new Ui::RemoteSettingsWidgetScp())
 {
     m_ui->setupUi(this);
 }
 
-RemoteMergeSettingsWidgetScp::~RemoteMergeSettingsWidgetScp()
+RemoteSettingsWidgetScp::~RemoteSettingsWidgetScp()
 {
 }
 
-void RemoteMergeSettingsWidgetScp::initialize()
+void RemoteSettingsWidgetScp::initialize()
+{
+    // Not used. Left to load SCP settings from Database in the future
+}
+
+void RemoteSettingsWidgetScp::uninitialize()
 {
 }
 
-void RemoteMergeSettingsWidgetScp::uninitialize()
-{
-}
-
-void RemoteMergeSettingsWidgetScp::showEvent(QShowEvent* event)
+void RemoteSettingsWidgetScp::showEvent(QShowEvent* event)
 {
     QWidget::showEvent(event);
     m_ui->url->setFocus();
 }
 
-bool RemoteMergeSettingsWidgetScp::save()
+bool RemoteSettingsWidgetScp::save()
 {
-    qDebug() << m_ui->url->text() << "Do not get here";
+    // Not used. Left for future to persist SCP settings in database.
     return true;
 }
 
-RemoteProgramParams* RemoteMergeSettingsWidgetScp::getRemoteProgramParams()
+RemoteProgramParams* RemoteSettingsWidgetScp::getRemoteProgramParams()
 {
     auto* scpParams = new ScpParams(m_ui->url->text());
     scpParams->setPort(m_ui->port->text());

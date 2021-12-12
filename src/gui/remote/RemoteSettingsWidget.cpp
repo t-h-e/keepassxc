@@ -15,19 +15,31 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KEEPASSXC_REMOTEPROGRAMPARAMS_H
-#define KEEPASSXC_REMOTEPROGRAMPARAMS_H
+#include "RemoteSettingsWidget.h"
+#include "core/Database.h"
 
-#include <QString>
+RemoteSettingsWidget::RemoteSettingsWidget(QWidget* parent)
+    : SettingsWidget(parent)
+{
+}
 
-class RemoteProgramParams {
-public:
-    virtual ~RemoteProgramParams() = default;
+RemoteSettingsWidget::~RemoteSettingsWidget()
+{
+}
 
-    virtual QString getProgram() const = 0;
-    virtual QString getUrl() = 0;
-    virtual QStringList getArgumentsForDownload(QString destination) = 0;
-    virtual QStringList getArgumentsForUpload(QString source) = 0;
-};
+/**
+ * Load the database to be configured by this page and initialize the page.
+ * The page will NOT take ownership of the database.
+ *
+ * @param db database object to be configured
+ */
+void RemoteSettingsWidget::load(QSharedPointer<Database> db)
+{
+    m_db = std::move(db);
+    initialize();
+}
 
-#endif // KEEPASSXC_REMOTEPROGRAMPARAMS_H
+const QSharedPointer<Database> RemoteSettingsWidget::getDatabase() const
+{
+    return m_db;
+}

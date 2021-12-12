@@ -37,7 +37,7 @@ public:
     explicit DatabaseTabWidget(QWidget* parent = nullptr);
     ~DatabaseTabWidget() override;
     void mergeDatabase(const QString& filePath);
-    void mergeRemoteDatabase(const QString& filePath);
+    void remoteSyncDatabase(const QString& filePath);
 
     QString tabName(int index);
     DatabaseWidget* currentDatabaseWidget();
@@ -65,8 +65,8 @@ public slots:
     DatabaseWidget* newDatabase();
     void openDatabase();
     void mergeDatabase();
-    void mergeDatabaseRemote(RemoteProgramParams* RemoteProgramParams);
-    void handleMergedDatabaseRemote(const QSharedPointer<Database>&);
+    void syncDatabaseWithRemote(RemoteProgramParams* RemoteProgramParams);
+    void handleSyncedDatabaseRemote(const QSharedPointer<Database>&);
     void importCsv();
     void importKeePass1Database();
     void importOpVaultDatabase();
