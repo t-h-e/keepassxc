@@ -15,8 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KEEPASSX_REMOTEMERGESETTINGSWIDGET_H
-#define KEEPASSX_REMOTEMERGESETTINGSWIDGET_H
+#ifndef KEEPASSX_REMOTESETTINGSWIDGET_H
+#define KEEPASSX_REMOTESETTINGSWIDGET_H
 
 #include "RemoteProgramParams.h"
 #include "config-keepassx.h"
@@ -25,17 +25,17 @@
 #include <QPointer>
 
 class Database;
-class RemoteMergeSettingsWidgetScp;
+class RemoteSettingsWidgetScp;
 
 namespace Ui
 {
-    class RemoteMergeSettingsDialog;
+    class RemoteSettingsDialog;
 }
 
-class IRemoteMergeSettingsPage
+class IRemoteSettingsPage
 {
 public:
-    virtual ~IRemoteMergeSettingsPage() = default;
+    virtual ~IRemoteSettingsPage() = default;
     virtual QString name() = 0;
     virtual QIcon icon() = 0;
     virtual QWidget* createWidget() = 0;
@@ -43,21 +43,21 @@ public:
     virtual void saveSettings(QWidget* widget) = 0;
 };
 
-class RemoteMergeSettingsDialog : public DialogyWidget
+class RemoteSettingsDialog : public DialogyWidget
 {
     Q_OBJECT
 
 public:
-    explicit RemoteMergeSettingsDialog(QWidget* parent = nullptr);
-    ~RemoteMergeSettingsDialog() override;
-    Q_DISABLE_COPY(RemoteMergeSettingsDialog);
+    explicit RemoteSettingsDialog(QWidget* parent = nullptr);
+    ~RemoteSettingsDialog() override;
+    Q_DISABLE_COPY(RemoteSettingsDialog);
 
     void load(const QSharedPointer<Database>& db);
-    void addSettingsPage(IRemoteMergeSettingsPage* page);
+    void addSettingsPage(IRemoteSettingsPage* page);
 
 signals:
     void cancel(bool accepted);
-    void mergeWithRemote(RemoteProgramParams* remoteProgramParams);
+    void syncWithRemote(RemoteProgramParams* remoteProgramParams);
 
 private slots:
     void save();
@@ -66,8 +66,8 @@ private slots:
 
 private:
     QSharedPointer<Database> m_db;
-    const QScopedPointer<Ui::RemoteMergeSettingsDialog> m_ui;
-    QPointer<RemoteMergeSettingsWidgetScp> m_remoteScpWidget;
+    const QScopedPointer<Ui::RemoteSettingsDialog> m_ui;
+    QPointer<RemoteSettingsWidgetScp> m_remoteScpWidget;
 };
 
-#endif // KEEPASSX_REMOTEMERGESETTINGSWIDGET_H
+#endif // KEEPASSX_REMOTESETTINGSWIDGET_H

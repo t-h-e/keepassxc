@@ -39,7 +39,7 @@ public:
         None,
         AutoType,
         Merge,
-        MergeRemote,
+        RemoteSync,
         Browser
     };
 

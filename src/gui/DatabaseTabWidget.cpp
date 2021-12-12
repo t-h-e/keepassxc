@@ -17,7 +17,6 @@
 
 #include "DatabaseTabWidget.h"
 
-#include <QDebug>
 #include <QFileInfo>
 #include <QProcess>
 #include <QTemporaryDir>
@@ -243,8 +242,8 @@ void DatabaseTabWidget::addDatabaseTab(DatabaseWidget* dbWidget, bool inBackgrou
     connect(dbWidget, SIGNAL(databaseUnlocked()), SLOT(emitDatabaseLockChanged()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(updateTabName()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(emitDatabaseLockChanged()));
-    connect(dbWidget, SIGNAL(databaseMergedRemote(QSharedPointer<Database>)), SLOT(handleMergedDatabaseRemote(QSharedPointer<Database>)));
-    connect(dbWidget, SIGNAL(mergeWithRemote(RemoteProgramParams*)), SLOT(mergeDatabaseRemote(RemoteProgramParams*)));
+    connect(dbWidget, SIGNAL(databaseSynced(QSharedPointer<Database>)), SLOT(handleSyncedDatabaseRemote(QSharedPointer<Database>)));
+    connect(dbWidget, SIGNAL(syncWithRemote(RemoteProgramParams*)), SLOT(syncDatabaseWithRemote(RemoteProgramParams*)));
 }
 
 void DatabaseTabWidget::importCsv()
@@ -281,17 +280,22 @@ void DatabaseTabWidget::mergeDatabase()
     }
 }
 
-void DatabaseTabWidget::mergeDatabaseRemote(RemoteProgramParams* remoteProgramParams)
+void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgramParams)
 {
+    if (remoteProgramParams->getUrl().isEmpty()) {
+        currentDatabaseWidget()->showErrorMessage(tr("No URL set. Cannot sync database."));
+        return;
+    }
+
     QString tempPath = QDir::tempPath();
     m_remoteProgramParams = remoteProgramParams;
-    QString destination = tempPath + "/RemoteDatabase.kdbx";
+    QString destination = tempPath + "/RemoteDatabase" + QUuid::createUuid().toString() + ".kdbx";
     auto* remoteProcess = new QProcess(this);
     remoteProcess->start(remoteProgramParams->getProgram(), remoteProgramParams->getArgumentsForDownload(destination));
     bool finished = remoteProcess->waitForFinished(10000);
     int statusCode = remoteProcess->exitCode();
     if (finished && statusCode == 0) {
-        mergeRemoteDatabase(destination);
+        remoteSyncDatabase(destination);
     } else {
         QStringList command;
         command << remoteProgramParams->getProgram() << remoteProgramParams->getArgumentsForDownload(destination);
@@ -305,15 +309,15 @@ void DatabaseTabWidget::mergeDatabaseRemote(RemoteProgramParams* remoteProgramPa
     }
 }
 
-void DatabaseTabWidget::handleMergedDatabaseRemote(const QSharedPointer<Database>& remoteMergedDb)
+void DatabaseTabWidget::handleSyncedDatabaseRemote(const QSharedPointer<Database>& remoteSyncedDb)
 {
     auto* remoteProcess = new QProcess(this);
-    remoteProcess->start(m_remoteProgramParams->getProgram(), m_remoteProgramParams->getArgumentsForUpload(remoteMergedDb->filePath()));
+    remoteProcess->start(m_remoteProgramParams->getProgram(), m_remoteProgramParams->getArgumentsForUpload(remoteSyncedDb->filePath()));
     bool finished = remoteProcess->waitForFinished(10000);
     int statusCode = remoteProcess->exitCode();
     if (!finished || statusCode != 0) {
         QStringList command;
-        command << m_remoteProgramParams->getProgram() << m_remoteProgramParams->getArgumentsForUpload(remoteMergedDb->filePath());
+        command << m_remoteProgramParams->getProgram() << m_remoteProgramParams->getArgumentsForUpload(remoteSyncedDb->filePath());
         if (finished) {
             currentDatabaseWidget()->showErrorMessage(
                 tr("Failed to upload merged database. %1 with command `%2` exited with status code: %3").arg(m_remoteProgramParams->getProgram()).arg(command.join(" ")).arg(statusCode));
@@ -331,9 +335,9 @@ void DatabaseTabWidget::mergeDatabase(const QString& filePath)
     unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::Merge, filePath);
 }
 
-void DatabaseTabWidget::mergeRemoteDatabase(const QString& filePath)
+void DatabaseTabWidget::remoteSyncDatabase(const QString& filePath)
 {
-    unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::MergeRemote, filePath);
+    unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::RemoteSync, filePath);
 }
 
 void DatabaseTabWidget::importKeePass1Database()
@@ -802,7 +806,7 @@ void DatabaseTabWidget::handleDatabaseUnlockDialogFinished(bool accepted, Databa
 {
     // change the active tab to the database that was just unlocked in the dialog
     auto intent = m_databaseOpenDialog->intent();
-    if (accepted && intent != DatabaseOpenDialog::Intent::Merge && intent != DatabaseOpenDialog::Intent::MergeRemote) {
+    if (accepted && intent != DatabaseOpenDialog::Intent::Merge && intent != DatabaseOpenDialog::Intent::RemoteSync) {
         int index = indexOf(dbWidget);
         if (index != -1) {
             setCurrentIndex(index);

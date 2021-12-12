@@ -15,27 +15,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KEEPASSXC_REMOTEMERGESETTINGSWIDGETSCP_H
-#define KEEPASSXC_REMOTEMERGESETTINGSWIDGETSCP_H
+#ifndef KEEPASSXC_REMOTESETTINGSWIDGETSCP_H
+#define KEEPASSXC_REMOTESETTINGSWIDGETSCP_H
 
-#include "../dbsettings/DatabaseSettingsWidget.h"
+#include "RemoteSettingsWidget.h"
 #include "RemoteProgramParams.h"
 
 class Database;
 
 namespace Ui
 {
-    class RemoteMergeSettingsWidgetScp;
+    class RemoteSettingsWidgetScp;
 }
 
-class RemoteMergeSettingsWidgetScp : public DatabaseSettingsWidget
+class RemoteSettingsWidgetScp : public RemoteSettingsWidget
 {
     Q_OBJECT
 
 public:
-    explicit RemoteMergeSettingsWidgetScp(QWidget* parent = nullptr);
-    Q_DISABLE_COPY(RemoteMergeSettingsWidgetScp);
-    ~RemoteMergeSettingsWidgetScp() override;
+    explicit RemoteSettingsWidgetScp(QWidget* parent = nullptr);
+    Q_DISABLE_COPY(RemoteSettingsWidgetScp);
+    ~RemoteSettingsWidgetScp() override;
 
     inline bool hasAdvancedMode() const override
     {
@@ -51,7 +51,7 @@ public slots:
 protected:
     void showEvent(QShowEvent* event) override;
 
-    const QScopedPointer<Ui::RemoteMergeSettingsWidgetScp> m_ui;
+    const QScopedPointer<Ui::RemoteSettingsWidgetScp> m_ui;
 };
 
-#endif // KEEPASSXC_REMOTEMERGESETTINGSWIDGETSCP_H
+#endif // KEEPASSXC_REMOTESETTINGSWIDGETSCP_H
