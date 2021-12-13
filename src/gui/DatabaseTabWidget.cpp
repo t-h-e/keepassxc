@@ -242,7 +242,9 @@ void DatabaseTabWidget::addDatabaseTab(DatabaseWidget* dbWidget, bool inBackgrou
     connect(dbWidget, SIGNAL(databaseUnlocked()), SLOT(emitDatabaseLockChanged()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(updateTabName()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(emitDatabaseLockChanged()));
-    connect(dbWidget, SIGNAL(databaseSynced(QSharedPointer<Database>)), SLOT(handleSyncedDatabaseRemote(QSharedPointer<Database>)));
+    connect(dbWidget,
+            SIGNAL(databaseSynced(QSharedPointer<Database>)),
+            SLOT(handleSyncedDatabaseRemote(QSharedPointer<Database>)));
     connect(dbWidget, SIGNAL(syncWithRemote(RemoteProgramParams*)), SLOT(syncDatabaseWithRemote(RemoteProgramParams*)));
 }
 
@@ -300,11 +302,16 @@ void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgra
         QStringList command;
         command << remoteProgramParams->getProgram() << remoteProgramParams->getArgumentsForDownload(destination);
         if (finished) {
-            currentDatabaseWidget()->showErrorMessage(
-                tr("%1 with command `%2` exited with status code: %3").arg(remoteProgramParams->getProgram()).arg(command.join(" ")).arg(statusCode));
+            currentDatabaseWidget()->showErrorMessage(tr("%1 with command `%2` exited with status code: %3")
+                                                          .arg(remoteProgramParams->getProgram())
+                                                          .arg(command.join(" "))
+                                                          .arg(statusCode));
         } else {
             remoteProcess->kill();
-            currentDatabaseWidget()->showErrorMessage(tr("%1 with command `%2` did not finish in time. Process was killed.").arg(remoteProgramParams->getProgram()).arg(command.join(" ")));
+            currentDatabaseWidget()->showErrorMessage(
+                tr("%1 with command `%2` did not finish in time. Process was killed.")
+                    .arg(remoteProgramParams->getProgram())
+                    .arg(command.join(" ")));
         }
     }
 }
@@ -312,19 +319,27 @@ void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgra
 void DatabaseTabWidget::handleSyncedDatabaseRemote(const QSharedPointer<Database>& remoteSyncedDb)
 {
     auto* remoteProcess = new QProcess(this);
-    remoteProcess->start(m_remoteProgramParams->getProgram(), m_remoteProgramParams->getArgumentsForUpload(remoteSyncedDb->filePath()));
+    remoteProcess->start(m_remoteProgramParams->getProgram(),
+                         m_remoteProgramParams->getArgumentsForUpload(remoteSyncedDb->filePath()));
     bool finished = remoteProcess->waitForFinished(10000);
     int statusCode = remoteProcess->exitCode();
     if (!finished || statusCode != 0) {
         QStringList command;
-        command << m_remoteProgramParams->getProgram() << m_remoteProgramParams->getArgumentsForUpload(remoteSyncedDb->filePath());
+        command << m_remoteProgramParams->getProgram()
+                << m_remoteProgramParams->getArgumentsForUpload(remoteSyncedDb->filePath());
         if (finished) {
             currentDatabaseWidget()->showErrorMessage(
-                tr("Failed to upload merged database. %1 with command `%2` exited with status code: %3").arg(m_remoteProgramParams->getProgram()).arg(command.join(" ")).arg(statusCode));
+                tr("Failed to upload merged database. %1 with command `%2` exited with status code: %3")
+                    .arg(m_remoteProgramParams->getProgram())
+                    .arg(command.join(" "))
+                    .arg(statusCode));
         } else {
             remoteProcess->kill();
             currentDatabaseWidget()->showErrorMessage(
-                tr("Failed to upload merged database. %1 with command `%2` did not finish in time. Process was killed.").arg(m_remoteProgramParams->getProgram()).arg(command.join(" ")).arg(statusCode));
+                tr("Failed to upload merged database. %1 with command `%2` did not finish in time. Process was killed.")
+                    .arg(m_remoteProgramParams->getProgram())
+                    .arg(command.join(" "))
+                    .arg(statusCode));
         }
     }
     m_remoteProgramParams = nullptr;
@@ -573,9 +588,9 @@ void DatabaseTabWidget::showDatabaseSettings()
     currentDatabaseWidget()->switchToDatabaseSettings();
 }
 
-void DatabaseTabWidget::showRemoteMergeSettings()
+void DatabaseTabWidget::showRemoteSettings()
 {
-    currentDatabaseWidget()->switchToRemoteMergeSettings();
+    currentDatabaseWidget()->switchToRemoteSettings();
 }
 
 bool DatabaseTabWidget::isReadOnly(int index) const

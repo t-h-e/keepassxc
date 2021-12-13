@@ -19,9 +19,9 @@
 #ifndef KEEPASSX_DATABASEWIDGET_H
 #define KEEPASSX_DATABASEWIDGET_H
 
+#include "DatabaseOpenDialog.h"
 #include <QFileSystemWatcher>
 #include <QStackedWidget>
-#include "DatabaseOpenDialog.h"
 
 #include "config-keepassx.h"
 #include "gui/MessageWidget.h"
@@ -211,7 +211,7 @@ public slots:
     void switchToDatabaseSecurity();
     void switchToDatabaseReports();
     void switchToDatabaseSettings();
-    void switchToRemoteMergeSettings();
+    void switchToRemoteSettings();
     void switchToOpenDatabase();
     void switchToOpenDatabase(const QString& filePath);
     void switchToOpenDatabase(const QString& filePath, const QString& password, const QString& keyFile);
@@ -285,7 +285,7 @@ private:
     QPointer<EditEntryWidget> m_historyEditEntryWidget;
     QPointer<ReportsDialog> m_reportsDialog;
     QPointer<DatabaseSettingsDialog> m_databaseSettingDialog;
-    QPointer<RemoteSettingsDialog> m_remoteMergeSettingDialog;
+    QPointer<RemoteSettingsDialog> m_remoteSettingDialog;
     QPointer<DatabaseOpenWidget> m_databaseOpenWidget;
     QPointer<KeePass1OpenWidget> m_keepass1OpenWidget;
     QPointer<OpVaultOpenWidget> m_opVaultOpenWidget;

@@ -2233,6 +2233,26 @@ This is definitely a bug, please report it to the developers.</translation>
         <source>Open OPVault</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>No URL set. Cannot sync database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 with command `%2` exited with status code: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 with command `%2` did not finish in time. Process was killed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to upload merged database. %1 with command `%2` exited with status code: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to upload merged database. %1 with command `%2` did not finish in time. Process was killed.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DatabaseWidget</name>
@@ -5351,6 +5371,14 @@ We recommend you use the AppImage available on our downloads page.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>&amp;Remote Sync…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote sync</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Lock Database</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7768,6 +7796,44 @@ Please consider generating a new key file.</source>
     <message>
         <source>Internal zlib error: </source>
         <translation>Internal zlib error: </translation>
+    </message>
+</context>
+<context>
+    <name>RemoteSettingsDialog</name>
+    <message>
+        <source>scp</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RemoteSettingsWidgetScp</name>
+    <message>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation type="unfinished">URL:</translation>
+    </message>
+    <message>
+        <source>URL field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Key file:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Key File field</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

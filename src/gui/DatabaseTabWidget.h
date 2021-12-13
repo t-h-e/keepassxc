@@ -85,7 +85,7 @@ public slots:
     void showDatabaseSecurity();
     void showDatabaseReports();
     void showDatabaseSettings();
-    void showRemoteMergeSettings();
+    void showRemoteSettings();
     void performGlobalAutoType(const QString& search);
     void performBrowserUnlock();
 

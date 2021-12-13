@@ -20,7 +20,8 @@
 
 #include <QString>
 
-class RemoteProgramParams {
+class RemoteProgramParams
+{
 public:
     virtual ~RemoteProgramParams() = default;
 
