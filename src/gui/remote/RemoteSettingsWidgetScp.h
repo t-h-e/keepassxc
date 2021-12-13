@@ -18,8 +18,8 @@
 #ifndef KEEPASSXC_REMOTESETTINGSWIDGETSCP_H
 #define KEEPASSXC_REMOTESETTINGSWIDGETSCP_H
 
-#include "RemoteSettingsWidget.h"
 #include "RemoteProgramParams.h"
+#include "RemoteSettingsWidget.h"
 
 class Database;
 

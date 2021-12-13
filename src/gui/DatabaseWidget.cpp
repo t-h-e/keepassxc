@@ -77,7 +77,7 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     , m_historyEditEntryWidget(new EditEntryWidget(this))
     , m_reportsDialog(new ReportsDialog(this))
     , m_databaseSettingDialog(new DatabaseSettingsDialog(this))
-    , m_remoteMergeSettingDialog(new RemoteSettingsDialog(this))
+    , m_remoteSettingDialog(new RemoteSettingsDialog(this))
     , m_databaseOpenWidget(new DatabaseOpenWidget(this))
     , m_keepass1OpenWidget(new KeePass1OpenWidget(this))
     , m_opVaultOpenWidget(new OpVaultOpenWidget(this))
@@ -151,7 +151,7 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     m_csvImportWizard->setObjectName("csvImportWizard");
     m_reportsDialog->setObjectName("reportsDialog");
     m_databaseSettingDialog->setObjectName("databaseSettingsDialog");
-    m_remoteMergeSettingDialog->setObjectName("remoteMergeSettingsDialog");
+    m_remoteSettingDialog->setObjectName("remoteSettingsDialog");
     m_databaseOpenWidget->setObjectName("databaseOpenWidget");
     m_keepass1OpenWidget->setObjectName("keepass1OpenWidget");
     m_opVaultOpenWidget->setObjectName("opVaultOpenWidget");
@@ -161,7 +161,7 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     addChildWidget(m_editGroupWidget);
     addChildWidget(m_reportsDialog);
     addChildWidget(m_databaseSettingDialog);
-    addChildWidget(m_remoteMergeSettingDialog);
+    addChildWidget(m_remoteSettingDialog);
     addChildWidget(m_historyEditEntryWidget);
     addChildWidget(m_databaseOpenWidget);
     addChildWidget(m_csvImportWizard);
@@ -194,8 +194,8 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     connect(m_editGroupWidget, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
     connect(m_reportsDialog, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
     connect(m_databaseSettingDialog, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
-    connect(m_remoteMergeSettingDialog, SIGNAL(cancel(bool)), SLOT(switchToMainView(bool)));
-    connect(m_remoteMergeSettingDialog, SIGNAL(syncWithRemote(RemoteProgramParams*)), SLOT(syncWithRemoteAndSwitchToMainView(RemoteProgramParams*)));
+    connect(m_remoteSettingDialog, SIGNAL(cancel(bool)), SLOT(switchToMainView(bool)));
+    connect(m_remoteSettingDialog, SIGNAL(syncWithRemote(RemoteProgramParams*)), SLOT(syncWithRemoteAndSwitchToMainView(RemoteProgramParams*)));
     connect(m_databaseOpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
     connect(m_keepass1OpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
     connect(m_opVaultOpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
@@ -972,7 +972,8 @@ int DatabaseWidget::addChildWidget(QWidget* w)
     return index;
 }
 
-void DatabaseWidget::syncWithRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams) {
+void DatabaseWidget::syncWithRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams)
+{
     switchToMainView(true);
     emit syncWithRemote(remoteProgramParams);
 }
@@ -1302,10 +1303,10 @@ void DatabaseWidget::switchToDatabaseSettings()
     setCurrentWidget(m_databaseSettingDialog);
 }
 
-void DatabaseWidget::switchToRemoteMergeSettings()
+void DatabaseWidget::switchToRemoteSettings()
 {
-    m_remoteMergeSettingDialog->load(m_db);
-    setCurrentWidget(m_remoteMergeSettingDialog);
+    m_remoteSettingDialog->load(m_db);
+    setCurrentWidget(m_remoteSettingDialog);
 }
 
 void DatabaseWidget::switchToOpenDatabase()
