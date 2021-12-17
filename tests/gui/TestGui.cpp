@@ -333,6 +333,60 @@ void TestGui::testMergeDatabase()
     QCOMPARE(m_db->rootGroup()->findChildByName("General")->entries().size(), 1);
 }
 
+void TestGui::testRemoteSyncDatabase()
+{
+    // It is safe to ignore the warning this line produces
+    QSignalSpy dbSyncSpy(m_dbWidget.data(), SIGNAL(databaseSynced(QSharedPointer<Database>)));
+    QApplication::processEvents();
+
+    triggerAction("actionRemoteDatabaseSync");
+
+    // set URL to merge from
+    auto* remoteSettingsDialog = m_dbWidget->findChild<QWidget*>("remoteSettingsDialog");
+    auto* urlEdit = remoteSettingsDialog->findChild<QLineEdit*>("url");
+    QVERIFY(urlEdit != nullptr);
+    urlEdit->setText("pi@saudose:MergeDatabase.kdbx");
+    QTest::keyClick(urlEdit, Qt::Key_Enter);
+
+    QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("editPassword"));
+    auto* editPasswordMerge = QApplication::focusWidget();
+    QVERIFY(editPasswordMerge->isVisible());
+
+    QTest::keyClicks(editPasswordMerge, "a");
+    QTest::keyClick(editPasswordMerge, Qt::Key_Enter);
+
+    QTRY_COMPARE(dbSyncSpy.count(), 1);
+    QTRY_VERIFY(m_tabWidget->tabText(m_tabWidget->currentIndex()).contains("*"));
+
+    m_db = m_tabWidget->currentDatabaseWidget()->database();
+
+    // there are seven child groups of the root group
+    QCOMPARE(m_db->rootGroup()->children().size(), 7);
+    // the merged group should contain an entry
+    QCOMPARE(m_db->rootGroup()->children().at(6)->entries().size(), 1);
+    // the General group contains one entry merged from the other db
+    QCOMPARE(m_db->rootGroup()->findChildByName("General")->entries().size(), 1);
+}
+
+//void TestGui::testDatabaseSettings()
+//{
+//    m_db->metadata()->setName("testDatabaseSettings");
+//    triggerAction("actionDatabaseSettings");
+//    auto* dbSettingsDialog = m_dbWidget->findChild<QWidget*>("databaseSettingsDialog");
+//    auto* transformRoundsSpinBox = dbSettingsDialog->findChild<QSpinBox*>("transformRoundsSpinBox");
+//    auto advancedToggle = dbSettingsDialog->findChild<QCheckBox*>("advancedSettingsToggle");
+//
+//    advancedToggle->setChecked(true);
+//    QApplication::processEvents();
+//
+//    QVERIFY(transformRoundsSpinBox != nullptr);
+//    transformRoundsSpinBox->setValue(123456);
+//    QTest::keyClick(transformRoundsSpinBox, Qt::Key_Enter);
+//    QTRY_COMPARE(m_db->kdf()->rounds(), 123456);
+//
+//    checkSaveDatabase();
+//}
+
 void TestGui::testAutoreloadDatabase()
 {
     config()->set(Config::AutoReloadOnChange, false);
