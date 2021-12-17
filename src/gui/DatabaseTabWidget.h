@@ -20,6 +20,7 @@
 
 #include "DatabaseOpenDialog.h"
 #include "gui/MessageWidget.h"
+#include "gui/remote/RemoteProcess.h"
 #include "gui/remote/RemoteProgramParams.h"
 
 #include <QTabWidget>
@@ -47,6 +48,8 @@ public:
     bool canSave(int index = -1) const;
     bool isModified(int index = -1) const;
     bool hasLockableDatabases() const;
+
+    void setCreateRemoteProcessFunc(std::function<RemoteProcess*()> createRemoteProcessFunc); // used for testing only
 
 public slots:
     void lockAndSwitchToFirstUnlockedDatabase(int index = -1);
@@ -120,6 +123,7 @@ private:
     QPointer<DatabaseOpenDialog> m_databaseOpenDialog;
 
     RemoteProgramParams* m_remoteProgramParams;
+    std::function<RemoteProcess*()> m_createRemoteProcess;
 };
 
 #endif // KEEPASSX_DATABASETABWIDGET_H

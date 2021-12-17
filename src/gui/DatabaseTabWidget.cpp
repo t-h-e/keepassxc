@@ -20,6 +20,7 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QTemporaryDir>
+#include <utility>
 
 #include "autotype/AutoType.h"
 #include "core/Tools.h"
@@ -48,6 +49,7 @@ DatabaseTabWidget::DatabaseTabWidget(QWidget* parent)
     auto* tabBar = new DragTabBar(this);
     setTabBar(tabBar);
     setDocumentMode(true);
+    setCreateRemoteProcessFunc([this]() { return new RemoteProcess(this); });
 
     // clang-format off
     connect(this, SIGNAL(tabCloseRequested(int)), SLOT(closeDatabaseTab(int)));
@@ -289,10 +291,9 @@ void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgra
         return;
     }
 
-    QString tempPath = QDir::tempPath();
+    auto* remoteProcess = m_createRemoteProcess();
+    QString destination = remoteProcess->getTempFileLocation();
     m_remoteProgramParams = remoteProgramParams;
-    QString destination = tempPath + "/RemoteDatabase" + QUuid::createUuid().toString() + ".kdbx";
-    auto* remoteProcess = new QProcess(this);
     remoteProcess->start(remoteProgramParams->getProgram(), remoteProgramParams->getArgumentsForDownload(destination));
     bool finished = remoteProcess->waitForFinished(10000);
     int statusCode = remoteProcess->exitCode();
@@ -318,7 +319,7 @@ void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgra
 
 void DatabaseTabWidget::handleSyncedDatabaseRemote(const QSharedPointer<Database>& remoteSyncedDb)
 {
-    auto* remoteProcess = new QProcess(this);
+    auto* remoteProcess = m_createRemoteProcess();
     remoteProcess->start(m_remoteProgramParams->getProgram(),
                          m_remoteProgramParams->getArgumentsForUpload(remoteSyncedDb->filePath()));
     bool finished = remoteProcess->waitForFinished(10000);
@@ -925,4 +926,9 @@ void DatabaseTabWidget::performBrowserUnlock()
     if (dbWidget && dbWidget->isLocked()) {
         unlockAnyDatabaseInDialog(DatabaseOpenDialog::Intent::Browser);
     }
+}
+
+void DatabaseTabWidget::setCreateRemoteProcessFunc(std::function<RemoteProcess*()> createRemoteProcessFunc)
+{
+    m_createRemoteProcess = std::move(createRemoteProcessFunc);
 }
