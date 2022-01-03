@@ -1196,10 +1196,11 @@ void DatabaseWidget::unlockDatabase(bool accepted)
     if (senderDialog) {
         if (senderDialog->intent() == DatabaseOpenDialog::Intent::Merge) {
             mergeDatabase(accepted);
+            return;
         } else if (senderDialog->intent() == DatabaseOpenDialog::Intent::RemoteSync) {
             syncDatabase(accepted);
+            return;
         }
-        return;
     }
 
     QSharedPointer<Database> db;
