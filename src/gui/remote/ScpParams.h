@@ -31,12 +31,12 @@ public:
         return "scp";
     }
 
-    void setPort(QString port);
-    void setKeyFile(QString keyFile);
+    void setPort(const QString& port);
+    void setKeyFile(const QString& keyFile);
 
     QString getUrl() override;
-    QStringList getArgumentsForDownload(QString destination) override;
-    QStringList getArgumentsForUpload(QString source) override;
+    QStringList getArgumentsForDownload(const QString& destination) override;
+    QStringList getArgumentsForUpload(const QString& source) override;
 
 private:
     QStringList getOptions();

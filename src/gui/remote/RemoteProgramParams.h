@@ -27,8 +27,8 @@ public:
 
     virtual QString getProgram() const = 0;
     virtual QString getUrl() = 0;
-    virtual QStringList getArgumentsForDownload(QString destination) = 0;
-    virtual QStringList getArgumentsForUpload(QString source) = 0;
+    virtual QStringList getArgumentsForDownload(const QString& destination) = 0;
+    virtual QStringList getArgumentsForUpload(const QString& source) = 0;
 };
 
 #endif // KEEPASSXC_REMOTEPROGRAMPARAMS_H

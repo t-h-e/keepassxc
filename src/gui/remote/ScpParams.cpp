@@ -25,14 +25,14 @@ ScpParams::ScpParams(QString url)
 {
 }
 
-void ScpParams::setPort(QString port)
+void ScpParams::setPort(const QString& port)
 {
-    m_port = std::move(port);
+    m_port = port;
 }
 
-void ScpParams::setKeyFile(QString keyFile)
+void ScpParams::setKeyFile(const QString& keyFile)
 {
-    m_keyFile = std::move(keyFile);
+    m_keyFile = keyFile;
 }
 
 QString ScpParams::getUrl()
@@ -40,14 +40,14 @@ QString ScpParams::getUrl()
     return m_url;
 }
 
-QStringList ScpParams::getArgumentsForDownload(QString destination)
+QStringList ScpParams::getArgumentsForDownload(const QString& destination)
 {
     QStringList argumentsForDownload;
     argumentsForDownload << getOptions() << m_url << destination;
     return argumentsForDownload;
 }
 
-QStringList ScpParams::getArgumentsForUpload(QString source)
+QStringList ScpParams::getArgumentsForUpload(const QString& source)
 {
     QStringList argumentsForUpload;
     argumentsForUpload << getOptions() << source << m_url;
