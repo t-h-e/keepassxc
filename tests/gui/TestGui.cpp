@@ -119,25 +119,7 @@ void TestGui::init()
     m_mainWindow->activateWindow();
     QApplication::processEvents();
 
-    fileDialog()->setNextFileName(m_dbFilePath);
-    triggerAction("actionDatabaseOpen");
-
-    QApplication::processEvents();
-
-    m_dbWidget = m_tabWidget->currentDatabaseWidget();
-    auto* databaseOpenWidget = m_tabWidget->currentDatabaseWidget()->findChild<QWidget*>("databaseOpenWidget");
-    QVERIFY(databaseOpenWidget);
-    auto* editPassword = databaseOpenWidget->findChild<QLineEdit*>("editPassword");
-    QVERIFY(editPassword);
-    editPassword->setFocus();
-
-    QTest::keyClicks(editPassword, "a");
-    QTest::keyClick(editPassword, Qt::Key_Enter);
-
-    QTRY_VERIFY(!m_dbWidget->isLocked());
-    m_db = m_dbWidget->database();
-
-    QApplication::processEvents();
+    openDatabase(m_dbFilePath);
 }
 
 // Every test ends with closing the temp database without saving
@@ -337,8 +319,12 @@ void TestGui::testMergeDatabase()
 void TestGui::testRemoteSyncDatabase()
 {
     QString sourceToMerge = "user@server:Database.kdbx";
-    m_tabWidget->setCreateRemoteProcessFunc([this, sourceToMerge]() {
-        return new MockRemoteProcess(this, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), sourceToMerge);
+    TemporaryFile tmpSyncFile;
+    QVERIFY(tmpSyncFile.copyFromFile(QString(KEEPASSX_TEST_DATA_DIR).append("/MergeDatabase.kdbx")));
+    QString syncDatabaseFilename = tmpSyncFile.fileName();
+
+    m_tabWidget->setCreateRemoteProcessFunc([this, syncDatabaseFilename, sourceToMerge]() {
+        return new MockRemoteProcess(this, syncDatabaseFilename, sourceToMerge);
     });
 
     // It is safe to ignore the warning this line produces
@@ -372,6 +358,19 @@ void TestGui::testRemoteSyncDatabase()
     QCOMPARE(m_db->rootGroup()->children().at(6)->entries().size(), 1);
     // the General group contains one entry merged from the other db
     QCOMPARE(m_db->rootGroup()->findChildByName("General")->entries().size(), 1);
+
+    checkSaveDatabase(); // save original database to avoid modified dialog when opening another database
+
+    // open remote synced database
+    openDatabase(syncDatabaseFilename);
+
+    // check that remote database contains entries from local one
+    QCOMPARE(m_db->rootGroup()->findChildByName("Homebanking")->children().size(), 1);
+    QCOMPARE(m_db->rootGroup()->findChildByName("Homebanking")->children().at(0)->entries().size(), 1);
+
+//    // Reset the state
+//    cleanup();
+//    init();
 }
 
 void TestGui::testAutoreloadDatabase()
@@ -1864,4 +1863,27 @@ void TestGui::clickIndex(const QModelIndex& index,
                          Qt::KeyboardModifiers stateKey)
 {
     QTest::mouseClick(view->viewport(), button, stateKey, view->visualRect(index).center());
+}
+
+void TestGui::openDatabase(const QString& filePath)
+{
+    fileDialog()->setNextFileName(filePath);
+    triggerAction("actionDatabaseOpen");
+
+    QApplication::processEvents();
+
+    m_dbWidget = m_tabWidget->currentDatabaseWidget();
+    auto* databaseOpenWidget = m_tabWidget->currentDatabaseWidget()->findChild<QWidget*>("databaseOpenWidget");
+    QVERIFY(databaseOpenWidget);
+    auto* editPassword = databaseOpenWidget->findChild<QLineEdit*>("editPassword");
+    QVERIFY(editPassword);
+    editPassword->setFocus();
+
+    QTest::keyClicks(editPassword, "a");
+    QTest::keyClick(editPassword, Qt::Key_Enter);
+
+    QTRY_VERIFY(!m_dbWidget->isLocked());
+    m_db = m_dbWidget->database();
+
+    QApplication::processEvents();
 }

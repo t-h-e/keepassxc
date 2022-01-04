@@ -84,6 +84,7 @@ private:
                     Qt::MouseButton button,
                     Qt::KeyboardModifiers stateKey = 0);
     void checkSaveDatabase();
+    void openDatabase(const QString& filePath);
 
     QScopedPointer<MainWindow> m_mainWindow;
     QPointer<DatabaseTabWidget> m_tabWidget;
