@@ -194,8 +194,7 @@ set(keepassx_SOURCES
         streams/qtiocompressor.cpp
         streams/StoreDataStream.cpp
         streams/SymmetricCipherStream.cpp
-        totp/totp.cpp
-        command/SyncCommand.cpp)
+        totp/totp.cpp)
 if(APPLE)
     set(keepassx_SOURCES
             ${keepassx_SOURCES}

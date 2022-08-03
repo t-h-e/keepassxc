@@ -51,6 +51,8 @@ public slots:
     };
 
 private slots:
+    void syncSave();
+    void syncLoad();
 
 private:
 

@@ -24,11 +24,15 @@
 #include "gui/Icons.h"
 #include "gui/MessageBox.h"
 
+#include <QDebug>
+
 DatabaseSettingsWidgetSyncCommand::DatabaseSettingsWidgetSyncCommand(QWidget* parent)
     : DatabaseSettingsWidget(parent)
     , m_ui(new Ui::DatabaseSettingsWidgetSyncCommand())
 {
     m_ui->setupUi(this);
+    connect(m_ui->pushButton_13, SIGNAL(clicked()), this, SLOT(syncLoad()));
+    connect(m_ui->pushButton_15, SIGNAL(clicked()), this, SLOT(syncSave()));
 }
 
 DatabaseSettingsWidgetSyncCommand::~DatabaseSettingsWidgetSyncCommand()
@@ -37,4 +41,21 @@ DatabaseSettingsWidgetSyncCommand::~DatabaseSettingsWidgetSyncCommand()
 
 void DatabaseSettingsWidgetSyncCommand::initialize()
 {
+}
+
+void DatabaseSettingsWidgetSyncCommand::syncLoad()
+{
+    // TODO: maybe a command text field is needed after all. Otherwise, a complicated regex is needed if spaces are within the command
+    qDebug() << "here load";
+
+    qDebug() << m_ui->plainTextEdit_90->toPlainText();
+    qDebug() << m_ui->plainTextEdit_11->toPlainText();
+}
+
+void DatabaseSettingsWidgetSyncCommand::syncSave()
+{
+    qDebug() << "here save";
+
+    qDebug() << m_ui->plainTextEdit_91->toPlainText();
+    qDebug() << m_ui->plainTextEdit_13->toPlainText();
 }

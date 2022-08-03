@@ -1128,16 +1128,8 @@ QString Entry::resolveDateTimePlaceholder(Entry::PlaceholderType placeholderType
 
 QString Entry::resolveReferencePlaceholderRecursive(const QString& placeholder, int maxDepth) const
 {
-    Q_ASSERT(m_group);
-    Q_ASSERT(m_group->database());
-
-    return resolveReferencePlaceholderRecursive(placeholder, maxDepth, m_group->database());
-}
-
-QString Entry::resolveReferencePlaceholderRecursive(const QString& placeholder, int maxDepth, Database* database)
-{
     if (maxDepth <= 0) {
-        qWarning("Maximum depth of replacement has been reached.");
+        qWarning("Maximum depth of replacement has been reached. Entry uuid: %s", uuid().toString().toLatin1().data());
         return placeholder;
     }
 
@@ -1155,7 +1147,9 @@ QString Entry::resolveReferencePlaceholderRecursive(const QString& placeholder, 
 
     const EntryReferenceType searchInType = Entry::referenceType(searchIn);
 
-    const Entry* refEntry = database->rootGroup()->findEntryBySearchTerm(searchText, searchInType);
+    Q_ASSERT(m_group);
+    Q_ASSERT(m_group->database());
+    const Entry* refEntry = m_group->database()->rootGroup()->findEntryBySearchTerm(searchText, searchInType);
 
     if (refEntry) {
         const QString wantedField = match.captured(EntryAttributes::WantedFieldGroupName);

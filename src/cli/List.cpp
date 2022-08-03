@@ -41,8 +41,6 @@ List::List()
         {QString("group"), QObject::tr("Path of the group to list. Default is /"), QString("[group]")});
 }
 
-#include "command/SyncCommand.h"
-#include <QDebug>
 int List::executeWithDatabase(QSharedPointer<Database> database, QSharedPointer<QCommandLineParser> parser)
 {
     auto& out = Utils::STDOUT;
@@ -55,17 +53,6 @@ int List::executeWithDatabase(QSharedPointer<Database> database, QSharedPointer<
     // No group provided, defaulting to root group.
     if (args.size() == 1) {
         out << database->rootGroup()->print(recursive, flatten) << flush;
-
-        SyncCommand cmd;
-        cmd.fromTemplate("cat", "some '{REF:P@I:674F59DC12DB41749F89D7E9CA7C8CA2}' some", &(*database));
-        cmd.start();
-
-        cmd.waitForFinished(10000);
-        qDebug() << "error:" << cmd.errorString();
-
-        qDebug() << "stdout:" << cmd.outString();
-        qDebug() << "stderr: " << cmd.errString();
-
         return EXIT_SUCCESS;
     }
 
@@ -77,6 +64,5 @@ int List::executeWithDatabase(QSharedPointer<Database> database, QSharedPointer<
     }
 
     out << group->print(recursive, flatten) << flush;
-
     return EXIT_SUCCESS;
 }
