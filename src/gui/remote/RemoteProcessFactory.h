@@ -15,35 +15,20 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KEEPASSXC_SCPPARAMS_H
-#define KEEPASSXC_SCPPARAMS_H
+#ifndef KEEPASSXC_REMOTEPROCESSFACTORY_H
+#define KEEPASSXC_REMOTEPROCESSFACTORY_H
 
-#include "RemoteProgramParams.h"
-#include <QStringList>
+#include "gui/remote/RemoteProcess.h"
 
-class ScpParams : public RemoteProgramParams
+class RemoteProcessFactory
 {
 public:
-    explicit ScpParams(QString url);
-
-    void setPort(QString port);
-    void setKeyFile(QString keyFile);
-
-    bool allNecessaryParamsSet() override;
-    QString getCommandForDownload(QString destination) override;
-    QString getCommandForUpload(QString source) override;
+    static RemoteProcess* createRemoteProcess(QObject* parent);
+    // use only for testing
+    static void setCreateRemoteProcessFunc(std::function<RemoteProcess*(QObject*)> createRemoteProcessFunc);
 
 private:
-    QString getProgram()
-    {
-        return "scp";
-    }
-
-    QStringList getOptions();
-
-    QString m_url;
-    QString m_port;
-    QString m_keyFile;
+    static std::function<RemoteProcess*(QObject*)> m_createRemoteProcess;
 };
 
-#endif // KEEPASSXC_SCPPARAMS_H
+#endif // KEEPASSXC_REMOTEPROCESSFACTORY_H

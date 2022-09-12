@@ -53,6 +53,7 @@
 #include "gui/group/EditGroupWidget.h"
 #include "gui/group/GroupModel.h"
 #include "gui/group/GroupView.h"
+#include "gui/remote/RemoteProcessFactory.h"
 #include "gui/tag/TagsEdit.h"
 #include "gui/wizard/NewDatabaseWizard.h"
 #include "keys/FileKey.h"
@@ -362,8 +363,8 @@ void TestGui::testMergeDatabase()
 void TestGui::testRemoteSyncDatabase()
 {
     QString sourceToMerge = "user@server:Database.kdbx";
-    m_tabWidget->setCreateRemoteProcessFunc([this, sourceToMerge]() {
-        return new MockRemoteProcess(this, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), sourceToMerge);
+    RemoteProcessFactory::setCreateRemoteProcessFunc([sourceToMerge](QObject* parent) {
+        return new MockRemoteProcess(parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), sourceToMerge);
     });
 
     // It is safe to ignore the warning this line produces
@@ -378,6 +379,7 @@ void TestGui::testRemoteSyncDatabase()
     QVERIFY(urlEdit != nullptr);
     urlEdit->setText(sourceToMerge);
     QTest::keyClick(urlEdit, Qt::Key_Enter);
+    QApplication::processEvents();
 
     QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
     auto* editPasswordSync = QApplication::focusWidget();
