@@ -27,9 +27,21 @@ MockRemoteProcess::MockRemoteProcess(QObject* parent, QString mockedTempFileLoca
 {
 }
 
-void MockRemoteProcess::start(const QString&, const QStringList& arguments)
+void MockRemoteProcess::start(const QString&)
 {
-    QVERIFY(arguments.contains(m_source));
+    // nothing to do
+}
+
+qint64 MockRemoteProcess::write(const QString& data) {
+    return data.length();
+}
+
+bool MockRemoteProcess::waitForBytesWritten() {
+    return true;
+}
+
+void MockRemoteProcess::closeWriteChannel() {
+    // nothing to do
 }
 
 bool MockRemoteProcess::waitForFinished(int)

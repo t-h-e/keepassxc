@@ -20,7 +20,7 @@
 
 #include "DatabaseOpenDialog.h"
 #include "gui/MessageWidget.h"
-#include "gui/remote/RemoteProcess.h"
+#include "gui/remote/RemoteHandler.h"
 #include "gui/remote/RemoteProgramParams.h"
 
 #include <QTabWidget>
@@ -39,7 +39,6 @@ public:
     explicit DatabaseTabWidget(QWidget* parent = nullptr);
     ~DatabaseTabWidget() override;
     void mergeDatabase(const QString& filePath);
-    void remoteSyncDatabase(const QString& filePath);
 
     QString tabName(int index);
     DatabaseWidget* currentDatabaseWidget();
@@ -48,8 +47,6 @@ public:
     bool canSave(int index = -1) const;
     bool isModified(int index = -1) const;
     bool hasLockableDatabases() const;
-
-    void setCreateRemoteProcessFunc(std::function<RemoteProcess*()> createRemoteProcessFunc); // used for testing only
 
 public slots:
     void lockAndSwitchToFirstUnlockedDatabase(int index = -1);
@@ -69,7 +66,8 @@ public slots:
     void openDatabase();
     void mergeDatabase();
     void syncDatabaseWithRemote(RemoteProgramParams* RemoteProgramParams);
-    void handleSyncedDatabaseRemote(const QSharedPointer<Database>&);
+    void remoteSyncDatabase(const QString& filePath);
+
     void importCsv();
     void importKeePass1Database();
     void importOpVaultDatabase();
@@ -124,9 +122,6 @@ private:
     QPointer<DatabaseWidget> m_dbWidgetPendingLock;
     QPointer<DatabaseOpenDialog> m_databaseOpenDialog;
     QTimer m_lockDelayTimer;
-
-    RemoteProgramParams* m_remoteProgramParams;
-    std::function<RemoteProcess*()> m_createRemoteProcess;
 };
 
 #endif // KEEPASSX_DATABASETABWIDGET_H

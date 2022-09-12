@@ -35,23 +35,23 @@ void ScpParams::setKeyFile(QString keyFile)
     m_keyFile = std::move(keyFile);
 }
 
-QString ScpParams::getUrl()
+bool ScpParams::allNecessaryParamsSet()
 {
-    return m_url;
+    return !m_url.isEmpty();
 }
 
-QStringList ScpParams::getArgumentsForDownload(QString destination)
+QString ScpParams::getCommandForDownload(QString destination)
 {
     QStringList argumentsForDownload;
-    argumentsForDownload << getOptions() << m_url << destination;
-    return argumentsForDownload;
+    argumentsForDownload << getProgram() << getOptions() << m_url << destination;
+    return argumentsForDownload.join(' ');
 }
 
-QStringList ScpParams::getArgumentsForUpload(QString source)
+QString ScpParams::getCommandForUpload(QString source)
 {
     QStringList argumentsForUpload;
-    argumentsForUpload << getOptions() << source << m_url;
-    return argumentsForUpload;
+    argumentsForUpload << getProgram() << getOptions() << source << m_url;
+    return argumentsForUpload.join(' ');
 }
 
 QStringList ScpParams::getOptions()
