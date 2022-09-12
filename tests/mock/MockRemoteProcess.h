@@ -26,9 +26,12 @@ public:
     explicit MockRemoteProcess(QObject* parent, QString mockedTempFileLocation, QString source);
     ~MockRemoteProcess() override = default;
 
-    void start(const QString& program, const QStringList& arguments) override;
+    void start(const QString& program) override;
+    qint64 write(const QString& data) override;
+    bool waitForBytesWritten() override;
+    void closeWriteChannel() override;
     bool waitForFinished(int msecs) override;
-    int exitCode() const override;
+    [[nodiscard]] int exitCode() const override;
 
     QString getTempFileLocation() override;
 

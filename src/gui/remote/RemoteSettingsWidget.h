@@ -19,6 +19,7 @@
 #define KEEPASSXC_REMOTESETTINGSWIDGET_H
 
 #include "gui/settings/SettingsWidget.h"
+#include "RemoteProgramParams.h"
 
 class Database;
 
@@ -37,6 +38,9 @@ public:
     virtual void load(QSharedPointer<Database> db);
 
     const QSharedPointer<Database> getDatabase() const;
+
+public slots:
+    virtual RemoteProgramParams* getRemoteProgramParams() = 0;
 
 signals:
     /**

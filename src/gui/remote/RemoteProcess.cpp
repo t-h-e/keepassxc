@@ -25,14 +25,30 @@ RemoteProcess::RemoteProcess(QObject* parent)
 {
 }
 
-void RemoteProcess::start(const QString& program, const QStringList& arguments)
+void RemoteProcess::start(const QString& program)
 {
-    m_process->start(program, arguments);
+    m_process->start(program);
 }
+
+qint64 RemoteProcess::write(const QString& data) {
+    return m_process->write(data.toUtf8());
+}
+
+bool RemoteProcess::waitForBytesWritten()
+{
+    return m_process->waitForBytesWritten();
+}
+
+void RemoteProcess::closeWriteChannel()
+{
+    m_process->closeWriteChannel();
+}
+
 bool RemoteProcess::waitForFinished(int msecs)
 {
     return m_process->waitForFinished(msecs);
 }
+
 int RemoteProcess::exitCode() const
 {
     return m_process->exitCode();

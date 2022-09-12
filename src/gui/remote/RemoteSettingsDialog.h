@@ -25,6 +25,7 @@
 #include <QPointer>
 
 class Database;
+class RemoteSettingsWidgetAnyCommand;
 class RemoteSettingsWidgetScp;
 
 namespace Ui
@@ -67,6 +68,7 @@ private slots:
 private:
     QSharedPointer<Database> m_db;
     const QScopedPointer<Ui::RemoteSettingsDialog> m_ui;
+    QPointer<RemoteSettingsWidgetAnyCommand> m_remoteAnyCommandWidget;
     QPointer<RemoteSettingsWidgetScp> m_remoteScpWidget;
 };
 
