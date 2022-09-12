@@ -18,6 +18,7 @@
 #include "RemoteSettingsDialog.h"
 #include "ui_RemoteSettingsDialog.h"
 
+#include "RemoteSettingsWidgetAnyCommand.h"
 #include "RemoteSettingsWidgetScp.h"
 
 #include "core/Database.h"
@@ -26,9 +27,12 @@
 
 #include <QScrollArea>
 
+#include <QDebug>
+
 RemoteSettingsDialog::RemoteSettingsDialog(QWidget* parent)
     : DialogyWidget(parent)
     , m_ui(new Ui::RemoteSettingsDialog())
+    , m_remoteAnyCommandWidget(new RemoteSettingsWidgetAnyCommand(this))
     , m_remoteScpWidget(new RemoteSettingsWidgetScp(this))
 {
     m_ui->setupUi(this);
@@ -37,7 +41,9 @@ RemoteSettingsDialog::RemoteSettingsDialog(QWidget* parent)
     connect(m_ui->buttonBox, SIGNAL(rejected()), SLOT(reject()));
 
     m_ui->categoryList->addCategory(tr("scp"), icons()->icon("web"));
+    m_ui->categoryList->addCategory(tr("anyCommand"), icons()->icon("web"));
     m_ui->stackedWidget->addWidget(m_remoteScpWidget);
+    m_ui->stackedWidget->addWidget(m_remoteAnyCommandWidget);
 
     auto* scrollArea = new QScrollArea(parent);
     scrollArea->setFrameShape(QFrame::NoFrame);
@@ -61,6 +67,7 @@ void RemoteSettingsDialog::load(const QSharedPointer<Database>& db)
 {
     m_ui->categoryList->setCurrentCategory(0);
     m_remoteScpWidget->load(db);
+    m_remoteAnyCommandWidget->load(db);
 
     m_db = db;
 }
@@ -77,7 +84,16 @@ void RemoteSettingsDialog::addSettingsPage(IRemoteSettingsPage* page)
 
 void RemoteSettingsDialog::save()
 {
-    emit syncWithRemote(m_remoteScpWidget->getRemoteProgramParams());
+    // TODO: use some kind of differentiation
+    if (m_ui->categoryList->currentCategory() == 1) {
+        qDebug() << "this is one";
+    } else if (m_ui->categoryList->currentCategory() == 0) {
+        qDebug() << "this is zero";
+    } else {
+        qDebug() << "this is one: " << m_ui->categoryList->currentCategory();
+    }
+    emit syncWithRemote(m_remoteAnyCommandWidget->getRemoteProgramParams());
+//    emit syncWithRemote(m_remoteScpWidget->getRemoteProgramParams());
 }
 
 void RemoteSettingsDialog::reject()

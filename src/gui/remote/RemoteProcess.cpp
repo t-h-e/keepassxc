@@ -25,9 +25,30 @@ RemoteProcess::RemoteProcess(QObject* parent)
 {
 }
 
+void RemoteProcess::start(const QString& program)
+{
+    m_process->start(program);
+}
+void RemoteProcess::startAsCommand(const QString& /*program*/, const QStringList& /*arguments*/)
+{
+    // TODO: program and arguments need to be combined
+    // TODO: cool that works :)
+    m_process->start("/home/the/git/keepassxc_testing/test_remote.sh whatever there will be ha ha -i asdf");
+}
 void RemoteProcess::start(const QString& program, const QStringList& arguments)
 {
     m_process->start(program, arguments);
+}
+qint64 RemoteProcess::write(const QString& data) {
+    return m_process->write(data.toUtf8());
+}
+bool RemoteProcess::waitForBytesWritten()
+{
+    return m_process->waitForBytesWritten();
+}
+void RemoteProcess::closeWriteChannel()
+{
+    m_process->closeWriteChannel();
 }
 bool RemoteProcess::waitForFinished(int msecs)
 {

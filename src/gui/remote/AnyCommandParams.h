@@ -15,28 +15,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KEEPASSXC_SCPPARAMS_H
-#define KEEPASSXC_SCPPARAMS_H
+#ifndef KEEPASSXC_ANYCOMMANDPARAMS_H
+#define KEEPASSXC_ANYCOMMANDPARAMS_H
 
 #include "RemoteProgramParams.h"
 #include <QStringList>
 
-class ScpParams : public RemoteProgramParams
+class AnyCommandParams : public RemoteProgramParams
 {
 public:
-    explicit ScpParams(QString url);
+    explicit AnyCommandParams(QString url);
 
-    QString getProgram() override
-    {
-        return "scp";
-    }
+    QString getProgram() override;
 
     void setPort(QString port);
     void setKeyFile(QString keyFile);
 
-    bool allNecessaryParamsSet() override;
+    bool allNecessaryParamsSet() override
+    {
+        return true;
+    }
     QStringList getArgumentsForDownload(QString destination) override;
     QStringList getArgumentsForUpload(QString source) override;
+    QString getInputForDownload(QString destination) override;
+    QString getInputForUpload(QString source) override;
 
 private:
     QStringList getOptions();
@@ -46,4 +48,4 @@ private:
     QString m_keyFile;
 };
 
-#endif // KEEPASSXC_SCPPARAMS_H
+#endif // KEEPASSXC_ANYCOMMANDPARAMS_H

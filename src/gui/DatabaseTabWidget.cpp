@@ -292,17 +292,35 @@ void DatabaseTabWidget::mergeDatabase()
 
 void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgramParams)
 {
-    if (remoteProgramParams->getUrl().isEmpty()) {
-        currentDatabaseWidget()->showErrorMessage(tr("No URL set. Cannot sync database."));
+    if (!remoteProgramParams->allNecessaryParamsSet()) {
+        currentDatabaseWidget()->showErrorMessage(tr("Not all required parameters set. Cannot sync database."));
         return;
     }
 
     auto* remoteProcess = m_createRemoteProcess();
     QString destination = remoteProcess->getTempFileLocation();
     m_remoteProgramParams = remoteProgramParams;
-    remoteProcess->start(remoteProgramParams->getProgram(), remoteProgramParams->getArgumentsForDownload(destination));
+    auto downloadArguments = remoteProgramParams->getArgumentsForDownload(destination);
+    if (downloadArguments.isEmpty()) {
+        remoteProcess->start(remoteProgramParams->getProgram());
+    } else {
+        // TODO: does this work. needed as we cannot parse the arguments of anyCommand properly
+        remoteProcess->startAsCommand(remoteProgramParams->getProgram(),
+                             remoteProgramParams->getArgumentsForDownload(destination));
+
+//        remoteProcess->start(remoteProgramParams->getProgram(),
+//                             remoteProgramParams->getArgumentsForDownload(destination));
+    }
+    auto input = remoteProgramParams->getInputForDownload(destination);
+    if (!input.isEmpty()) {
+        remoteProcess->write(input + "\n");
+        remoteProcess->waitForBytesWritten();
+        remoteProcess->closeWriteChannel();
+    }
     bool finished = remoteProcess->waitForFinished(10000);
     int statusCode = remoteProcess->exitCode();
+    // TODO: remove next line
+    finished = false;
     if (finished && statusCode == 0) {
         remoteSyncDatabase(destination);
     } else {

@@ -26,9 +26,14 @@ public:
     explicit RemoteProcess(QObject* parent);
     virtual ~RemoteProcess() = default;
 
+    virtual void start(const QString& program);
+    virtual void startAsCommand(const QString& program, const QStringList& arguments);
     virtual void start(const QString& program, const QStringList& arguments);
+    virtual qint64 write(const QString& data);
+    virtual bool waitForBytesWritten();
+    virtual void closeWriteChannel();
     virtual bool waitForFinished(int msecs);
-    virtual int exitCode() const;
+    [[nodiscard]] virtual int exitCode() const;
 
     virtual QString getTempFileLocation();
 

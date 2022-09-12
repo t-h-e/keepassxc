@@ -15,46 +15,53 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScpParams.h"
+#include "AnyCommandParams.h"
 
 #include <utility>
 
-ScpParams::ScpParams(QString url)
+AnyCommandParams::AnyCommandParams(QString url)
     : RemoteProgramParams()
     , m_url(std::move(url))
 {
 }
 
-void ScpParams::setPort(QString port)
+QString AnyCommandParams::getProgram()
+{
+    return m_url;
+}
+
+void AnyCommandParams::setPort(QString port)
 {
     m_port = std::move(port);
 }
 
-void ScpParams::setKeyFile(QString keyFile)
+void AnyCommandParams::setKeyFile(QString keyFile)
 {
     m_keyFile = std::move(keyFile);
 }
 
-bool ScpParams::allNecessaryParamsSet()
-{
-    return !m_url.isEmpty();
-}
-
-QStringList ScpParams::getArgumentsForDownload(QString destination)
+QStringList AnyCommandParams::getArgumentsForDownload(QString destination)
 {
     QStringList argumentsForDownload;
-    argumentsForDownload << getOptions() << m_url << destination;
+    argumentsForDownload << m_keyFile << destination;
     return argumentsForDownload;
 }
 
-QStringList ScpParams::getArgumentsForUpload(QString source)
+QStringList AnyCommandParams::getArgumentsForUpload(QString source)
 {
     QStringList argumentsForUpload;
-    argumentsForUpload << getOptions() << source << m_url;
+    argumentsForUpload << source << m_keyFile;
     return argumentsForUpload;
 }
 
-QStringList ScpParams::getOptions()
+QString AnyCommandParams::getInputForDownload(QString) {
+    return m_keyFile;
+}
+QString AnyCommandParams::getInputForUpload(QString) {
+    return m_keyFile;
+}
+
+QStringList AnyCommandParams::getOptions()
 {
     QStringList options;
     if (!m_port.isEmpty()) {

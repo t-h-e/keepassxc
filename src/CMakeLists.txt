@@ -162,9 +162,11 @@ set(keepassx_SOURCES
         gui/dbsettings/DatabaseSettingsWidgetMetaDataSimple.cpp
         gui/dbsettings/DatabaseSettingsWidgetEncryption.cpp
         gui/dbsettings/DatabaseSettingsWidgetDatabaseKey.cpp
+        gui/remote/AnyCommandParams.cpp
         gui/remote/RemoteProcess.cpp
         gui/remote/RemoteSettingsDialog.cpp
         gui/remote/RemoteSettingsWidget.cpp
+        gui/remote/RemoteSettingsWidgetAnyCommand.cpp
         gui/remote/RemoteSettingsWidgetScp.cpp
         gui/remote/ScpParams.cpp
         gui/reports/ReportsWidget.cpp
