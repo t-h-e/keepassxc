@@ -53,6 +53,9 @@
         <property name="accessibleName">
          <string>URL field</string>
         </property>
+        <property name="placeholderText">
+         <string>[user@]hostname:DatabaseOnRemote.kdbx</string>
+        </property>
        </widget>
       </item>
       <item row="1" column="0">
@@ -66,6 +69,9 @@
        <widget class="QLineEdit" name="port">
         <property name="accessibleName">
          <string>Port field</string>
+        </property>
+        <property name="placeholderText">
+         <string>(default: 22)</string>
         </property>
        </widget>
       </item>
@@ -83,6 +89,9 @@
         </property>
         <property name="accessibleName">
          <string>Key File field</string>
+        </property>
+        <property name="placeholderText">
+         <string>(optional)</string>
         </property>
        </widget>
       </item>
