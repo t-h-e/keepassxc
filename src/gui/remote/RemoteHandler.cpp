@@ -1,19 +1,19 @@
 /*
-*  Copyright (C) 2022 KeePassXC Team <team@keepassxc.org>
-*
-*  This program is free software: you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation, either version 2 or (at your option)
-*  version 3 of the License.
-*
-*  This program is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ *  Copyright (C) 2022 KeePassXC Team <team@keepassxc.org>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 or (at your option)
+ *  version 3 of the License.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "RemoteHandler.h"
 #include "RemoteProcessFactory.h"
@@ -60,15 +60,11 @@ void RemoteHandler::download()
     }
 
     if (finished) {
-        emit downloadError(tr("Command `%1` exited with status code: %3")
-                               .arg(downloadCommand)
-                               .arg(statusCode));
+        emit downloadError(tr("Command `%1` exited with status code: %3").arg(downloadCommand).arg(statusCode));
     } else {
         remoteProcess->kill();
-        emit downloadError( tr("Command `%1` did not finish in time. Process was killed.")
-                                .arg(downloadCommand));
+        emit downloadError(tr("Command `%1` did not finish in time. Process was killed.").arg(downloadCommand));
     }
-
 }
 
 void RemoteHandler::upload(const QSharedPointer<Database>& remoteSyncedDb)
@@ -94,13 +90,14 @@ void RemoteHandler::upload(const QSharedPointer<Database>& remoteSyncedDb)
     }
 
     if (finished) {
-        emit uploadError( tr("Failed to upload merged database. Command `%1` exited with status code: %3")
+        emit uploadError(tr("Failed to upload merged database. Command `%1` exited with status code: %3")
                              .arg(uploadCommand)
                              .arg(statusCode));
     } else {
         remoteProcess->kill();
-        emit uploadError(tr("Failed to upload merged database. Command `%1` did not finish in time. Process was killed.")
-                             .arg(uploadCommand)
-                             .arg(statusCode));
+        emit uploadError(
+            tr("Failed to upload merged database. Command `%1` did not finish in time. Process was killed.")
+                .arg(uploadCommand)
+                .arg(statusCode));
     }
 }

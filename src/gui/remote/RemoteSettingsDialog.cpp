@@ -84,7 +84,8 @@ void RemoteSettingsDialog::addSettingsPage(IRemoteSettingsPage* page)
 
 void RemoteSettingsDialog::save()
 {
-    auto remoteProgramParams = dynamic_cast<RemoteSettingsWidget*>(m_ui->stackedWidget->currentWidget())->getRemoteProgramParams();
+    auto remoteProgramParams =
+        dynamic_cast<RemoteSettingsWidget*>(m_ui->stackedWidget->currentWidget())->getRemoteProgramParams();
     emit syncWithRemote(remoteProgramParams);
 }
 

@@ -30,7 +30,8 @@ void AnyCommandParams::setCommandForDownload(QString downloadCommand)
     m_downloadCommand = std::move(downloadCommand);
 }
 
-void AnyCommandParams::setInputForDownload(QString downloadCommandInput) {
+void AnyCommandParams::setInputForDownload(QString downloadCommandInput)
+{
     m_downloadCommandInput = std::move(downloadCommandInput);
 }
 
@@ -38,7 +39,8 @@ void AnyCommandParams::setCommandForUpload(QString uploadCommand)
 {
     m_uploadCommand = std::move(uploadCommand);
 }
-void AnyCommandParams::setInputForUpload(QString uploadCommandInput) {
+void AnyCommandParams::setInputForUpload(QString uploadCommandInput)
+{
     m_uploadCommandInput = std::move(uploadCommandInput);
 }
 
@@ -47,7 +49,8 @@ QString AnyCommandParams::getCommandForDownload(QString destination)
     return resolveCommandOrInput(m_downloadCommand, destination);
 }
 
-QString AnyCommandParams::getInputForDownload(QString destination) {
+QString AnyCommandParams::getInputForDownload(QString destination)
+{
     return resolveCommandOrInput(m_downloadCommandInput, destination);
 }
 
@@ -56,11 +59,13 @@ QString AnyCommandParams::getCommandForUpload(QString source)
     return resolveCommandOrInput(m_uploadCommand, source);
 }
 
-QString AnyCommandParams::getInputForUpload(QString source) {
+QString AnyCommandParams::getInputForUpload(QString source)
+{
     return resolveCommandOrInput(m_uploadCommandInput, source);
 }
 
-QString AnyCommandParams::resolveCommandOrInput(QString input, QString tempDatabasePath) {
+QString AnyCommandParams::resolveCommandOrInput(QString input, QString tempDatabasePath)
+{
     auto resolved = input.replace("{TEMP_DATABASE}", tempDatabasePath);
     // TODO: Question for the reviewer: currently `Entry::resolveReferencePlaceholderRecursive` is private,
     //  but the method does not rely on any field of `Entry`.

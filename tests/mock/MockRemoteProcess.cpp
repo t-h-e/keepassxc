@@ -32,15 +32,18 @@ void MockRemoteProcess::start(const QString&)
     // nothing to do
 }
 
-qint64 MockRemoteProcess::write(const QString& data) {
+qint64 MockRemoteProcess::write(const QString& data)
+{
     return data.length();
 }
 
-bool MockRemoteProcess::waitForBytesWritten() {
+bool MockRemoteProcess::waitForBytesWritten()
+{
     return true;
 }
 
-void MockRemoteProcess::closeWriteChannel() {
+void MockRemoteProcess::closeWriteChannel()
+{
     // nothing to do
 }
 

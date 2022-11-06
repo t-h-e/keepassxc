@@ -18,8 +18,8 @@
 #ifndef KEEPASSXC_REMOTESETTINGSWIDGET_H
 #define KEEPASSXC_REMOTESETTINGSWIDGET_H
 
-#include "gui/settings/SettingsWidget.h"
 #include "RemoteProgramParams.h"
+#include "gui/settings/SettingsWidget.h"
 
 class Database;
 

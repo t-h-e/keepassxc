@@ -30,7 +30,8 @@ void RemoteProcess::start(const QString& program)
     m_process->start(program);
 }
 
-qint64 RemoteProcess::write(const QString& data) {
+qint64 RemoteProcess::write(const QString& data)
+{
     return m_process->write(data.toUtf8());
 }
 
