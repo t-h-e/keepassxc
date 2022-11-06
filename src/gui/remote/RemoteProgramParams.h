@@ -29,10 +29,12 @@ public:
     virtual bool allNecessaryParamsSet() = 0;
     virtual QString getCommandForDownload(QString destination) = 0;
     virtual QString getCommandForUpload(QString source) = 0;
-    virtual QString getInputForDownload(QString /*destination*/) {
+    virtual QString getInputForDownload(QString /*destination*/)
+    {
         return "";
     };
-    virtual QString getInputForUpload(QString /*source*/) {
+    virtual QString getInputForUpload(QString /*source*/)
+    {
         return "";
     };
 };

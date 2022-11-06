@@ -2318,26 +2318,6 @@ This is definitely a bug, please report it to the developers.</source>
         <comment>Database tab name modifier</comment>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>No URL set. Cannot sync database.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 with command `%2` exited with status code: %3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 with command `%2` did not finish in time. Process was killed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to upload merged database. %1 with command `%2` exited with status code: %3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to upload merged database. %1 with command `%2` did not finish in time. Process was killed.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>DatabaseWidget</name>
@@ -8316,9 +8296,93 @@ Kernel: %3 %4</source>
     </message>
 </context>
 <context>
+    <name>RemoteHandler</name>
+    <message>
+        <source>Not all required parameters set. Cannot sync database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command `%1` exited with status code: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command `%1` did not finish in time. Process was killed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to upload merged database. Command `%1` exited with status code: %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to upload merged database. Command `%1` did not finish in time. Process was killed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RemoteSettingsDialog</name>
     <message>
         <source>scp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>anyCommand</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RemoteSettingsWidgetAnyCommand</name>
+    <message>
+        <source>Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download command field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g.: sftp user@hostname</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download input field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g.:
+get DatabaseOnRemote.kdbx {TEMP_DATABASE}
+exit
+---
+{TEMP_DATABASE} is used as placeholder to store the database in a temporary location
+The command has to exit. In case of `sftp` as last commend `exit` has to be sent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upload command field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upload input field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g.:
+put {TEMP_DATABASE} DatabaseOnRemote.kdbx
+exit
+---
+{TEMP_DATABASE} is used as placeholder to store the database in a temporary location
+The command has to exit. In case of `sftp` as last commend `exit` has to be sent</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8350,6 +8414,18 @@ Kernel: %3 %4</source>
     </message>
     <message>
         <source>Key File field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[user@]hostname:DatabaseOnRemote.kdbx</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(default: 22)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(optional)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
