@@ -350,7 +350,8 @@ void TestGui::testRemoteSyncDatabase()
 {
     QString sourceToMerge = "user@server:Database.kdbx";
     RemoteProcessFactory::setCreateRemoteProcessFunc([sourceToMerge](QObject* parent) {
-        return new MockRemoteProcess(parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), sourceToMerge);
+        return new MockRemoteProcess(
+            parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), sourceToMerge);
     });
 
     // It is safe to ignore the warning this line produces
