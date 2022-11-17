@@ -490,6 +490,7 @@ MainWindow::MainWindow()
     connect(m_ui->actionImportCsv, SIGNAL(triggered()), m_ui->tabWidget, SLOT(importCsv()));
     connect(m_ui->actionImportKeePass1, SIGNAL(triggered()), m_ui->tabWidget, SLOT(importKeePass1Database()));
     connect(m_ui->actionImportOpVault, SIGNAL(triggered()), m_ui->tabWidget, SLOT(importOpVaultDatabase()));
+    connect(m_ui->actionOpenRemoteDatabase, SIGNAL(triggered()), m_ui->tabWidget, SLOT(openRemoteDatabase()));
     connect(m_ui->actionExportCsv, SIGNAL(triggered()), m_ui->tabWidget, SLOT(exportToCsv()));
     connect(m_ui->actionExportHtml, SIGNAL(triggered()), m_ui->tabWidget, SLOT(exportToHtml()));
     connect(m_ui->actionExportXML, SIGNAL(triggered()), m_ui->tabWidget, SLOT(exportToXML()));
@@ -558,6 +559,7 @@ MainWindow::MainWindow()
     connect(m_ui->welcomeWidget, SIGNAL(importKeePass1Database()), SLOT(switchToKeePass1Database()));
     connect(m_ui->welcomeWidget, SIGNAL(importOpVaultDatabase()), SLOT(switchToOpVaultDatabase()));
     connect(m_ui->welcomeWidget, SIGNAL(importCsv()), SLOT(switchToCsvImport()));
+    connect(m_ui->welcomeWidget, SIGNAL(openRemoteDatabase()), SLOT(switchToRemoteDatabase()));
 
     connect(m_ui->actionAbout, SIGNAL(triggered()), SLOT(showAboutDialog()));
     connect(m_ui->actionDonate, SIGNAL(triggered()), SLOT(openDonateUrl()));
@@ -1309,6 +1311,12 @@ void MainWindow::switchToOpVaultDatabase()
 void MainWindow::switchToCsvImport()
 {
     m_ui->tabWidget->importCsv();
+    switchToDatabases();
+}
+
+void MainWindow::switchToRemoteDatabase()
+{
+    m_ui->tabWidget->openRemoteDatabase();
     switchToDatabases();
 }
 

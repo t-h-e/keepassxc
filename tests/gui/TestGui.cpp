@@ -21,6 +21,7 @@
 
 #include <QCheckBox>
 #include <QClipboard>
+#include <QListWidget>
 #include <QMimeData>
 #include <QPlainTextEdit>
 #include <QPushButton>
@@ -1544,6 +1545,44 @@ void TestGui::testKeePass1Import()
     MessageBox::setNextAnswer(MessageBox::No);
     triggerAction("actionDatabaseClose");
     QApplication::processEvents();
+}
+
+void TestGui::testOpenRemoteDatabase()
+{
+    // close current database
+    cleanup();
+
+    QString remoteFileToOpen = "user@server:Database.kdbx";
+    RemoteProcessFactory::setCreateRemoteProcessFunc([remoteFileToOpen](QObject* parent) {
+        return new MockRemoteProcess(
+            parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), remoteFileToOpen);
+    });
+    triggerAction("actionOpenRemoteDatabase");
+    QApplication::processEvents();
+
+    // click on scp category
+    auto categoryItemList =
+        QApplication::activeModalWidget()->findChild<CategoryListWidget*>("categoryList")->findChild<QListWidget*>();
+    auto scpListItems = categoryItemList->findItems("scp", Qt::MatchExactly);
+    QTRY_COMPARE(scpListItems.size(), 1);
+    const auto scpItemRect = categoryItemList->visualItemRect(scpListItems.at(0));
+    QTest::mouseClick(categoryItemList->viewport(), Qt::LeftButton, nullptr, scpItemRect.center());
+
+    // Assuming that the `scp` command is the first one
+    auto* urlEdit = QApplication::activeModalWidget()->findChild<QWidget*>("url");
+    QTest::keyClicks(urlEdit, remoteFileToOpen);
+    QTest::keyClick(urlEdit, Qt::Key_Enter);
+    QApplication::processEvents();
+
+    QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
+    auto* editPasswordSync = QApplication::focusWidget();
+    QVERIFY(editPasswordSync->isVisible());
+
+    QTest::keyClicks(editPasswordSync, "a");
+    QTest::keyClick(editPasswordSync, Qt::Key_Enter);
+
+    // database has been opened
+    QTRY_COMPARE(m_tabWidget->tabText(m_tabWidget->currentIndex()), QString("SyncDatabase.kdbx"));
 }
 
 void TestGui::testDatabaseLocking()

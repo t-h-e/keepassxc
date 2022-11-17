@@ -5440,6 +5440,10 @@ We recommend you use the AppImage available on our downloads page.</source>
         <source>Allow Screen Capture</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Open remote database</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManageDatabase</name>
@@ -7981,11 +7985,14 @@ Kernel: %3 %4</source>
     </message>
 </context>
 <context>
-    <name>RemoteHandler</name>
+    <name>RemoteFileDialog</name>
     <message>
-        <source>Not all required parameters set. Cannot sync database.</source>
+        <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>RemoteHandler</name>
     <message>
         <source>Command `%1` exited with status code: %3</source>
         <translation type="unfinished"></translation>
@@ -8000,6 +8007,10 @@ Kernel: %3 %4</source>
     </message>
     <message>
         <source>Failed to upload merged database. Command `%1` did not finish in time. Process was killed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not all required parameters set. Cannot download database.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9076,6 +9087,10 @@ Example: JBSWY3DPEHPK3PXP</source>
     </message>
     <message>
         <source>Welcome to KeePassXC %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open from remote</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

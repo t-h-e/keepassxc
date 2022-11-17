@@ -57,6 +57,8 @@ public:
     void addSettingsPage(IRemoteSettingsPage* page);
 
 signals:
+    // TODO: check if remove of boolean works
+    //  Search for `SLOT(switchToMainView`
     void cancel(bool accepted);
     void syncWithRemote(RemoteProgramParams* remoteProgramParams);
 
