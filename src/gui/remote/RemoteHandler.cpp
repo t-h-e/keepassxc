@@ -35,7 +35,7 @@ RemoteHandler::~RemoteHandler()
 void RemoteHandler::download()
 {
     if (!m_remoteProgramParams->allNecessaryParamsSet()) {
-        emit downloadError(tr("Not all required parameters set. Cannot sync database."));
+        emit downloadError(tr("Not all required parameters set. Cannot download database."));
         return;
     }
 

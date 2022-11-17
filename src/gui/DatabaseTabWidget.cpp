@@ -20,7 +20,6 @@
 #include <QFileInfo>
 #include <QTabBar>
 #include <utility>
-#include <QDebug>
 
 #include "autotype/AutoType.h"
 #include "core/Tools.h"
@@ -33,6 +32,7 @@
 #include "gui/HtmlExporter.h"
 #include "gui/MessageBox.h"
 #include "gui/export/ExportDialog.h"
+#include "gui/remote/RemoteFileDialog.h"
 #ifdef Q_OS_MACOS
 #include "gui/osutils/macutils/MacUtils.h"
 #endif
@@ -299,12 +299,14 @@ void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgra
 
     connect(remoteHandler, &RemoteHandler::downloadedSuccessfullyTo, this, &DatabaseTabWidget::remoteSyncDatabase);
     auto* const oneShotUploadConnection = new QMetaObject::Connection;
-    *oneShotUploadConnection = connect(this->currentDatabaseWidget(),
-            &DatabaseWidget::databaseSynced, [remoteHandler, oneShotUploadConnection](const QSharedPointer<Database>& database) {
-                              disconnect(*oneShotUploadConnection);
-                              delete oneShotUploadConnection;
-                              emit remoteHandler->uploadToRemote(database);
-            });
+    *oneShotUploadConnection =
+        connect(this->currentDatabaseWidget(),
+                &DatabaseWidget::databaseSynced,
+                [remoteHandler, oneShotUploadConnection](const QSharedPointer<Database>& database) {
+                    disconnect(*oneShotUploadConnection);
+                    delete oneShotUploadConnection;
+                    emit remoteHandler->uploadToRemote(database);
+                });
 
     auto showSyncErrorMessage = [this, remoteHandler](const QString& errorMessage) {
         this->currentDatabaseWidget()->setDisabled(false);
@@ -327,6 +329,21 @@ void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgra
 void DatabaseTabWidget::remoteSyncDatabase(const QString& filePath)
 {
     unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::RemoteSync, filePath);
+}
+
+void DatabaseTabWidget::openRemoteDatabase()
+{
+    auto* dialog = new RemoteFileDialog(this);
+    connect(dialog, &RemoteFileDialog::downloadedSuccessfullyTo, this, &DatabaseTabWidget::openDatabaseFromFile);
+    dialog->open();
+}
+
+void DatabaseTabWidget::openDatabaseFromFile(const QString& fileName)
+{
+    auto db = QSharedPointer<Database>::create();
+    auto* dbWidget = new DatabaseWidget(db, this);
+    addDatabaseTab(dbWidget);
+    dbWidget->switchToOpenDatabase(fileName);
 }
 
 void DatabaseTabWidget::importKeePass1Database()

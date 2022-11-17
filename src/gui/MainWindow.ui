@@ -238,6 +238,7 @@
      <addaction name="actionImportCsv"/>
      <addaction name="actionImportOpVault"/>
      <addaction name="actionImportKeePass1"/>
+     <addaction name="actionOpenRemoteDatabase"/>
     </widget>
     <widget class="QMenu" name="menuExport">
      <property name="title">
@@ -925,6 +926,14 @@
    </property>
    <property name="toolTip">
     <string>Import a CSV file</string>
+   </property>
+  </action>
+  <action name="actionOpenRemoteDatabase">
+   <property name="text">
+    <string>CSV File…</string>
+   </property>
+   <property name="toolTip">
+    <string>Open remote database</string>
    </property>
   </action>
   <action name="actionEntryTotp">
