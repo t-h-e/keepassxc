@@ -68,9 +68,10 @@ public slots:
     void syncDatabaseWithRemote(RemoteProgramParams* RemoteProgramParams);
     void remoteSyncDatabase(const QString& filePath);
 
-    void importCsv();
     void importKeePass1Database();
     void importOpVaultDatabase();
+    void importCsv();
+    void openRemoteDatabase();
     bool saveDatabase(int index = -1);
     bool saveDatabaseAs(int index = -1);
     bool saveDatabaseBackup(int index = -1);

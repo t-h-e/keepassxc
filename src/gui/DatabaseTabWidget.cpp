@@ -30,6 +30,7 @@
 #include "gui/DatabaseWidget.h"
 #include "gui/DatabaseWidgetStateSync.h"
 #include "gui/FileDialog.h"
+#include "gui/remote/RemoteFileDialog.h"
 #include "gui/HtmlExporter.h"
 #include "gui/MessageBox.h"
 #include "gui/export/ExportDialog.h"
@@ -326,6 +327,19 @@ void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgra
 void DatabaseTabWidget::remoteSyncDatabase(const QString& filePath)
 {
     unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::RemoteSync, filePath);
+}
+
+void DatabaseTabWidget::openRemoteDatabase()
+{
+    auto fileName = remoteFileDialog()->getRemoteFileName(this);
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    auto db = QSharedPointer<Database>::create();
+    auto* dbWidget = new DatabaseWidget(db, this);
+    addDatabaseTab(dbWidget);
+    dbWidget->switchToImportKeepass1(fileName);
 }
 
 void DatabaseTabWidget::importKeePass1Database()
