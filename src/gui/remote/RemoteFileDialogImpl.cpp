@@ -18,8 +18,8 @@
 #include "RemoteFileDialogImpl.h"
 #include "ui_RemoteFileDialogImpl.h"
 
+#include "RemoteHandler.h"
 #include "RemoteSettingsDialog.h"
-#include "RemoteSettingsWidgetAnyCommand.h"
 
 #include <QDebug>
 
@@ -27,13 +27,12 @@ RemoteFileDialogImpl::RemoteFileDialogImpl(QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::RemoteFileDialogImpl())
     , m_remoteSettingsDialog(new RemoteSettingsDialog(this))
-    , m_remoteProgramParams(nullptr)
-//    , m_remoteAnyCommandWidget(new RemoteSettingsWidgetAnyCommand(this))
+    , m_fileName(nullptr)
 {
     m_ui->setupUi(this);
 
-    // TODO: add widget
-    //  see RemoteSettingsDialog::RemoteSettingsDialog
+    m_ui->messageWidget->setHidden(true);
+
     m_ui->verticalLayout->addWidget(m_remoteSettingsDialog);
 
     connect(m_remoteSettingsDialog, SIGNAL(cancel(bool)), SLOT(close()));
@@ -44,9 +43,21 @@ RemoteFileDialogImpl::RemoteFileDialogImpl(QWidget* parent)
 
 void RemoteFileDialogImpl::acceptRemoteProgramParams(RemoteProgramParams* params)
 {
-    m_remoteProgramParams = params;
-    accept();
-    // emit accepted();
+    qDebug() << "params set";
+    auto remoteHandler = new RemoteHandler(this, params);
+    connect(remoteHandler, &RemoteHandler::downloadedSuccessfullyTo, this, [this, remoteHandler](const QString& downloadedFileName) {
+        qDebug() << "success";
+        m_fileName = new QString(downloadedFileName);
+        accept();
+        delete remoteHandler;
+    });
+    connect(remoteHandler, &RemoteHandler::downloadError, this, [this, remoteHandler](const QString& errorMessage) {
+        qDebug() << "fail";
+        this->m_ui->messageWidget->showMessage(errorMessage, MessageWidget::Error);
+        delete remoteHandler;
+    });
+
+    emit remoteHandler->downloadFromRemote();
 }
 
 QString RemoteFileDialogImpl::getRemoteFileName(QWidget* parent)
@@ -55,10 +66,10 @@ QString RemoteFileDialogImpl::getRemoteFileName(QWidget* parent)
 
     dialog->exec(); // TODO: use open() after verifying that everything else works. apparently exec is dangerous
 
-    if (dialog->m_remoteProgramParams != nullptr) {
-        qDebug() << dialog->m_remoteProgramParams->getCommandForDownload("what");
-        // TODO: next download :)
+    qDebug() << "exec is over";
+    if (dialog->m_fileName != nullptr) {
+        qDebug() << dialog->m_fileName;
+        return *dialog->m_fileName;
     }
-
     return nullptr;
 }

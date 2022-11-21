@@ -23,10 +23,8 @@
 #include <QWidget>
 
 #include "RemoteProgramParams.h"
-//#include "RemoteSettingsWidgetAnyCommand.h"
 
 class RemoteSettingsDialog;
-// class RemoteSettingsWidgetAnyCommand;
 
 namespace Ui
 {
@@ -51,7 +49,7 @@ private:
     //  requires refactoring of RemoteSettingsDialog as the dialog contains Database, which we do not need here
     //    RemoteSettingsWidgetAnyCommand* m_remoteAnyCommandWidget;
     RemoteSettingsDialog* m_remoteSettingsDialog;
-    RemoteProgramParams* m_remoteProgramParams;
+    QString* m_fileName;
 };
 
 #endif // KEEPASSXC_REMOTEFILEDIALOGIMPL_H
