@@ -18,27 +18,34 @@
 #ifndef KEEPASSXC_REMOTEFILEDIALOG_H
 #define KEEPASSXC_REMOTEFILEDIALOG_H
 
-#include <QString>
-#include <QWidget>
+#include <QDialog>
+#include <QPointer>
 
-class RemoteFileDialog
+#include "RemoteProgramParams.h"
+
+class RemoteSettingsDialog;
+
+namespace Ui
 {
-public:
-    QString getRemoteFileName(QWidget* parent = nullptr);
+    class RemoteFileDialog;
+}
 
-    static RemoteFileDialog* instance();
+class RemoteFileDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    static QString getRemoteFileName(QWidget* parent);
+
+private slots:
+    void acceptRemoteProgramParams(RemoteProgramParams* params);
 
 private:
-    RemoteFileDialog();
+    explicit RemoteFileDialog(QWidget* parent = nullptr);
+    ~RemoteFileDialog() override;
 
-    static RemoteFileDialog* m_instance;
-
-    Q_DISABLE_COPY(RemoteFileDialog);
+    QScopedPointer<Ui::RemoteFileDialog> m_ui;
+    QPointer<RemoteSettingsDialog> m_remoteSettingsDialog;
+    QString* m_fileName;
 };
-
-inline RemoteFileDialog* remoteFileDialog()
-{
-    return RemoteFileDialog::instance();
-}
 
 #endif // KEEPASSXC_REMOTEFILEDIALOG_H

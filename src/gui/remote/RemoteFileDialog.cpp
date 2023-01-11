@@ -16,35 +16,69 @@
  */
 
 #include "RemoteFileDialog.h"
-#include "RemoteFileDialogImpl.h"
+#include "ui_RemoteFileDialog.h"
 
-RemoteFileDialog* RemoteFileDialog::m_instance(nullptr);
+#include "RemoteHandler.h"
+#include "RemoteSettingsDialog.h"
 
-RemoteFileDialog::RemoteFileDialog()
+#include <QDebug>
+
+RemoteFileDialog::RemoteFileDialog(QWidget* parent)
+    : QDialog(parent)
+    , m_ui(new Ui::RemoteFileDialog())
+    , m_remoteSettingsDialog(new RemoteSettingsDialog(this))
+    , m_fileName(nullptr)
 {
+    m_ui->setupUi(this);
+
+    m_ui->messageWidget->setHidden(true);
+
+    m_ui->verticalLayout->addWidget(m_remoteSettingsDialog);
+
+    connect(m_remoteSettingsDialog, SIGNAL(cancel(bool)), SLOT(close()));
+    connect(m_remoteSettingsDialog,
+            SIGNAL(syncWithRemote(RemoteProgramParams*)),
+            SLOT(acceptRemoteProgramParams(RemoteProgramParams*)));
+}
+
+RemoteFileDialog::~RemoteFileDialog()
+{
+}
+
+void RemoteFileDialog::acceptRemoteProgramParams(RemoteProgramParams* params)
+{
+    qDebug() << "params set";
+    auto remoteHandler = new RemoteHandler(this, params);
+    connect(remoteHandler,
+            &RemoteHandler::downloadedSuccessfullyTo,
+            this,
+            [this, remoteHandler](const QString& downloadedFileName) {
+                qDebug() << "success";
+                qDebug() << "success" << downloadedFileName;
+                m_fileName = new QString(downloadedFileName);
+                qDebug() << "success" << m_fileName;
+                accept();
+                delete remoteHandler;
+            });
+    connect(remoteHandler, &RemoteHandler::downloadError, this, [this, remoteHandler](const QString& errorMessage) {
+        qDebug() << "fail";
+        this->m_ui->messageWidget->showMessage(errorMessage, MessageWidget::Error);
+        delete remoteHandler;
+    });
+
+    emit remoteHandler->downloadFromRemote();
 }
 
 QString RemoteFileDialog::getRemoteFileName(QWidget* parent)
 {
-    const auto result = RemoteFileDialogImpl::getRemoteFileName(parent);
-    //    const auto& workingDir = dir.isEmpty() ? config()->get(Config::LastDir).toString() : dir;
-    //    const auto result = QDir::toNativeSeparators(
-    //        QFileDialog::getOpenFileName(parent, caption, workingDir, filter, selectedFilter, options));
+    auto* dialog = new RemoteFileDialog(parent);
 
-    // TODO: how to check if this is needed without a Mac?
-#ifdef Q_OS_MACOS
-    // on Mac OS X the focus is lost after closing the native dialog
-    if (parent) {
-        parent->activateWindow();
-    }
-#endif
-    return result;
-}
+    dialog->exec(); // TODO: use open() after verifying that everything else works. apparently exec is dangerous
 
-RemoteFileDialog* RemoteFileDialog::instance()
-{
-    if (!m_instance) {
-        m_instance = new RemoteFileDialog();
+    qDebug() << "exec is over";
+    if (dialog->m_fileName != nullptr) {
+        qDebug() << dialog->m_fileName;
+        return *dialog->m_fileName;
     }
-    return m_instance;
+    return nullptr;
 }

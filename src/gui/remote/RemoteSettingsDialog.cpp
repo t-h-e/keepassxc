@@ -45,13 +45,6 @@ RemoteSettingsDialog::RemoteSettingsDialog(QWidget* parent)
     m_ui->stackedWidget->addWidget(m_remoteScpWidget);
     m_ui->stackedWidget->addWidget(m_remoteAnyCommandWidget);
 
-    auto* scrollArea = new QScrollArea(parent);
-    scrollArea->setFrameShape(QFrame::NoFrame);
-    scrollArea->setFrameShadow(QFrame::Plain);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrollArea->setSizeAdjustPolicy(QScrollArea::AdjustToContents);
-    scrollArea->setWidgetResizable(true);
-
     m_ui->stackedWidget->setCurrentIndex(0);
 
     connect(m_ui->categoryList, SIGNAL(categoryChanged(int)), m_ui->stackedWidget, SLOT(setCurrentIndex(int)));

@@ -165,7 +165,6 @@ set(keepassx_SOURCES
         gui/dbsettings/DatabaseSettingsWidgetDatabaseKey.cpp
         gui/remote/AnyCommandParams.cpp
         gui/remote/RemoteFileDialog.cpp
-        gui/remote/RemoteFileDialogImpl.cpp
         gui/remote/RemoteHandler.cpp
         gui/remote/RemoteProcess.cpp
         gui/remote/RemoteProcessFactory.cpp
