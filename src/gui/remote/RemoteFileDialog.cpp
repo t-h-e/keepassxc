@@ -21,13 +21,10 @@
 #include "RemoteHandler.h"
 #include "RemoteSettingsDialog.h"
 
-#include <QDebug>
-
 RemoteFileDialog::RemoteFileDialog(QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::RemoteFileDialog())
     , m_remoteSettingsDialog(new RemoteSettingsDialog(this))
-    , m_fileName(nullptr)
 {
     m_ui->setupUi(this);
 
@@ -47,38 +44,19 @@ RemoteFileDialog::~RemoteFileDialog()
 
 void RemoteFileDialog::acceptRemoteProgramParams(RemoteProgramParams* params)
 {
-    qDebug() << "params set";
     auto remoteHandler = new RemoteHandler(this, params);
     connect(remoteHandler,
             &RemoteHandler::downloadedSuccessfullyTo,
             this,
             [this, remoteHandler](const QString& downloadedFileName) {
-                qDebug() << "success";
-                qDebug() << "success" << downloadedFileName;
-                m_fileName = new QString(downloadedFileName);
-                qDebug() << "success" << m_fileName;
                 accept();
                 delete remoteHandler;
+                emit downloadedSuccessfullyTo(downloadedFileName);
             });
     connect(remoteHandler, &RemoteHandler::downloadError, this, [this, remoteHandler](const QString& errorMessage) {
-        qDebug() << "fail";
         this->m_ui->messageWidget->showMessage(errorMessage, MessageWidget::Error);
         delete remoteHandler;
     });
 
     emit remoteHandler->downloadFromRemote();
-}
-
-QString RemoteFileDialog::getRemoteFileName(QWidget* parent)
-{
-    auto* dialog = new RemoteFileDialog(parent);
-
-    dialog->exec(); // TODO: use open() after verifying that everything else works. apparently exec is dangerous
-
-    qDebug() << "exec is over";
-    if (dialog->m_fileName != nullptr) {
-        qDebug() << dialog->m_fileName;
-        return *dialog->m_fileName;
-    }
-    return nullptr;
 }

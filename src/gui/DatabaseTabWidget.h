@@ -72,6 +72,7 @@ public slots:
     void importOpVaultDatabase();
     void importCsv();
     void openRemoteDatabase();
+    void openDatabaseFromFile(const QString& fileName);
     bool saveDatabase(int index = -1);
     bool saveDatabaseAs(int index = -1);
     bool saveDatabaseBackup(int index = -1);

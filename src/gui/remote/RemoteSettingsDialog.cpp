@@ -45,6 +45,7 @@ RemoteSettingsDialog::RemoteSettingsDialog(QWidget* parent)
     m_ui->stackedWidget->addWidget(m_remoteScpWidget);
     m_ui->stackedWidget->addWidget(m_remoteAnyCommandWidget);
 
+    m_ui->categoryList->setCurrentCategory(0);
     m_ui->stackedWidget->setCurrentIndex(0);
 
     connect(m_ui->categoryList, SIGNAL(categoryChanged(int)), m_ui->stackedWidget, SLOT(setCurrentIndex(int)));

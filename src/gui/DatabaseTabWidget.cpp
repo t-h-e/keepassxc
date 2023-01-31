@@ -332,11 +332,13 @@ void DatabaseTabWidget::remoteSyncDatabase(const QString& filePath)
 
 void DatabaseTabWidget::openRemoteDatabase()
 {
-    auto fileName = RemoteFileDialog::getRemoteFileName(this);
-    if (fileName.isEmpty()) {
-        return;
-    }
+    auto* dialog = new RemoteFileDialog(this);
+    connect(dialog, &RemoteFileDialog::downloadedSuccessfullyTo, this, &DatabaseTabWidget::openDatabaseFromFile);
+    dialog->open();
+}
 
+void DatabaseTabWidget::openDatabaseFromFile(const QString& fileName)
+{
     auto db = QSharedPointer<Database>::create();
     auto* dbWidget = new DatabaseWidget(db, this);
     addDatabaseTab(dbWidget);

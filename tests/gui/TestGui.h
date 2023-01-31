@@ -63,6 +63,7 @@ private slots:
     void testSaveBackupPath_data();
     void testDatabaseSettings();
     void testKeePass1Import();
+    void testOpenRemoteDatabase();
     void testDatabaseLocking();
     void testDragAndDropKdbxFiles();
     void testSortGroups();

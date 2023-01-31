@@ -34,18 +34,18 @@ class RemoteFileDialog : public QDialog
 {
     Q_OBJECT
 public:
-    static QString getRemoteFileName(QWidget* parent);
+    explicit RemoteFileDialog(QWidget* parent = nullptr);
+    ~RemoteFileDialog() override;
+
+signals:
+    void downloadedSuccessfullyTo(const QString& filePath);
 
 private slots:
     void acceptRemoteProgramParams(RemoteProgramParams* params);
 
 private:
-    explicit RemoteFileDialog(QWidget* parent = nullptr);
-    ~RemoteFileDialog() override;
-
     QScopedPointer<Ui::RemoteFileDialog> m_ui;
     QPointer<RemoteSettingsDialog> m_remoteSettingsDialog;
-    QString* m_fileName;
 };
 
 #endif // KEEPASSXC_REMOTEFILEDIALOG_H
