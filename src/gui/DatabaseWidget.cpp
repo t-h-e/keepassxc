@@ -1201,6 +1201,18 @@ void DatabaseWidget::mergeDatabase(bool accepted)
     emit databaseMerged(m_db);
 }
 
+bool DatabaseWidget::attemptSyncDatabaseWithSameKey(const QString& filePath)
+{
+    QString ignoreErrors;
+    QSharedPointer<Database> srcDb = QSharedPointer<Database>::create();
+    if (srcDb->open(filePath, m_db->key(), &ignoreErrors)) {
+        syncDatabase(m_db, srcDb);
+        emit databaseSyncedWith(srcDb);
+        return true;
+    }
+    return false;
+}
+
 void DatabaseWidget::syncDatabase(bool accepted)
 {
     if (accepted) {
@@ -1222,23 +1234,27 @@ void DatabaseWidget::syncDatabase(bool accepted)
             return;
         }
 
-        Merger mergerToRemote(m_db.data(), srcDb.data());
-        Merger mergerFromRemote(srcDb.data(), m_db.data());
-        QStringList changeList = mergerToRemote.merge() + mergerFromRemote.merge();
-
-        if (!changeList.isEmpty()) {
-            showMessage(tr("Successfully merged the database files."), MessageWidget::Information);
-
-            // Save synced database
-            QString error;
-            srcDb->save(Database::Atomic, {}, &error);
-        } else {
-            showMessage(tr("Database was not modified by merge operation."), MessageWidget::Information);
-        }
+        syncDatabase(srcDb, m_db);
+        emit databaseSyncedWith(srcDb);
     }
-
     switchToMainView();
-    emit databaseSynced(m_db);
+}
+
+void DatabaseWidget::syncDatabase(const QSharedPointer<Database>& srcDb, const QSharedPointer<Database>& destinationDb)
+{
+    Merger mergerToRemote(destinationDb.data(), srcDb.data());
+    Merger mergerFromRemote(srcDb.data(), destinationDb.data());
+    QStringList changeList = mergerToRemote.merge() + mergerFromRemote.merge();
+
+    if (!changeList.isEmpty()) {
+        showMessage(tr("Successfully merged the database files."), MessageWidget::Information);
+
+        // Save synced database
+        QString error;
+        srcDb->save(Database::Atomic, {}, &error);
+    } else {
+        showMessage(tr("Database was not modified by merge operation."), MessageWidget::Information);
+    }
 }
 
 /**

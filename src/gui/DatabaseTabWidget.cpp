@@ -299,7 +299,7 @@ void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgra
     auto* const oneShotUploadConnection = new QMetaObject::Connection;
     *oneShotUploadConnection =
         connect(this->currentDatabaseWidget(),
-                &DatabaseWidget::databaseSynced,
+                &DatabaseWidget::databaseSyncedWith,
                 [remoteHandler, oneShotUploadConnection](const QSharedPointer<Database>& database) {
                     disconnect(*oneShotUploadConnection);
                     delete oneShotUploadConnection;
@@ -326,7 +326,10 @@ void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgra
 
 void DatabaseTabWidget::remoteSyncDatabase(const QString& filePath)
 {
-    unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::RemoteSync, filePath);
+    bool syncSuccessful = this->currentDatabaseWidget()->attemptSyncDatabaseWithSameKey(filePath);
+    if (!syncSuccessful) {
+        unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::RemoteSync, filePath);
+    }
 }
 
 void DatabaseTabWidget::openRemoteDatabase()
