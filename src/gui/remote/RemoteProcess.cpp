@@ -62,6 +62,6 @@ void RemoteProcess::kill()
 
 QString RemoteProcess::getTempFileLocation()
 {
-    return QDir::toNativeSeparators(
-        QDir::temp().absoluteFilePath("RemoteDatabase" + QUuid::createUuid().toString() + ".kdbx"));
+    return QDir::toNativeSeparators(QDir::temp().absoluteFilePath(
+        "RemoteDatabase-" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".kdbx"));
 }
