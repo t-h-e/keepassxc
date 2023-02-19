@@ -42,9 +42,9 @@ RemoteFileDialog::~RemoteFileDialog()
 {
 }
 
-void RemoteFileDialog::acceptRemoteProgramParams(RemoteProgramParams* params)
+void RemoteFileDialog::acceptRemoteProgramParams(RemoteProgramParams* remoteProgramParams)
 {
-    auto remoteHandler = new RemoteHandler(this, params);
+    auto remoteHandler = new RemoteHandler(this);
     connect(remoteHandler,
             &RemoteHandler::downloadedSuccessfullyTo,
             this,
@@ -58,5 +58,5 @@ void RemoteFileDialog::acceptRemoteProgramParams(RemoteProgramParams* params)
         delete remoteHandler;
     });
 
-    emit remoteHandler->downloadFromRemote();
+    emit remoteHandler->downloadFromRemote(remoteProgramParams);
 }
