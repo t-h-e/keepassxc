@@ -23,7 +23,7 @@
 class RemoteProcessFactory
 {
 public:
-    static RemoteProcess* createRemoteProcess(QObject* parent);
+    static RemoteProcess* createRemoteProcess(QObject* parent = nullptr);
     // use only for testing
     static void setCreateRemoteProcessFunc(std::function<RemoteProcess*(QObject*)> createRemoteProcessFunc);
 

@@ -112,6 +112,7 @@ signals:
     void messageGlobal(const QString&, MessageWidget::MessageType type);
     void messageDismissGlobal();
     void databaseUnlockDialogFinished(bool accepted, DatabaseWidget* dbWidget);
+    void updateSyncProgress(int percentage, QString message);
 
 private slots:
     void toggleTabbar();
@@ -120,6 +121,8 @@ private slots:
     void handleDatabaseUnlockDialogFinished(bool accepted, DatabaseWidget* dbWidget);
     void handleExportError(const QString& reason);
     void updateLastDatabases();
+    void remoteSyncSuccess();
+    void showRemoteSyncErrorMessage(const QString& errorMessage);
 
 private:
     QSharedPointer<Database> execNewDatabaseWizard();
@@ -133,8 +136,7 @@ private:
     QTimer m_lockDelayTimer;
     bool m_databaseOpenInProgress;
 
-    RemoteProgramParams* m_remoteProgramParams;
-    std::function<RemoteProcess*()> m_createRemoteProcess;
+    QPointer<RemoteHandler> m_remoteHandler;
 };
 
 #endif // KEEPASSX_DATABASETABWIDGET_H

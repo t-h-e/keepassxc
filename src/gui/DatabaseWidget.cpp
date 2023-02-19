@@ -1258,13 +1258,13 @@ void DatabaseWidget::syncDatabase(const QSharedPointer<Database>& srcDb, const Q
     QStringList changeList = mergerToRemote.merge() + mergerFromRemote.merge();
 
     if (!changeList.isEmpty()) {
-        showMessage(tr("Successfully merged the database files."), MessageWidget::Information);
+        showMessage(tr("Successfully synced the database files."), MessageWidget::Information);
 
         // Save synced database
         QString error;
         srcDb->save(Database::Atomic, {}, &error);
     } else {
-        showMessage(tr("Database was not modified by merge operation."), MessageWidget::Information);
+        showMessage(tr("Database was not modified by sync operation."), MessageWidget::Information);
     }
 }
 
