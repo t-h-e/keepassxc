@@ -17,34 +17,34 @@
 
 #include "RemoteHandler.h"
 #include "RemoteProcessFactory.h"
+#include "core/AsyncTask.h"
 
 #include <QDebug>
 
-RemoteHandler::RemoteHandler(QObject* parent, RemoteProgramParams* remoteProgramParams)
+RemoteHandler::RemoteHandler(QObject* parent)
     : QObject(parent)
-    , m_remoteProgramParams(remoteProgramParams)
 {
-    connect(this, SIGNAL(downloadFromRemote()), SLOT(download()));
-    connect(this, SIGNAL(uploadToRemote(QSharedPointer<Database>)), SLOT(upload(QSharedPointer<Database>)));
+    connect(this, &RemoteHandler::downloadFromRemote, &RemoteHandler::download);
+    connect(this, &RemoteHandler::uploadToRemote, &RemoteHandler::upload);
 }
 
 RemoteHandler::~RemoteHandler()
 {
 }
 
-void RemoteHandler::download()
+void RemoteHandler::download(RemoteProgramParams* remoteProgramParams)
 {
-    if (!m_remoteProgramParams->allNecessaryParamsSet()) {
-        emit downloadError(tr("Not all required parameters set. Cannot download database."));
-        return;
-    }
+    AsyncTask::runAndWaitForFinished([&] { this->downloadInternal(remoteProgramParams); });
+}
 
-    auto* remoteProcess = RemoteProcessFactory::createRemoteProcess(this);
+void RemoteHandler::downloadInternal(RemoteProgramParams* remoteProgramParams)
+{
+    auto* remoteProcess = RemoteProcessFactory::createRemoteProcess();
     QString destination = remoteProcess->getTempFileLocation();
-    auto downloadCommand = m_remoteProgramParams->getCommandForDownload(destination);
+    auto downloadCommand = remoteProgramParams->getCommandForDownload(destination);
     qDebug() << "download command" << downloadCommand;
     remoteProcess->start(downloadCommand);
-    auto input = m_remoteProgramParams->getInputForDownload(destination);
+    auto input = remoteProgramParams->getInputForDownload(destination);
     if (!input.isEmpty()) {
         qDebug() << "download input" << input;
 
@@ -54,6 +54,7 @@ void RemoteHandler::download()
     }
     bool finished = remoteProcess->waitForFinished(10000);
     int statusCode = remoteProcess->exitCode();
+
     if (finished && statusCode == 0) {
         emit downloadedSuccessfullyTo(destination);
         return;
@@ -67,14 +68,20 @@ void RemoteHandler::download()
     }
 }
 
-void RemoteHandler::upload(const QSharedPointer<Database>& remoteSyncedDb)
+void RemoteHandler::upload(const QSharedPointer<Database>& remoteSyncedDb, RemoteProgramParams* remoteProgramParams)
 {
-    auto* remoteProcess = RemoteProcessFactory::createRemoteProcess(this);
+    AsyncTask::runAndWaitForFinished([&] { this->uploadInternal(remoteSyncedDb, remoteProgramParams); });
+}
+
+void RemoteHandler::uploadInternal(const QSharedPointer<Database>& remoteSyncedDb,
+                                   RemoteProgramParams* remoteProgramParams)
+{
+    auto remoteProcess = RemoteProcessFactory::createRemoteProcess();
     QString source = remoteSyncedDb->filePath();
-    auto uploadCommand = m_remoteProgramParams->getCommandForUpload(source);
+    auto uploadCommand = remoteProgramParams->getCommandForUpload(source);
     qDebug() << "upload command" << uploadCommand;
     remoteProcess->start(uploadCommand);
-    auto input = m_remoteProgramParams->getInputForUpload(source);
+    auto input = remoteProgramParams->getInputForUpload(source);
     if (!input.isEmpty()) {
         qDebug() << "upload input" << input;
 

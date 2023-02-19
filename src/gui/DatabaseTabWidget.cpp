@@ -43,6 +43,7 @@ DatabaseTabWidget::DatabaseTabWidget(QWidget* parent)
     , m_dbWidgetStateSync(new DatabaseWidgetStateSync(this))
     , m_dbWidgetPendingLock(nullptr)
     , m_databaseOpenDialog(new DatabaseOpenDialog(this))
+    , m_remoteHandler(new RemoteHandler(this))
 {
     auto* tabBar = new QTabBar(this);
     tabBar->setAcceptDrops(true);
@@ -60,6 +61,10 @@ DatabaseTabWidget::DatabaseTabWidget(QWidget* parent)
     connect(autoType(), SIGNAL(autotypeRejected()), SLOT(relockPendingDatabase()));
     connect(m_databaseOpenDialog.data(), &DatabaseOpenDialog::dialogFinished,
             this, &DatabaseTabWidget::handleDatabaseUnlockDialogFinished);
+    connect(m_remoteHandler, &RemoteHandler::downloadedSuccessfullyTo, this, &DatabaseTabWidget::remoteSyncDatabase);
+    connect(m_remoteHandler, &RemoteHandler::downloadError, this, &DatabaseTabWidget::showRemoteSyncErrorMessage);
+    connect(m_remoteHandler, &RemoteHandler::uploadError, this, &DatabaseTabWidget::showRemoteSyncErrorMessage);
+    connect(m_remoteHandler, &RemoteHandler::uploadSuccess, this, &DatabaseTabWidget::remoteSyncSuccess);
     // clang-format on
 
 #ifdef Q_OS_MACOS
@@ -293,39 +298,40 @@ void DatabaseTabWidget::mergeDatabase(const QString& filePath)
 
 void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgramParams)
 {
-    auto remoteHandler = new RemoteHandler(this, remoteProgramParams);
+    emit updateSyncProgress(25, "Downloading...");
 
-    connect(remoteHandler, &RemoteHandler::downloadedSuccessfullyTo, this, &DatabaseTabWidget::remoteSyncDatabase);
+    // one shot upload connection is needed to pass the same RemoteProgramParams to upload as used for download
     auto* const oneShotUploadConnection = new QMetaObject::Connection;
+    auto uploadSyncedDatabase =
+        [this, oneShotUploadConnection, remoteProgramParams](const QSharedPointer<Database>& database) {
+            disconnect(*oneShotUploadConnection);
+            delete oneShotUploadConnection;
+            emit this->updateSyncProgress(75, "Uploading...");
+            emit m_remoteHandler->uploadToRemote(database, remoteProgramParams);
+        };
     *oneShotUploadConnection =
-        connect(this->currentDatabaseWidget(),
-                &DatabaseWidget::databaseSyncedWith,
-                [remoteHandler, oneShotUploadConnection](const QSharedPointer<Database>& database) {
-                    disconnect(*oneShotUploadConnection);
-                    delete oneShotUploadConnection;
-                    emit remoteHandler->uploadToRemote(database);
-                });
-
-    auto showSyncErrorMessage = [this, remoteHandler](const QString& errorMessage) {
-        this->currentDatabaseWidget()->setDisabled(false);
-        currentDatabaseWidget()->showErrorMessage(errorMessage);
-        delete remoteHandler;
-    };
-    connect(remoteHandler, &RemoteHandler::downloadError, this, showSyncErrorMessage);
-    connect(remoteHandler, &RemoteHandler::uploadError, this, showSyncErrorMessage);
-
-    auto syncSuccess = [this, remoteHandler]() {
-        this->currentDatabaseWidget()->setDisabled(false);
-        delete remoteHandler;
-    };
-    connect(remoteHandler, &RemoteHandler::uploadSuccess, this, syncSuccess);
+        connect(this->currentDatabaseWidget(), &DatabaseWidget::databaseSyncedWith, uploadSyncedDatabase);
 
     this->currentDatabaseWidget()->setDisabled(true);
-    emit remoteHandler->downloadFromRemote();
+    emit m_remoteHandler->downloadFromRemote(remoteProgramParams);
+}
+
+void DatabaseTabWidget::remoteSyncSuccess()
+{
+    this->currentDatabaseWidget()->setDisabled(false);
+    emit updateSyncProgress(-1, "");
+}
+
+void DatabaseTabWidget::showRemoteSyncErrorMessage(const QString& errorMessage)
+{
+    this->currentDatabaseWidget()->setDisabled(false);
+    emit updateSyncProgress(-1, "");
+    currentDatabaseWidget()->showErrorMessage(errorMessage);
 }
 
 void DatabaseTabWidget::remoteSyncDatabase(const QString& filePath)
 {
+    emit this->updateSyncProgress(50, "Syncing...");
     bool syncSuccessful = this->currentDatabaseWidget()->attemptSyncDatabaseWithSameKey(filePath);
     if (!syncSuccessful) {
         unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::RemoteSync, filePath);

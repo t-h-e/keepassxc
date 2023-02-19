@@ -29,12 +29,13 @@ class RemoteHandler : public QObject
     Q_OBJECT
 
 public:
-    explicit RemoteHandler(QObject* parent, RemoteProgramParams* remoteProgramParams);
+    explicit RemoteHandler(QObject* parent = 0);
     ~RemoteHandler() override;
+    void download(RemoteProgramParams* remoteProgramParams);
 
 signals:
-    void downloadFromRemote();
-    void uploadToRemote(const QSharedPointer<Database>&);
+    void downloadFromRemote(RemoteProgramParams*);
+    void uploadToRemote(const QSharedPointer<Database>&, RemoteProgramParams*);
 
     void downloadedSuccessfullyTo(const QString& filePath);
     void downloadError(const QString& errorMessage);
@@ -42,11 +43,11 @@ signals:
     void uploadError(const QString& errorMessage);
 
 private slots:
-    void download();
-    void upload(const QSharedPointer<Database>&);
+    void upload(const QSharedPointer<Database>&, RemoteProgramParams* remoteProgramParams);
 
 private:
-    RemoteProgramParams* m_remoteProgramParams;
+    void downloadInternal(RemoteProgramParams* remoteProgramParams);
+    void uploadInternal(const QSharedPointer<Database>& remoteSyncedDb, RemoteProgramParams* remoteProgramParams);
 };
 
 #endif // KEEPASSXC_REMOTEHANDLER_H
