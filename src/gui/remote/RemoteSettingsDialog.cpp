@@ -57,9 +57,14 @@ RemoteSettingsDialog::~RemoteSettingsDialog()
 {
 }
 
+void RemoteSettingsDialog::initialize()
+{
+    m_remoteScpWidget->initialize();
+    m_remoteAnyCommandWidget->initialize();
+}
+
 void RemoteSettingsDialog::load(const QSharedPointer<Database>& db)
 {
-    m_ui->categoryList->setCurrentCategory(0);
     m_remoteScpWidget->load(db);
     m_remoteAnyCommandWidget->load(db);
 
@@ -78,8 +83,11 @@ void RemoteSettingsDialog::addSettingsPage(IRemoteSettingsPage* page)
 
 void RemoteSettingsDialog::save()
 {
-    auto remoteProgramParams =
-        dynamic_cast<RemoteSettingsWidget*>(m_ui->stackedWidget->currentWidget())->getRemoteProgramParams();
+    auto remoteSettingsWidget = dynamic_cast<RemoteSettingsWidget*>(m_ui->stackedWidget->currentWidget());
+    // Only save the current widget
+    remoteSettingsWidget->save();
+
+    auto remoteProgramParams = remoteSettingsWidget->getRemoteProgramParams();
     emit syncWithRemote(remoteProgramParams);
 }
 

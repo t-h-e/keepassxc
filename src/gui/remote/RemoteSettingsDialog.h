@@ -53,12 +53,11 @@ public:
     ~RemoteSettingsDialog() override;
     Q_DISABLE_COPY(RemoteSettingsDialog);
 
+    void initialize();
     void load(const QSharedPointer<Database>& db);
     void addSettingsPage(IRemoteSettingsPage* page);
 
 signals:
-    // TODO: check if remove of boolean works
-    //  Search for `SLOT(switchToMainView`
     void cancel(bool accepted);
     void syncWithRemote(RemoteProgramParams* remoteProgramParams);
 

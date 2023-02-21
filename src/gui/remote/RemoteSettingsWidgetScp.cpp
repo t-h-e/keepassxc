@@ -19,6 +19,7 @@
 #include "ui_RemoteSettingsWidgetScp.h"
 
 #include "ScpParams.h"
+#include "core/Config.h"
 
 RemoteSettingsWidgetScp::RemoteSettingsWidgetScp(QWidget* parent)
     : RemoteSettingsWidget(parent)
@@ -33,7 +34,9 @@ RemoteSettingsWidgetScp::~RemoteSettingsWidgetScp()
 
 void RemoteSettingsWidgetScp::initialize()
 {
-    // Not used. Left to load SCP settings from Database in the future
+    m_ui->url->setText(config()->get(Config::Remote_Scp_Url).toString());
+    m_ui->port->setText(config()->get(Config::Remote_Scp_Port).toString());
+    m_ui->keyFile->setText(config()->get(Config::Remote_Scp_KeyFile).toString());
 }
 
 void RemoteSettingsWidgetScp::uninitialize()
@@ -48,7 +51,9 @@ void RemoteSettingsWidgetScp::showEvent(QShowEvent* event)
 
 bool RemoteSettingsWidgetScp::save()
 {
-    // Not used. Left for future to persist SCP settings in database.
+    config()->set(Config::Remote_Scp_Url, m_ui->url->text());
+    config()->set(Config::Remote_Scp_Port, m_ui->port->text());
+    config()->set(Config::Remote_Scp_KeyFile, m_ui->keyFile->text());
     return true;
 }
 

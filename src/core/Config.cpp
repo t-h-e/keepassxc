@@ -217,8 +217,18 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
     // Messages
     {Config::Messages_NoLegacyKeyFileWarning, {QS("Messages/NoLegacyKeyFileWarning"), Roaming, false}},
     {Config::Messages_Qt55CompatibilityWarning, {QS("Messages/Qt55CompatibilityWarning"), Local, false}},
-    {Config::Messages_HidePreReleaseWarning, {QS("Messages/HidePreReleaseWarning"), Local, {}}}};
+    {Config::Messages_HidePreReleaseWarning, {QS("Messages/HidePreReleaseWarning"), Local, {}}},
 
+    // Remote
+    {Config::Remote_Scp_Url,{QS("Remote/Scp/Url"), Local, {}}},
+    {Config::Remote_Scp_Port,{QS("Remote/Scp/Port"), Local, {}}},
+    {Config::Remote_Scp_KeyFile,{QS("Remote/Scp/KeyFile"), Local, {}}},
+
+    {Config::Remote_AnyCommand_DownloadCommand,{QS("Remote/AnyCommand/DownloadCommand"), Local, {}}},
+    {Config::Remote_AnyCommand_DownloadInput,{QS("Remote/AnyCommand/DownloadInput"), Local, {}}},
+    {Config::Remote_AnyCommand_UploadCommand,{QS("Remote/AnyCommand/UploadCommand"), Local, {}}},
+    {Config::Remote_AnyCommand_UploadInput,{QS("Remote/AnyCommand/UploadInput"), Local, {}}}
+    };
 // clang-format on
 
 QPointer<Config> Config::m_instance(nullptr);
