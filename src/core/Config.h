@@ -193,6 +193,15 @@ public:
         Messages_Qt55CompatibilityWarning,
         Messages_HidePreReleaseWarning,
 
+        Remote_Scp_Url,
+        Remote_Scp_Port,
+        Remote_Scp_KeyFile,
+
+        Remote_AnyCommand_DownloadCommand,
+        Remote_AnyCommand_DownloadInput,
+        Remote_AnyCommand_UploadCommand,
+        Remote_AnyCommand_UploadInput,
+
         // Special internal value
         Deleted
     };

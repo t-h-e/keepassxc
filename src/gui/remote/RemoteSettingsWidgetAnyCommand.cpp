@@ -19,6 +19,7 @@
 #include "ui_RemoteSettingsWidgetAnyCommand.h"
 
 #include "AnyCommandParams.h"
+#include "core/Config.h"
 
 RemoteSettingsWidgetAnyCommand::RemoteSettingsWidgetAnyCommand(QWidget* parent)
     : RemoteSettingsWidget(parent)
@@ -33,7 +34,10 @@ RemoteSettingsWidgetAnyCommand::~RemoteSettingsWidgetAnyCommand()
 
 void RemoteSettingsWidgetAnyCommand::initialize()
 {
-    // Not used. Left to load SCP settings from Database in the future
+    m_ui->downloadCommand->setText(config()->get(Config::Remote_AnyCommand_DownloadCommand).toString());
+    m_ui->inputForDownload->setPlainText(config()->get(Config::Remote_AnyCommand_DownloadInput).toString());
+    m_ui->uploadCommand->setText(config()->get(Config::Remote_AnyCommand_UploadCommand).toString());
+    m_ui->inputForUpload->setPlainText(config()->get(Config::Remote_AnyCommand_UploadInput).toString());
 }
 
 void RemoteSettingsWidgetAnyCommand::uninitialize()
@@ -48,7 +52,10 @@ void RemoteSettingsWidgetAnyCommand::showEvent(QShowEvent* event)
 
 bool RemoteSettingsWidgetAnyCommand::save()
 {
-    // Not used. Left for future to persist settings in database.
+    config()->set(Config::Remote_AnyCommand_DownloadCommand, m_ui->downloadCommand->text());
+    config()->set(Config::Remote_AnyCommand_DownloadInput, m_ui->inputForDownload->toPlainText());
+    config()->set(Config::Remote_AnyCommand_UploadCommand, m_ui->uploadCommand->text());
+    config()->set(Config::Remote_AnyCommand_UploadInput, m_ui->inputForUpload->toPlainText());
     return true;
 }
 
