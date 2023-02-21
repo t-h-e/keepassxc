@@ -2510,6 +2510,14 @@ Disable safe saves and try again?</source>
         <source>Could not find database file: %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Successfully synced the database files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database was not modified by sync operation.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditEntryWidget</name>
@@ -3702,7 +3710,7 @@ Error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Attachment &quot;%1&quot; already exists.
+        <source>Attachment &quot;%1&quot; already exists. 
 Would you like to overwrite the existing attachment?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8317,10 +8325,6 @@ Kernel: %3 %4</source>
     </message>
     <message>
         <source>Failed to upload merged database. Command `%1` did not finish in time. Process was killed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not all required parameters set. Cannot download database.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
