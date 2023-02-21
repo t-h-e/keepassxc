@@ -36,6 +36,8 @@ RemoteFileDialog::RemoteFileDialog(QWidget* parent)
     connect(m_remoteSettingsDialog,
             SIGNAL(syncWithRemote(RemoteProgramParams*)),
             SLOT(acceptRemoteProgramParams(RemoteProgramParams*)));
+
+    m_remoteSettingsDialog->initialize();
 }
 
 RemoteFileDialog::~RemoteFileDialog()
