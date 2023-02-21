@@ -21,6 +21,7 @@
 #include <QDialog>
 #include <QPointer>
 
+#include "RemoteHandler.h"
 #include "RemoteProgramParams.h"
 
 class RemoteSettingsDialog;
@@ -44,8 +45,12 @@ private slots:
     void acceptRemoteProgramParams(RemoteProgramParams* params);
 
 private:
+    void showRemoteDownloadErrorMessage(const QString& errorMessage);
+    void handleSuccessfulDownload(const QString& downloadedFileName);
+
     QScopedPointer<Ui::RemoteFileDialog> m_ui;
     QPointer<RemoteSettingsDialog> m_remoteSettingsDialog;
+    QPointer<RemoteHandler> m_remoteHandler;
 };
 
 #endif // KEEPASSXC_REMOTEFILEDIALOG_H
