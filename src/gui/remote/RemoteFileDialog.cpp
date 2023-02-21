@@ -18,13 +18,13 @@
 #include "RemoteFileDialog.h"
 #include "ui_RemoteFileDialog.h"
 
-#include "RemoteHandler.h"
 #include "RemoteSettingsDialog.h"
 
 RemoteFileDialog::RemoteFileDialog(QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::RemoteFileDialog())
     , m_remoteSettingsDialog(new RemoteSettingsDialog(this))
+    , m_remoteHandler(new RemoteHandler(this))
 {
     m_ui->setupUi(this);
 
@@ -34,8 +34,13 @@ RemoteFileDialog::RemoteFileDialog(QWidget* parent)
 
     connect(m_remoteSettingsDialog, SIGNAL(cancel(bool)), SLOT(close()));
     connect(m_remoteSettingsDialog,
-            SIGNAL(syncWithRemote(RemoteProgramParams*)),
-            SLOT(acceptRemoteProgramParams(RemoteProgramParams*)));
+            &RemoteSettingsDialog::syncWithRemote,
+            this,
+            &RemoteFileDialog::acceptRemoteProgramParams);
+
+    connect(
+        m_remoteHandler, &RemoteHandler::downloadedSuccessfullyTo, this, &RemoteFileDialog::handleSuccessfulDownload);
+    connect(m_remoteHandler, &RemoteHandler::downloadError, this, &RemoteFileDialog::showRemoteDownloadErrorMessage);
 
     m_remoteSettingsDialog->initialize();
 }
@@ -46,19 +51,18 @@ RemoteFileDialog::~RemoteFileDialog()
 
 void RemoteFileDialog::acceptRemoteProgramParams(RemoteProgramParams* remoteProgramParams)
 {
-    auto remoteHandler = new RemoteHandler(this);
-    connect(remoteHandler,
-            &RemoteHandler::downloadedSuccessfullyTo,
-            this,
-            [this, remoteHandler](const QString& downloadedFileName) {
-                accept();
-                delete remoteHandler;
-                emit downloadedSuccessfullyTo(downloadedFileName);
-            });
-    connect(remoteHandler, &RemoteHandler::downloadError, this, [this, remoteHandler](const QString& errorMessage) {
-        this->m_ui->messageWidget->showMessage(errorMessage, MessageWidget::Error);
-        delete remoteHandler;
-    });
+    this->setDisabled(true);
+    emit m_remoteHandler->downloadFromRemote(remoteProgramParams);
+}
 
-    emit remoteHandler->downloadFromRemote(remoteProgramParams);
+void RemoteFileDialog::handleSuccessfulDownload(const QString& downloadedFileName)
+{
+    accept();
+    emit downloadedSuccessfullyTo(downloadedFileName);
+}
+
+void RemoteFileDialog::showRemoteDownloadErrorMessage(const QString& errorMessage)
+{
+    this->setDisabled(false);
+    this->m_ui->messageWidget->showMessage(errorMessage, MessageWidget::Error);
 }
