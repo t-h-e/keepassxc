@@ -23,12 +23,13 @@
 class RemoteProcessFactory
 {
 public:
-    static RemoteProcess* createRemoteProcess(QObject* parent = nullptr);
+    static QScopedPointer<RemoteProcess> createRemoteProcess(QObject* parent = nullptr);
     // use only for testing
-    static void setCreateRemoteProcessFunc(std::function<RemoteProcess*(QObject*)> createRemoteProcessFunc);
+    static void
+    setCreateRemoteProcessFunc(std::function<QScopedPointer<RemoteProcess>(QObject*)> createRemoteProcessFunc);
 
 private:
-    static std::function<RemoteProcess*(QObject*)> m_createRemoteProcess;
+    static std::function<QScopedPointer<RemoteProcess>(QObject*)> m_createRemoteProcess;
 };
 
 #endif // KEEPASSXC_REMOTEPROCESSFACTORY_H

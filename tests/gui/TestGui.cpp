@@ -369,8 +369,8 @@ void TestGui::testRemoteSyncDatabaseSameKey()
 {
     QString sourceToMerge = "user@server:Database.kdbx";
     RemoteProcessFactory::setCreateRemoteProcessFunc([sourceToMerge](QObject* parent) {
-        return new MockRemoteProcess(
-            parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), sourceToMerge);
+        return QScopedPointer<RemoteProcess>(
+            new MockRemoteProcess(parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), sourceToMerge));
     });
 
     QSignalSpy dbSyncSpy(m_dbWidget.data(), &DatabaseWidget::databaseSyncedWith);
@@ -401,8 +401,8 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
 {
     QString sourceToMerge = "user@server:Database.kdbx";
     RemoteProcessFactory::setCreateRemoteProcessFunc([sourceToMerge](QObject* parent) {
-        return new MockRemoteProcess(
-            parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabaseDifferentPassword.kdbx"), sourceToMerge);
+        return QScopedPointer<RemoteProcess>(new MockRemoteProcess(
+            parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabaseDifferentPassword.kdbx"), sourceToMerge));
     });
 
     QSignalSpy dbSyncSpy(m_dbWidget.data(), &DatabaseWidget::databaseSyncedWith);
@@ -417,7 +417,8 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     urlEdit->setText(sourceToMerge);
     QTest::keyClick(urlEdit, Qt::Key_Enter);
     QApplication::processEvents();
-
+    // need to process more events as opening with the same key did not work and more events have been fired
+    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
     QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
     auto* editPasswordSync = QApplication::focusWidget();
     QVERIFY(editPasswordSync->isVisible());
@@ -1736,10 +1737,11 @@ void TestGui::testOpenRemoteDatabase()
 
     QString remoteFileToOpen = "user@server:Database.kdbx";
     RemoteProcessFactory::setCreateRemoteProcessFunc([remoteFileToOpen](QObject* parent) {
-        return new MockRemoteProcess(
-            parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), remoteFileToOpen);
+        return QScopedPointer<RemoteProcess>(new MockRemoteProcess(
+            parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), remoteFileToOpen));
     });
-    triggerAction("actionOpenRemoteDatabase");
+    auto* openRemoteButton = QApplication::activeWindow()->findChild<QPushButton*>("buttonOpenRemote");
+    QTest::mouseClick(openRemoteButton, Qt::LeftButton);
     QApplication::processEvents();
 
     // click on scp category
@@ -1753,8 +1755,13 @@ void TestGui::testOpenRemoteDatabase()
     // Assuming that the `scp` command is the first one
     auto* urlEdit = QApplication::activeModalWidget()->findChild<QWidget*>("url");
     QTest::keyClicks(urlEdit, remoteFileToOpen);
-    QTest::keyClick(urlEdit, Qt::Key_Enter);
+    auto* dialogButtonBox = QApplication::activeModalWidget()->findChild<QDialogButtonBox*>("buttonBox");
+    QTest::mouseClick(dialogButtonBox->button(QDialogButtonBox::Ok), Qt::LeftButton);
     QApplication::processEvents();
+
+    // set active window explicitly, as this seems to get lost in the test after the dialog has been accepted and closed
+    // this only fails in the CI pipeline (Ubuntu and Windows)
+    QApplication::setActiveWindow(m_mainWindow.data());
 
     QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
     auto* editPasswordSync = QApplication::focusWidget();

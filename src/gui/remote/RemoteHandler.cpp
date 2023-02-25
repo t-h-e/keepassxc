@@ -39,7 +39,7 @@ void RemoteHandler::download(RemoteProgramParams* remoteProgramParams)
 
 void RemoteHandler::downloadInternal(RemoteProgramParams* remoteProgramParams)
 {
-    auto* remoteProcess = RemoteProcessFactory::createRemoteProcess();
+    auto remoteProcess = RemoteProcessFactory::createRemoteProcess();
     QString destination = remoteProcess->getTempFileLocation();
     auto downloadCommand = remoteProgramParams->getCommandForDownload(destination);
     qDebug() << "download command" << downloadCommand;
@@ -52,9 +52,9 @@ void RemoteHandler::downloadInternal(RemoteProgramParams* remoteProgramParams)
         remoteProcess->waitForBytesWritten();
         remoteProcess->closeWriteChannel();
     }
+
     bool finished = remoteProcess->waitForFinished(10000);
     int statusCode = remoteProcess->exitCode();
-
     if (finished && statusCode == 0) {
         emit downloadedSuccessfullyTo(destination);
         return;
