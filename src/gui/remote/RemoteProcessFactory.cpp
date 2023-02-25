@@ -19,17 +19,18 @@
 
 #include <utility>
 
-std::function<RemoteProcess*(QObject*)> RemoteProcessFactory::m_createRemoteProcess([](QObject* parent) {
-    return new RemoteProcess(parent);
+std::function<QScopedPointer<RemoteProcess>(QObject*)> RemoteProcessFactory::m_createRemoteProcess([](QObject* parent) {
+    return QScopedPointer<RemoteProcess>(new RemoteProcess(parent));
 });
 
-RemoteProcess* RemoteProcessFactory::createRemoteProcess(QObject* parent)
+QScopedPointer<RemoteProcess> RemoteProcessFactory::createRemoteProcess(QObject* parent)
 {
     return m_createRemoteProcess(parent);
 }
 
 // use for testing only
-void RemoteProcessFactory::setCreateRemoteProcessFunc(std::function<RemoteProcess*(QObject*)> createRemoteProcessFunc)
+void RemoteProcessFactory::setCreateRemoteProcessFunc(
+    std::function<QScopedPointer<RemoteProcess>(QObject*)> createRemoteProcessFunc)
 {
     m_createRemoteProcess = std::move(createRemoteProcessFunc);
 }
