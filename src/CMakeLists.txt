@@ -166,6 +166,7 @@ set(keepassx_SOURCES
         gui/remote/AnyCommandParams.cpp
         gui/remote/RemoteFileDialog.cpp
         gui/remote/RemoteHandler.cpp
+        gui/remote/RemoteParamsConfig.cpp
         gui/remote/RemoteProcess.cpp
         gui/remote/RemoteProcessFactory.cpp
         gui/remote/RemoteSettingsDialog.cpp

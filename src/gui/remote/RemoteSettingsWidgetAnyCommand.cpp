@@ -20,6 +20,7 @@
 
 #include "AnyCommandParams.h"
 #include "core/Config.h"
+#include "RemoteParamsConfig.h"
 
 RemoteSettingsWidgetAnyCommand::RemoteSettingsWidgetAnyCommand(QWidget* parent)
     : RemoteSettingsWidget(parent)
@@ -34,6 +35,14 @@ RemoteSettingsWidgetAnyCommand::~RemoteSettingsWidgetAnyCommand()
 
 void RemoteSettingsWidgetAnyCommand::initialize()
 {
+    auto lastAnyCommand = remoteParamsConfig()->getLastRemoteProgramOf<AnyCommandParams>("anyCommand");
+    // TODO: how to set these as AnyCommandParams only returns already
+//    m_ui->downloadCommand->setText(lastAnyCommand->getCommandForDownload());
+//    m_ui->inputForDownload->setPlainText(config()->get(Config::Remote_AnyCommand_DownloadInput).toString());
+//    m_ui->uploadCommand->setText(config()->get(Config::Remote_AnyCommand_UploadCommand).toString());
+//    m_ui->inputForUpload->setPlainText(config()->get(Config::Remote_AnyCommand_UploadInput).toString());
+
+
     m_ui->downloadCommand->setText(config()->get(Config::Remote_AnyCommand_DownloadCommand).toString());
     m_ui->inputForDownload->setPlainText(config()->get(Config::Remote_AnyCommand_DownloadInput).toString());
     m_ui->uploadCommand->setText(config()->get(Config::Remote_AnyCommand_UploadCommand).toString());

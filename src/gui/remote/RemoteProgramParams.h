@@ -26,6 +26,7 @@ class RemoteProgramParams
 public:
     virtual ~RemoteProgramParams() = default;
 
+    virtual QString type() = 0;
     virtual bool allNecessaryParamsSet() = 0;
     virtual QString getCommandForDownload(QString destination) = 0;
     virtual QString getCommandForUpload(QString source) = 0;

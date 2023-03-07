@@ -37,16 +37,10 @@ public:
 
     virtual void load(QSharedPointer<Database> db);
 
-    const QSharedPointer<Database> getDatabase() const;
+    QSharedPointer<Database> getDatabase() const;
 
 public slots:
     virtual RemoteProgramParams* getRemoteProgramParams() = 0;
-
-signals:
-    /**
-     * Can be emitted to indicate size changes and allow parents widgets to adjust properly.
-     */
-    void sizeChanged();
 
 protected:
     QSharedPointer<Database> m_db;

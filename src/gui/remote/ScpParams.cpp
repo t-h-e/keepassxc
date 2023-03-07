@@ -65,3 +65,15 @@ QStringList ScpParams::getOptions()
     }
     return options;
 }
+
+QDataStream& operator<<(QDataStream &out, const ScpParams& scpParams) {
+    out << scpParams.m_url << scpParams.m_port << scpParams.m_keyFile;
+    return out;
+}
+
+QDataStream& operator>>(QDataStream &in, ScpParams& scpParams) {
+    in >> scpParams.m_url;
+    in >> scpParams.m_port;
+    in >> scpParams.m_keyFile;
+    return in;
+}

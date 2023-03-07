@@ -20,6 +20,7 @@
 
 #include "RemoteSettingsWidgetAnyCommand.h"
 #include "RemoteSettingsWidgetScp.h"
+#include "RemoteParamsConfig.h"
 
 #include "core/Database.h"
 #include "core/Global.h"
@@ -88,6 +89,7 @@ void RemoteSettingsDialog::save()
     remoteSettingsWidget->save();
 
     auto remoteProgramParams = remoteSettingsWidget->getRemoteProgramParams();
+    remoteParamsConfig()->updateRemoteProgramEntries(remoteProgramParams);
     emit syncWithRemote(remoteProgramParams);
 }
 

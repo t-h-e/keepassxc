@@ -39,7 +39,7 @@ void RemoteSettingsWidget::load(QSharedPointer<Database> db)
     initialize();
 }
 
-const QSharedPointer<Database> RemoteSettingsWidget::getDatabase() const
+QSharedPointer<Database> RemoteSettingsWidget::getDatabase() const
 {
     return m_db;
 }

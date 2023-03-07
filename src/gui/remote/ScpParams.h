@@ -19,19 +19,32 @@
 #define KEEPASSXC_SCPPARAMS_H
 
 #include "RemoteProgramParams.h"
+#include <QMetaType>
 #include <QStringList>
 
 class ScpParams : public RemoteProgramParams
 {
 public:
+    ScpParams() = default;
+    ScpParams(const ScpParams &) = default;
+    ScpParams &operator=(const ScpParams &) = default;
+
+//    ScpParams(QString url, QString port, QString keyFile);
+
     explicit ScpParams(QString url);
 
     void setPort(QString port);
     void setKeyFile(QString keyFile);
 
+    QString type() override {
+        return "scp";
+    }
     bool allNecessaryParamsSet() override;
     QString getCommandForDownload(QString destination) override;
     QString getCommandForUpload(QString source) override;
+
+    friend QDataStream &operator<<(QDataStream &out, const ScpParams& scpParams);
+    friend QDataStream &operator>>(QDataStream &in, ScpParams& scpParams);
 
 private:
     QString getProgram()
@@ -45,5 +58,7 @@ private:
     QString m_port;
     QString m_keyFile;
 };
+
+Q_DECLARE_METATYPE(ScpParams);
 
 #endif // KEEPASSXC_SCPPARAMS_H

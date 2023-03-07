@@ -202,6 +202,8 @@ public:
         Remote_AnyCommand_UploadCommand,
         Remote_AnyCommand_UploadInput,
 
+        Remote_Program_Params,
+
         // Special internal value
         Deleted
     };
