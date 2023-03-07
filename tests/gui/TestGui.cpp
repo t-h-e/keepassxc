@@ -367,10 +367,10 @@ void TestGui::testMergeDatabase()
 
 void TestGui::testRemoteSyncDatabaseSameKey()
 {
-    QString sourceToMerge = "user@server:Database.kdbx";
-    RemoteProcessFactory::setCreateRemoteProcessFunc([sourceToMerge](QObject* parent) {
+    QString sourceToSync = "sftp user@server:Database.kdbx";
+    RemoteProcessFactory::setCreateRemoteProcessFunc([sourceToSync](QObject* parent) {
         return QScopedPointer<RemoteProcess>(
-            new MockRemoteProcess(parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), sourceToMerge));
+            new MockRemoteProcess(parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), sourceToSync));
     });
 
     QSignalSpy dbSyncSpy(m_dbWidget.data(), &DatabaseWidget::databaseSyncedWith);
@@ -380,10 +380,10 @@ void TestGui::testRemoteSyncDatabaseSameKey()
 
     // set URL to merge from
     auto* remoteSettingsDialog = m_dbWidget->findChild<QWidget*>("remoteSettingsDialog");
-    auto* urlEdit = remoteSettingsDialog->findChild<QLineEdit*>("url");
-    QVERIFY(urlEdit != nullptr);
-    urlEdit->setText(sourceToMerge);
-    QTest::keyClick(urlEdit, Qt::Key_Enter);
+    auto* downloadCommandEdit = remoteSettingsDialog->findChild<QLineEdit*>("downloadCommand");
+    QVERIFY(downloadCommandEdit != nullptr);
+    downloadCommandEdit->setText(sourceToSync);
+    QTest::keyClick(downloadCommandEdit, Qt::Key_Enter);
     QApplication::processEvents();
 
     QTRY_COMPARE(dbSyncSpy.count(), 1);
@@ -399,10 +399,10 @@ void TestGui::testRemoteSyncDatabaseSameKey()
 
 void TestGui::testRemoteSyncDatabaseRequiresPassword()
 {
-    QString sourceToMerge = "user@server:Database.kdbx";
-    RemoteProcessFactory::setCreateRemoteProcessFunc([sourceToMerge](QObject* parent) {
+    QString sourceToSync = "sftp user@server:Database.kdbx";
+    RemoteProcessFactory::setCreateRemoteProcessFunc([sourceToSync](QObject* parent) {
         return QScopedPointer<RemoteProcess>(new MockRemoteProcess(
-            parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabaseDifferentPassword.kdbx"), sourceToMerge));
+            parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabaseDifferentPassword.kdbx"), sourceToSync));
     });
 
     QSignalSpy dbSyncSpy(m_dbWidget.data(), &DatabaseWidget::databaseSyncedWith);
@@ -412,10 +412,10 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
 
     // set URL to merge from
     auto* remoteSettingsDialog = m_dbWidget->findChild<QWidget*>("remoteSettingsDialog");
-    auto* urlEdit = remoteSettingsDialog->findChild<QLineEdit*>("url");
-    QVERIFY(urlEdit != nullptr);
-    urlEdit->setText(sourceToMerge);
-    QTest::keyClick(urlEdit, Qt::Key_Enter);
+    auto* downloadCommandEdit = remoteSettingsDialog->findChild<QLineEdit*>("downloadCommand");
+    QVERIFY(downloadCommandEdit != nullptr);
+    downloadCommandEdit->setText(sourceToSync);
+    QTest::keyClick(downloadCommandEdit, Qt::Key_Enter);
     QApplication::processEvents();
     // need to process more events as opening with the same key did not work and more events have been fired
     QApplication::processEvents(QEventLoop::WaitForMoreEvents);
@@ -1735,7 +1735,7 @@ void TestGui::testOpenRemoteDatabase()
     // close current database
     cleanup();
 
-    QString remoteFileToOpen = "user@server:Database.kdbx";
+    QString remoteFileToOpen = "sftp user@server:Database.kdbx";
     RemoteProcessFactory::setCreateRemoteProcessFunc([remoteFileToOpen](QObject* parent) {
         return QScopedPointer<RemoteProcess>(new MockRemoteProcess(
             parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx"), remoteFileToOpen));
@@ -1744,17 +1744,8 @@ void TestGui::testOpenRemoteDatabase()
     QTest::mouseClick(openRemoteButton, Qt::LeftButton);
     QApplication::processEvents();
 
-    // click on scp category
-    auto categoryItemList =
-        QApplication::activeModalWidget()->findChild<CategoryListWidget*>("categoryList")->findChild<QListWidget*>();
-    auto scpListItems = categoryItemList->findItems("scp", Qt::MatchExactly);
-    QTRY_COMPARE(scpListItems.size(), 1);
-    const auto scpItemRect = categoryItemList->visualItemRect(scpListItems.at(0));
-    QTest::mouseClick(categoryItemList->viewport(), Qt::LeftButton, nullptr, scpItemRect.center());
-
-    // Assuming that the `scp` command is the first one
-    auto* urlEdit = QApplication::activeModalWidget()->findChild<QWidget*>("url");
-    QTest::keyClicks(urlEdit, remoteFileToOpen);
+    auto* downloadCommandEdit = QApplication::activeModalWidget()->findChild<QLineEdit*>("downloadCommand");
+    QTest::keyClicks(downloadCommandEdit, remoteFileToOpen);
     auto* dialogButtonBox = QApplication::activeModalWidget()->findChild<QDialogButtonBox*>("buttonBox");
     QTest::mouseClick(dialogButtonBox->button(QDialogButtonBox::Ok), Qt::LeftButton);
     QApplication::processEvents();

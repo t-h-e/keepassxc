@@ -20,11 +20,6 @@
 #include "core/Entry.h"
 #include <utility>
 
-AnyCommandParams::AnyCommandParams()
-    : RemoteProgramParams()
-{
-}
-
 void AnyCommandParams::setCommandForDownload(QString downloadCommand)
 {
     m_downloadCommand = std::move(downloadCommand);
@@ -64,7 +59,7 @@ QString AnyCommandParams::getInputForUpload(QString source)
     return resolveCommandOrInput(m_uploadCommandInput, source);
 }
 
-QString AnyCommandParams::resolveCommandOrInput(QString input, QString tempDatabasePath)
+QString AnyCommandParams::resolveCommandOrInput(QString input, const QString& tempDatabasePath)
 {
     auto resolved = input.replace("{TEMP_DATABASE}", tempDatabasePath);
     // TODO: Question for the reviewer: currently `Entry::resolveReferencePlaceholderRecursive` is private,

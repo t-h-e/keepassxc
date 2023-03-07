@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 KeePassXC Team <team@keepassxc.org>
+ *  Copyright (C) 2023 KeePassXC Team <team@keepassxc.org>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -15,39 +15,41 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KEEPASSXC_REMOTEFILEDIALOG_H
-#define KEEPASSXC_REMOTEFILEDIALOG_H
+#ifndef KEEPASSXC_REMOTESETTINGSCOMMANDWIDGET_H
+#define KEEPASSXC_REMOTESETTINGSCOMMANDWIDGET_H
 
-#include <QDialog>
-#include <QPointer>
-
-#include "RemoteHandler.h"
 #include "RemoteProgramParams.h"
+
+#include <QWidget>
+
+class Database;
 
 namespace Ui
 {
-    class RemoteFileDialog;
+    class RemoteSettingsCommandWidget;
 }
 
-class RemoteFileDialog : public QDialog
+class RemoteSettingsCommandWidget : public QWidget
 {
     Q_OBJECT
-public:
-    explicit RemoteFileDialog(QWidget* parent = nullptr);
-    ~RemoteFileDialog() override;
 
-signals:
-    void downloadedSuccessfullyTo(const QString& filePath);
+public:
+    explicit RemoteSettingsCommandWidget(QWidget* parent = nullptr);
+    Q_DISABLE_COPY(RemoteSettingsCommandWidget);
+    ~RemoteSettingsCommandWidget() override;
+
+    void initialize();
+    RemoteProgramParams* getRemoteProgramParams();
 
 private slots:
-    void acceptRemoteProgramParams();
+    void saveCurrentSettings();
+    void removeCurrentSettings();
+    void editCurrentSettings();
 
 private:
-    void showRemoteDownloadErrorMessage(const QString& errorMessage);
-    void handleSuccessfulDownload(const QString& downloadedFileName);
+    void updateSettingsList();
 
-    QScopedPointer<Ui::RemoteFileDialog> m_ui;
-    QPointer<RemoteHandler> m_remoteHandler;
+    const QScopedPointer<Ui::RemoteSettingsCommandWidget> m_ui;
 };
 
-#endif // KEEPASSXC_REMOTEFILEDIALOG_H
+#endif // KEEPASSXC_REMOTESETTINGSCOMMANDWIDGET_H

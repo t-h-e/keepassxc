@@ -221,6 +221,7 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     connect(m_databaseSettingDialog, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
     connect(m_remoteSettingDialog, SIGNAL(cancel(bool)), SLOT(switchToMainView(bool)));
     connect(m_remoteSettingDialog, SIGNAL(syncWithRemote(RemoteProgramParams*)), SLOT(syncWithRemoteAndSwitchToMainView(RemoteProgramParams*)));
+    connect(m_remoteSettingDialog, SIGNAL(saveToRemote(RemoteProgramParams*)), SLOT(saveToRemoteAndSwitchToMainView(RemoteProgramParams*)));
     connect(m_databaseOpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
     connect(m_keepass1OpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
     connect(m_opVaultOpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
@@ -1035,6 +1036,12 @@ int DatabaseWidget::addChildWidget(QWidget* w)
     int index = QStackedWidget::addWidget(w);
     adjustSize();
     return index;
+}
+
+void DatabaseWidget::saveToRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams)
+{
+    switchToMainView(true);
+    emit saveToRemote(remoteProgramParams);
 }
 
 void DatabaseWidget::syncWithRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams)

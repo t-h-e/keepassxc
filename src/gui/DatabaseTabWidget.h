@@ -66,7 +66,8 @@ public slots:
     DatabaseWidget* newDatabase();
     void openDatabase();
     void mergeDatabase();
-    void syncDatabaseWithRemote(RemoteProgramParams* RemoteProgramParams);
+    void syncDatabaseWithRemote(RemoteProgramParams* remoteProgramParams);
+    void saveDatabaseToRemote(RemoteProgramParams* remoteProgramParams);
     void remoteSyncDatabase(const QString& filePath);
 
     void importKeePass1Database();
@@ -122,7 +123,8 @@ private slots:
     void handleExportError(const QString& reason);
     void updateLastDatabases();
     void remoteSyncSuccess();
-    void showRemoteSyncErrorMessage(const QString& errorMessage);
+    void remoteUploadSuccess();
+    void showRemoteErrorMessage(const QString& errorMessage);
 
 private:
     QSharedPointer<Database> execNewDatabaseWizard();
@@ -135,8 +137,8 @@ private:
     QPointer<DatabaseOpenDialog> m_databaseOpenDialog;
     QTimer m_lockDelayTimer;
     bool m_databaseOpenInProgress;
-
-    QPointer<RemoteHandler> m_remoteHandler;
+    QPointer<RemoteHandler> m_remoteSyncHandler;
+    QPointer<RemoteHandler> m_remoteUploadHandler;
 };
 
 #endif // KEEPASSX_DATABASETABWIDGET_H

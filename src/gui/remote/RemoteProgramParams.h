@@ -19,24 +19,16 @@
 #define KEEPASSXC_REMOTEPROGRAMPARAMS_H
 
 #include <QString>
-#include <optional>
 
 class RemoteProgramParams
 {
 public:
     virtual ~RemoteProgramParams() = default;
 
-    virtual bool allNecessaryParamsSet() = 0;
     virtual QString getCommandForDownload(QString destination) = 0;
     virtual QString getCommandForUpload(QString source) = 0;
-    virtual QString getInputForDownload(QString /*destination*/)
-    {
-        return "";
-    };
-    virtual QString getInputForUpload(QString /*source*/)
-    {
-        return "";
-    };
+    virtual QString getInputForDownload(QString destination) = 0;
+    virtual QString getInputForUpload(QString source) = 0;
 };
 
 #endif // KEEPASSXC_REMOTEPROGRAMPARAMS_H

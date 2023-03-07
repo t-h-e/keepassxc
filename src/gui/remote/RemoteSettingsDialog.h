@@ -15,8 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KEEPASSX_REMOTESETTINGSWIDGET_H
-#define KEEPASSX_REMOTESETTINGSWIDGET_H
+#ifndef KEEPASSX_REMOTESETTINGSDIALOG_H
+#define KEEPASSX_REMOTESETTINGSDIALOG_H
 
 #include "RemoteProgramParams.h"
 #include "config-keepassx.h"
@@ -25,24 +25,11 @@
 #include <QPointer>
 
 class Database;
-class RemoteSettingsWidgetAnyCommand;
-class RemoteSettingsWidgetScp;
 
 namespace Ui
 {
     class RemoteSettingsDialog;
 }
-
-class IRemoteSettingsPage
-{
-public:
-    virtual ~IRemoteSettingsPage() = default;
-    virtual QString name() = 0;
-    virtual QIcon icon() = 0;
-    virtual QWidget* createWidget() = 0;
-    virtual void loadSettings(QWidget* widget, QSharedPointer<Database> db) = 0;
-    virtual void saveSettings(QWidget* widget) = 0;
-};
 
 class RemoteSettingsDialog : public DialogyWidget
 {
@@ -55,22 +42,26 @@ public:
 
     void initialize();
     void load(const QSharedPointer<Database>& db);
-    void addSettingsPage(IRemoteSettingsPage* page);
 
 signals:
     void cancel(bool accepted);
+    void saveToRemote(RemoteProgramParams* remoteProgramParams);
     void syncWithRemote(RemoteProgramParams* remoteProgramParams);
 
+protected:
+    void keyPressEvent(QKeyEvent* e) override;
+
 private slots:
-    void save();
+    void remoteSave();
+    void remoteSync();
     void reject();
-    void pageChanged();
 
 private:
+    RemoteProgramParams* getCurrentParams();
+    static bool clickButton(QPushButton* button);
+
     QSharedPointer<Database> m_db;
     const QScopedPointer<Ui::RemoteSettingsDialog> m_ui;
-    QPointer<RemoteSettingsWidgetAnyCommand> m_remoteAnyCommandWidget;
-    QPointer<RemoteSettingsWidgetScp> m_remoteScpWidget;
 };
 
-#endif // KEEPASSX_REMOTESETTINGSWIDGET_H
+#endif // KEEPASSX_REMOTESETTINGSDIALOG_H

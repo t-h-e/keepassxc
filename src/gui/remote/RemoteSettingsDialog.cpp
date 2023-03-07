@@ -18,39 +18,24 @@
 #include "RemoteSettingsDialog.h"
 #include "ui_RemoteSettingsDialog.h"
 
-#include "RemoteSettingsWidgetAnyCommand.h"
-#include "RemoteSettingsWidgetScp.h"
+#include "RemoteParamsConfig.h"
 
 #include "core/Database.h"
 #include "core/Global.h"
-#include "gui/Icons.h"
 
+#include <QKeyEvent>
+#include <QMenu>
 #include <QScrollArea>
-
-#include <QDebug>
 
 RemoteSettingsDialog::RemoteSettingsDialog(QWidget* parent)
     : DialogyWidget(parent)
     , m_ui(new Ui::RemoteSettingsDialog())
-    , m_remoteAnyCommandWidget(new RemoteSettingsWidgetAnyCommand(this))
-    , m_remoteScpWidget(new RemoteSettingsWidgetScp(this))
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->buttonBox, SIGNAL(accepted()), SLOT(save()));
-    connect(m_ui->buttonBox, SIGNAL(rejected()), SLOT(reject()));
-
-    m_ui->categoryList->addCategory(tr("scp"), icons()->icon("web"));
-    m_ui->categoryList->addCategory(tr("anyCommand"), icons()->icon("web"));
-    m_ui->stackedWidget->addWidget(m_remoteScpWidget);
-    m_ui->stackedWidget->addWidget(m_remoteAnyCommandWidget);
-
-    m_ui->categoryList->setCurrentCategory(0);
-    m_ui->stackedWidget->setCurrentIndex(0);
-
-    connect(m_ui->categoryList, SIGNAL(categoryChanged(int)), m_ui->stackedWidget, SLOT(setCurrentIndex(int)));
-
-    pageChanged();
+    connect(m_ui->cancelButton, &QPushButton::clicked, this, &RemoteSettingsDialog::reject);
+    connect(m_ui->remoteSaveButton, &QPushButton::clicked, this, &RemoteSettingsDialog::remoteSave);
+    connect(m_ui->remoteSyncButton, &QPushButton::clicked, this, &RemoteSettingsDialog::remoteSync);
 }
 
 RemoteSettingsDialog::~RemoteSettingsDialog()
@@ -59,36 +44,29 @@ RemoteSettingsDialog::~RemoteSettingsDialog()
 
 void RemoteSettingsDialog::initialize()
 {
-    m_remoteScpWidget->initialize();
-    m_remoteAnyCommandWidget->initialize();
+    m_ui->remoteSettingsCommandWidget->initialize();
 }
 
 void RemoteSettingsDialog::load(const QSharedPointer<Database>& db)
 {
-    m_remoteScpWidget->load(db);
-    m_remoteAnyCommandWidget->load(db);
-
     m_db = db;
 }
 
-void RemoteSettingsDialog::addSettingsPage(IRemoteSettingsPage* page)
+void RemoteSettingsDialog::remoteSave()
 {
-    const int category = m_ui->categoryList->currentCategory();
-    QWidget* widget = page->createWidget();
-    widget->setParent(this);
-    m_ui->stackedWidget->addWidget(widget);
-    m_ui->categoryList->addCategory(page->name(), page->icon());
-    m_ui->categoryList->setCurrentCategory(category);
+    auto remoteProgramParams = getCurrentParams();
+    emit saveToRemote(remoteProgramParams);
 }
 
-void RemoteSettingsDialog::save()
+void RemoteSettingsDialog::remoteSync()
 {
-    auto remoteSettingsWidget = dynamic_cast<RemoteSettingsWidget*>(m_ui->stackedWidget->currentWidget());
-    // Only save the current widget
-    remoteSettingsWidget->save();
-
-    auto remoteProgramParams = remoteSettingsWidget->getRemoteProgramParams();
+    auto remoteProgramParams = getCurrentParams();
     emit syncWithRemote(remoteProgramParams);
+}
+
+RemoteProgramParams* RemoteSettingsDialog::getCurrentParams()
+{
+    return m_ui->remoteSettingsCommandWidget->getRemoteProgramParams();
 }
 
 void RemoteSettingsDialog::reject()
@@ -96,6 +74,44 @@ void RemoteSettingsDialog::reject()
     emit cancel(false);
 }
 
-void RemoteSettingsDialog::pageChanged()
+// similar to DialogyWidget::keyPressEvent but no QDialogButtonBox is used
+void RemoteSettingsDialog::keyPressEvent(QKeyEvent* e)
 {
+#ifdef Q_OS_MACOS
+    if (e->modifiers() == Qt::ControlModifier && e->key() == Qt::Key_Period) {
+        if (!clickButton(m_ui->cancelButton)) {
+            e->ignore();
+        }
+    } else
+#endif
+        if (!e->modifiers() || e->modifiers() == Qt::ControlModifier
+            || (e->modifiers() & Qt::KeypadModifier && e->key() == Qt::Key_Enter)) {
+        switch (e->key()) {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+            if (!clickButton(m_ui->remoteSyncButton)) {
+                e->ignore();
+            }
+            break;
+        case Qt::Key_Escape:
+            if (!clickButton(m_ui->cancelButton)) {
+                e->ignore();
+            }
+            break;
+        default:
+            e->ignore();
+        }
+    } else {
+        e->ignore();
+    }
+}
+
+bool RemoteSettingsDialog::clickButton(QPushButton* pb)
+{
+    if (pb->isVisible() && pb->isEnabled()) {
+        pb->click();
+        return true;
+    }
+
+    return false;
 }
