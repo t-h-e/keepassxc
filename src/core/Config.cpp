@@ -220,14 +220,8 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
     {Config::Messages_HidePreReleaseWarning, {QS("Messages/HidePreReleaseWarning"), Local, {}}},
 
     // Remote
-    {Config::Remote_Scp_Url,{QS("Remote/Scp/Url"), Local, {}}},
-    {Config::Remote_Scp_Port,{QS("Remote/Scp/Port"), Local, {}}},
-    {Config::Remote_Scp_KeyFile,{QS("Remote/Scp/KeyFile"), Local, {}}},
+    {Config::Remote_Program_Settings,{QS("Remote/ProgramSetting"), Local, {}}}
 
-    {Config::Remote_AnyCommand_DownloadCommand,{QS("Remote/AnyCommand/DownloadCommand"), Local, {}}},
-    {Config::Remote_AnyCommand_DownloadInput,{QS("Remote/AnyCommand/DownloadInput"), Local, {}}},
-    {Config::Remote_AnyCommand_UploadCommand,{QS("Remote/AnyCommand/UploadCommand"), Local, {}}},
-    {Config::Remote_AnyCommand_UploadInput,{QS("Remote/AnyCommand/UploadInput"), Local, {}}}
     };
 // clang-format on
 

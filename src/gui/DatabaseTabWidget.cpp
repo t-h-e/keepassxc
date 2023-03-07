@@ -44,7 +44,8 @@ DatabaseTabWidget::DatabaseTabWidget(QWidget* parent)
     , m_dbWidgetPendingLock(nullptr)
     , m_databaseOpenDialog(new DatabaseOpenDialog(this))
     , m_databaseOpenInProgress(false)
-    , m_remoteHandler(new RemoteHandler(this))
+    , m_remoteSyncHandler(new RemoteHandler(this))
+    , m_remoteUploadHandler(new RemoteHandler(this))
 {
     auto* tabBar = new QTabBar(this);
     tabBar->setAcceptDrops(true);
@@ -62,10 +63,13 @@ DatabaseTabWidget::DatabaseTabWidget(QWidget* parent)
     connect(autoType(), SIGNAL(autotypeRejected()), SLOT(relockPendingDatabase()));
     connect(m_databaseOpenDialog.data(), &DatabaseOpenDialog::dialogFinished,
             this, &DatabaseTabWidget::handleDatabaseUnlockDialogFinished);
-    connect(m_remoteHandler, &RemoteHandler::downloadedSuccessfullyTo, this, &DatabaseTabWidget::remoteSyncDatabase);
-    connect(m_remoteHandler, &RemoteHandler::downloadError, this, &DatabaseTabWidget::showRemoteSyncErrorMessage);
-    connect(m_remoteHandler, &RemoteHandler::uploadError, this, &DatabaseTabWidget::showRemoteSyncErrorMessage);
-    connect(m_remoteHandler, &RemoteHandler::uploadSuccess, this, &DatabaseTabWidget::remoteSyncSuccess);
+    connect(m_remoteSyncHandler, &RemoteHandler::downloadedSuccessfullyTo, this, &DatabaseTabWidget::remoteSyncDatabase);
+    connect(m_remoteSyncHandler, &RemoteHandler::downloadError, this, &DatabaseTabWidget::showRemoteErrorMessage);
+    connect(m_remoteSyncHandler, &RemoteHandler::uploadError, this, &DatabaseTabWidget::showRemoteErrorMessage);
+    connect(m_remoteSyncHandler, &RemoteHandler::uploadSuccess, this, &DatabaseTabWidget::remoteSyncSuccess);
+
+    connect(m_remoteUploadHandler, &RemoteHandler::uploadError, this, &DatabaseTabWidget::showRemoteErrorMessage);
+    connect(m_remoteUploadHandler, &RemoteHandler::uploadSuccess, this, &DatabaseTabWidget::remoteUploadSuccess);
     // clang-format on
 
 #ifdef Q_OS_MACOS
@@ -256,6 +260,7 @@ void DatabaseTabWidget::addDatabaseTab(DatabaseWidget* dbWidget, bool inBackgrou
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(updateTabName()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(emitDatabaseLockChanged()));
     connect(dbWidget, SIGNAL(syncWithRemote(RemoteProgramParams*)), SLOT(syncDatabaseWithRemote(RemoteProgramParams*)));
+    connect(dbWidget, SIGNAL(saveToRemote(RemoteProgramParams*)), SLOT(saveDatabaseToRemote(RemoteProgramParams*)));
 }
 
 void DatabaseTabWidget::importCsv()
@@ -297,6 +302,22 @@ void DatabaseTabWidget::mergeDatabase(const QString& filePath)
     unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::Merge, filePath);
 }
 
+void DatabaseTabWidget::saveDatabaseToRemote(RemoteProgramParams* remoteProgramParams)
+{
+    emit updateSyncProgress(50, "Uploading...");
+
+    this->currentDatabaseWidget()->setDisabled(true);
+    auto currentDatabase = this->currentDatabaseWidget()->database();
+    emit m_remoteUploadHandler->uploadToRemote(currentDatabase, remoteProgramParams);
+}
+
+void DatabaseTabWidget::remoteUploadSuccess()
+{
+    this->currentDatabaseWidget()->setDisabled(false);
+    emit updateSyncProgress(-1, "");
+    currentDatabaseWidget()->showMessage("Upload successful.", MessageWidget::MessageType::Information);
+}
+
 void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgramParams)
 {
     emit updateSyncProgress(25, "Downloading...");
@@ -308,13 +329,13 @@ void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgra
             disconnect(*oneShotUploadConnection);
             delete oneShotUploadConnection;
             emit this->updateSyncProgress(75, "Uploading...");
-            emit m_remoteHandler->uploadToRemote(database, remoteProgramParams);
+            emit m_remoteSyncHandler->uploadToRemote(database, remoteProgramParams);
         };
     *oneShotUploadConnection =
         connect(this->currentDatabaseWidget(), &DatabaseWidget::databaseSyncedWith, uploadSyncedDatabase);
 
     this->currentDatabaseWidget()->setDisabled(true);
-    emit m_remoteHandler->downloadFromRemote(remoteProgramParams);
+    emit m_remoteSyncHandler->downloadFromRemote(remoteProgramParams);
 }
 
 void DatabaseTabWidget::remoteSyncSuccess()
@@ -323,7 +344,7 @@ void DatabaseTabWidget::remoteSyncSuccess()
     emit updateSyncProgress(-1, "");
 }
 
-void DatabaseTabWidget::showRemoteSyncErrorMessage(const QString& errorMessage)
+void DatabaseTabWidget::showRemoteErrorMessage(const QString& errorMessage)
 {
     this->currentDatabaseWidget()->setDisabled(false);
     emit updateSyncProgress(-1, "");

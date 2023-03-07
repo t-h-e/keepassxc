@@ -167,13 +167,12 @@ set(keepassx_SOURCES
         gui/remote/AnyCommandParams.cpp
         gui/remote/RemoteFileDialog.cpp
         gui/remote/RemoteHandler.cpp
+        gui/remote/RemoteParamsConfig.cpp
         gui/remote/RemoteProcess.cpp
         gui/remote/RemoteProcessFactory.cpp
+        gui/remote/RemoteSettings.cpp
+        gui/remote/RemoteSettingsCommandWidget.cpp
         gui/remote/RemoteSettingsDialog.cpp
-        gui/remote/RemoteSettingsWidget.cpp
-        gui/remote/RemoteSettingsWidgetAnyCommand.cpp
-        gui/remote/RemoteSettingsWidgetScp.cpp
-        gui/remote/ScpParams.cpp
         gui/reports/ReportsWidget.cpp
         gui/reports/ReportsDialog.cpp
         gui/reports/ReportsWidgetHealthcheck.cpp

@@ -149,6 +149,7 @@ signals:
     void databaseMerged(QSharedPointer<Database> mergedDb);
     void databaseSyncedWith(QSharedPointer<Database> syncedDb);
     void syncWithRemote(RemoteProgramParams* remoteProgramParams);
+    void saveToRemote(RemoteProgramParams* remoteProgramParams);
     void groupContextMenuRequested(const QPoint& globalPos);
     void entryContextMenuRequested(const QPoint& globalPos);
     void listModeAboutToActivate();
@@ -209,6 +210,7 @@ public slots:
     void cloneGroup();
     void deleteGroup();
     void syncWithRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams);
+    void saveToRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams);
     bool attemptSyncDatabaseWithSameKey(const QString& filePath);
     void switchToMainView(bool previousDialogAccepted = false);
     void switchToEntryEdit();

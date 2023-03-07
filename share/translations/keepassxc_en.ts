@@ -5522,10 +5522,6 @@ We recommend you use the AppImage available on our downloads page.</source>
         <source>&amp;Remote Sync…</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Remote sync</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%1 Entry(s)</source>
         <translation type="unfinished">
@@ -5563,6 +5559,18 @@ We recommend you use the AppImage available on our downloads page.</source>
     </message>
     <message>
         <source>Open remote database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Remote Sync Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open remote sync settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open remote database…</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8310,7 +8318,7 @@ Kernel: %3 %4</source>
 <context>
     <name>RemoteFileDialog</name>
     <message>
-        <source>Dialog</source>
+        <source>Open from remote</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8334,18 +8342,31 @@ Kernel: %3 %4</source>
     </message>
 </context>
 <context>
-    <name>RemoteSettingsDialog</name>
+    <name>RemoteSettingsCommandWidget</name>
     <message>
-        <source>scp</source>
+        <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>anyCommand</source>
+        <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>RemoteSettingsWidgetAnyCommand</name>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove settings</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Download</source>
         <translation type="unfinished"></translation>
@@ -8402,45 +8423,17 @@ The command has to exit. In case of `sftp` as last commend `exit` has to be sent
     </message>
 </context>
 <context>
-    <name>RemoteSettingsWidgetScp</name>
+    <name>RemoteSettingsDialog</name>
     <message>
-        <source>Connection</source>
+        <source>Sync</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
-    </message>
-    <message>
-        <source>URL field</source>
+        <source>Upload</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Port:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Port field</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Key file:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Key File field</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[user@]hostname:DatabaseOnRemote.kdbx</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>(default: 22)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>(optional)</source>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
