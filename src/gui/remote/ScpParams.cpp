@@ -17,6 +17,8 @@
 
 #include "ScpParams.h"
 
+#include <QMap>
+#include <QSharedPointer>
 #include <utility>
 
 ScpParams::ScpParams(QString url)
@@ -65,15 +67,23 @@ QStringList ScpParams::getOptions()
     }
     return options;
 }
-
-QDataStream& operator<<(QDataStream &out, const ScpParams& scpParams) {
-    out << scpParams.m_url << scpParams.m_port << scpParams.m_keyFile;
-    return out;
+QMap<QString, QString> ScpParams::toConfig()
+{
+    QMap<QString, QString> configMap;
+    configMap.insert("type", type());
+    configMap.insert("url", m_url);
+    configMap.insert("port", m_port);
+    configMap.insert("keyFile", m_keyFile);
+    return configMap;
 }
 
-QDataStream& operator>>(QDataStream &in, ScpParams& scpParams) {
-    in >> scpParams.m_url;
-    in >> scpParams.m_port;
-    in >> scpParams.m_keyFile;
-    return in;
+QSharedPointer<ScpParams> ScpParams::fromConfig(const QMap<QString, QVariant>& configMap)
+{
+    QSharedPointer<ScpParams> scpParams;
+    Q_ASSERT(configMap.value("type").toString() == scpParams.type());
+
+    scpParams.m_url = configMap.value("url").toString();
+    scpParams.m_port = configMap.value("port").toString();
+    scpParams.m_keyFile = configMap.value("keyFile").toString();
+    return scpParams;
 }

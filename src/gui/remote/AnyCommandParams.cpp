@@ -70,18 +70,25 @@ QString AnyCommandParams::resolveCommandOrInput(QString input, const QString& te
     return resolved;
 }
 
-QDataStream& operator<<(QDataStream& out, const AnyCommandParams& anyCommand)
+QMap<QString, QString> AnyCommandParams::toConfig()
 {
-    out << anyCommand.m_downloadCommand << anyCommand.m_downloadCommandInput;
-    out << anyCommand.m_uploadCommand << anyCommand.m_uploadCommandInput;
-    return out;
+    QMap<QString, QString> configMap;
+    configMap.insert("type", type());
+    configMap.insert("downloadCommand", m_downloadCommand);
+    configMap.insert("downloadCommandInput", m_downloadCommandInput);
+    configMap.insert("uploadCommand", m_uploadCommand);
+    configMap.insert("uploadCommandInput", m_uploadCommandInput);
+    return configMap;
 }
 
-QDataStream& operator>>(QDataStream& in, AnyCommandParams& anyCommand)
+QSharedPointer<AnyCommandParams> AnyCommandParams::fromConfig(const QMap<QString, QVariant>& configMap)
 {
-    in >> anyCommand.m_downloadCommand;
-    in >> anyCommand.m_downloadCommandInput;
-    in >> anyCommand.m_uploadCommand;
-    in >> anyCommand.m_uploadCommandInput;
-    return in;
+    QSharedPointer<AnyCommandParams> anyCommandParams;
+    Q_ASSERT(configMap.value("type") == anyCommandParams->type());
+
+    anyCommandParams->m_downloadCommand = configMap.value("downloadCommand").toString();
+    anyCommandParams->m_downloadCommandInput = configMap.value("downloadCommandInput").toString();
+    anyCommandParams->m_uploadCommand = configMap.value("uploadCommand").toString();
+    anyCommandParams->m_uploadCommandInput = configMap.value("uploadCommandInput").toString();
+    return anyCommandParams;
 }

@@ -19,17 +19,19 @@
 #define KEEPASSXC_ANYCOMMANDPARAMS_H
 
 #include "RemoteProgramParams.h"
-#include <QMetaType>
+#include <QMap>
 #include <QStringList>
+#include <QVariant>
 
 class AnyCommandParams : public RemoteProgramParams
 {
 public:
     AnyCommandParams() = default;
-    AnyCommandParams(const AnyCommandParams &) = default;
-    AnyCommandParams &operator=(const AnyCommandParams &) = default;
+    AnyCommandParams(const AnyCommandParams&) = default;
+    AnyCommandParams& operator=(const AnyCommandParams&) = default;
 
-    QString type() override {
+    QString type() override
+    {
         return "anyCommand";
     }
     bool allNecessaryParamsSet() override
@@ -46,8 +48,9 @@ public:
     void setCommandForUpload(QString uploadCommand);
     void setInputForUpload(QString uploadCommandInput);
 
-    friend QDataStream& operator<<(QDataStream &out, const AnyCommandParams& anyCommand);
-    friend QDataStream& operator>>(QDataStream &in, AnyCommandParams& anyCommand);
+    QMap<QString, QString> toConfig() override;
+    static QSharedPointer<AnyCommandParams> fromConfig(const QMap<QString, QVariant>& configMap);
+
 private:
     QString resolveCommandOrInput(QString input, const QString& tempDatabasePath);
 
@@ -56,7 +59,5 @@ private:
     QString m_uploadCommand;
     QString m_uploadCommandInput;
 };
-
-Q_DECLARE_METATYPE(AnyCommandParams);
 
 #endif // KEEPASSXC_ANYCOMMANDPARAMS_H

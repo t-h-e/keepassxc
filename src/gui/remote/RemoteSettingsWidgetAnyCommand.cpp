@@ -19,7 +19,6 @@
 #include "ui_RemoteSettingsWidgetAnyCommand.h"
 
 #include "AnyCommandParams.h"
-#include "core/Config.h"
 #include "RemoteParamsConfig.h"
 
 RemoteSettingsWidgetAnyCommand::RemoteSettingsWidgetAnyCommand(QWidget* parent)
@@ -36,17 +35,19 @@ RemoteSettingsWidgetAnyCommand::~RemoteSettingsWidgetAnyCommand()
 void RemoteSettingsWidgetAnyCommand::initialize()
 {
     auto lastAnyCommand = remoteParamsConfig()->getLastRemoteProgramOf<AnyCommandParams>("anyCommand");
-    // TODO: how to set these as AnyCommandParams only returns already
-//    m_ui->downloadCommand->setText(lastAnyCommand->getCommandForDownload());
-//    m_ui->inputForDownload->setPlainText(config()->get(Config::Remote_AnyCommand_DownloadInput).toString());
-//    m_ui->uploadCommand->setText(config()->get(Config::Remote_AnyCommand_UploadCommand).toString());
-//    m_ui->inputForUpload->setPlainText(config()->get(Config::Remote_AnyCommand_UploadInput).toString());
+    if (lastAnyCommand != nullptr) {
+        // TODO: how to set these as AnyCommandParams only returns already
+        m_ui->downloadCommand->setText(lastAnyCommand->getCommandForDownload("remove me"));
+        //
+        //        m_ui->inputForDownload->setPlainText(config()->get(Config::Remote_AnyCommand_DownloadInput).toString());
+        //    m_ui->uploadCommand->setText(config()->get(Config::Remote_AnyCommand_UploadCommand).toString());
+        //    m_ui->inputForUpload->setPlainText(config()->get(Config::Remote_AnyCommand_UploadInput).toString());
+    }
 
-
-    m_ui->downloadCommand->setText(config()->get(Config::Remote_AnyCommand_DownloadCommand).toString());
-    m_ui->inputForDownload->setPlainText(config()->get(Config::Remote_AnyCommand_DownloadInput).toString());
-    m_ui->uploadCommand->setText(config()->get(Config::Remote_AnyCommand_UploadCommand).toString());
-    m_ui->inputForUpload->setPlainText(config()->get(Config::Remote_AnyCommand_UploadInput).toString());
+    //    m_ui->downloadCommand->setText(config()->get(Config::Remote_AnyCommand_DownloadCommand).toString());
+    //    m_ui->inputForDownload->setPlainText(config()->get(Config::Remote_AnyCommand_DownloadInput).toString());
+    //    m_ui->uploadCommand->setText(config()->get(Config::Remote_AnyCommand_UploadCommand).toString());
+    //    m_ui->inputForUpload->setPlainText(config()->get(Config::Remote_AnyCommand_UploadInput).toString());
 }
 
 void RemoteSettingsWidgetAnyCommand::uninitialize()
@@ -61,10 +62,11 @@ void RemoteSettingsWidgetAnyCommand::showEvent(QShowEvent* event)
 
 bool RemoteSettingsWidgetAnyCommand::save()
 {
-    config()->set(Config::Remote_AnyCommand_DownloadCommand, m_ui->downloadCommand->text());
-    config()->set(Config::Remote_AnyCommand_DownloadInput, m_ui->inputForDownload->toPlainText());
-    config()->set(Config::Remote_AnyCommand_UploadCommand, m_ui->uploadCommand->text());
-    config()->set(Config::Remote_AnyCommand_UploadInput, m_ui->inputForUpload->toPlainText());
+    // TODO: remove; base class is taking care of that
+    //    config()->set(Config::Remote_AnyCommand_DownloadCommand, m_ui->downloadCommand->text());
+    //    config()->set(Config::Remote_AnyCommand_DownloadInput, m_ui->inputForDownload->toPlainText());
+    //    config()->set(Config::Remote_AnyCommand_UploadCommand, m_ui->uploadCommand->text());
+    //    config()->set(Config::Remote_AnyCommand_UploadInput, m_ui->inputForUpload->toPlainText());
     return true;
 }
 

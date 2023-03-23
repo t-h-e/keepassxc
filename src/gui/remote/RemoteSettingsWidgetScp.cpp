@@ -18,8 +18,9 @@
 #include "RemoteSettingsWidgetScp.h"
 #include "ui_RemoteSettingsWidgetScp.h"
 
+#include "RemoteParamsConfig.h"
 #include "ScpParams.h"
-#include "core/Config.h"
+#include <QDebug>
 
 RemoteSettingsWidgetScp::RemoteSettingsWidgetScp(QWidget* parent)
     : RemoteSettingsWidget(parent)
@@ -34,9 +35,19 @@ RemoteSettingsWidgetScp::~RemoteSettingsWidgetScp()
 
 void RemoteSettingsWidgetScp::initialize()
 {
-    m_ui->url->setText(config()->get(Config::Remote_Scp_Url).toString());
-    m_ui->port->setText(config()->get(Config::Remote_Scp_Port).toString());
-    m_ui->keyFile->setText(config()->get(Config::Remote_Scp_KeyFile).toString());
+    //    auto l = remoteParamsConfig()->getLastRemoteProgramEntries();
+    //    auto s = l.first();
+    //    qDebug() << s->type();
+
+    auto lastScpParams = remoteParamsConfig()->getLastRemoteProgramOf<ScpParams>("scp");
+    if (lastScpParams != nullptr) {
+        m_ui->url->setText(lastScpParams->getUrl());
+        m_ui->port->setText(lastScpParams->getPort());
+        m_ui->keyFile->setText(lastScpParams->getKeyFile());
+    }
+    //    m_ui->url->setText(config()->get(Config::Remote_Scp_Url).toString());
+    //    m_ui->port->setText(config()->get(Config::Remote_Scp_Port).toString());
+    //    m_ui->keyFile->setText(config()->get(Config::Remote_Scp_KeyFile).toString());
 }
 
 void RemoteSettingsWidgetScp::uninitialize()
@@ -51,9 +62,10 @@ void RemoteSettingsWidgetScp::showEvent(QShowEvent* event)
 
 bool RemoteSettingsWidgetScp::save()
 {
-    config()->set(Config::Remote_Scp_Url, m_ui->url->text());
-    config()->set(Config::Remote_Scp_Port, m_ui->port->text());
-    config()->set(Config::Remote_Scp_KeyFile, m_ui->keyFile->text());
+    // TODO: remove; base class is taking care of that
+    //    config()->set(Config::Remote_Scp_Url, m_ui->url->text());
+    //    config()->set(Config::Remote_Scp_Port, m_ui->port->text());
+    //    config()->set(Config::Remote_Scp_KeyFile, m_ui->keyFile->text());
     return true;
 }
 

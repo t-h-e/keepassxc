@@ -38,6 +38,8 @@ public:
     {
         return "";
     };
+
+    virtual QMap<QString, QString> toConfig() = 0;
 };
 
 #endif // KEEPASSXC_REMOTEPROGRAMPARAMS_H
