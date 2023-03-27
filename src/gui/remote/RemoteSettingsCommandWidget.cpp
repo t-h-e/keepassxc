@@ -34,6 +34,9 @@ RemoteSettingsCommandWidget::RemoteSettingsCommandWidget(QWidget* parent)
     connect(m_ui->settingsListWidget, &QListWidget::itemSelectionChanged, this, &RemoteSettingsCommandWidget::editCurrentSettings);
 
     updateSettingsList();
+    if (!remoteParamsConfig()->getRemoteProgramEntries().empty()){
+        m_ui->settingsListWidget->setCurrentRow(0);
+    }
 }
 
 RemoteSettingsCommandWidget::~RemoteSettingsCommandWidget()

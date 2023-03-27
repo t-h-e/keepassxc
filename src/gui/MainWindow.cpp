@@ -1329,18 +1329,25 @@ void MainWindow::updateRemoteSyncMenuEntries()
     m_ui->menuRemoteSync->clear();
     m_ui->menuRemoteSync->addAction(m_ui->actionRemoteDatabaseSync);
 
+    QList<RemoteSettings*> remoteSettingsForMenu;
+    foreach (auto entry, remoteParamsConfig()->getRemoteProgramEntries()) {
+        if (entry->getAddToMenu()) {
+            remoteSettingsForMenu << entry;
+        }
+    }
+
     // Build remote sync menu
-    if (remoteParamsConfig()->getRemoteProgramEntries().isEmpty()) {
+    if (remoteSettingsForMenu.isEmpty()) {
         return;
     }
 
     m_ui->menuRemoteSync->addSeparator();
-    foreach (auto entry, remoteParamsConfig()->getRemoteProgramEntries()) {
-        auto* remoteSyncAction = new QAction(entry->getName(), this);
+    foreach (auto entryForMenu, remoteSettingsForMenu) {
+        auto* remoteSyncAction = new QAction(entryForMenu->getName(), this);
         m_ui->menuRemoteSync->addAction(remoteSyncAction);
-        entry->toRemoteProgramParams();
-        connect(remoteSyncAction, &QAction::triggered, [this, entry]() {
-            m_ui->tabWidget->syncDatabaseWithRemote(entry->toRemoteProgramParams());
+        entryForMenu->toRemoteProgramParams();
+        connect(remoteSyncAction, &QAction::triggered, [this, entryForMenu]() {
+            m_ui->tabWidget->syncDatabaseWithRemote(entryForMenu->toRemoteProgramParams());
         });
     }
 }
