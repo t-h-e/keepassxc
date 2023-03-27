@@ -35,7 +35,7 @@ RemoteSettingsWidgetAnyCommand::~RemoteSettingsWidgetAnyCommand()
 
 void RemoteSettingsWidgetAnyCommand::initialize()
 {
-    auto lastAnyCommand = remoteParamsConfig()->getLastRemoteProgramOf<AnyCommandParams>("anyCommand");
+//    auto lastAnyCommand = remoteParamsConfig()->getLastRemoteProgramOf<AnyCommandParams>("anyCommand");
     // TODO: how to set these as AnyCommandParams only returns already
 //    m_ui->downloadCommand->setText(lastAnyCommand->getCommandForDownload());
 //    m_ui->inputForDownload->setPlainText(config()->get(Config::Remote_AnyCommand_DownloadInput).toString());

@@ -18,97 +18,79 @@
 #include "RemoteParamsConfig.h"
 
 #include "core/Config.h"
-#include "ScpParams.h"
-#include "AnyCommandParams.h"
 
 RemoteParamsConfig* RemoteParamsConfig::m_instance(nullptr);
 
 RemoteParamsConfig* RemoteParamsConfig::instance()
 {
     if (!m_instance) {
-        qRegisterMetaTypeStreamOperators<ScpParams>("ScpParams");
-        qRegisterMetaTypeStreamOperators<AnyCommandParams>("AnyCommandParams");
         m_instance = new RemoteParamsConfig();
     }
-
     return m_instance;
 }
 
 RemoteParamsConfig::RemoteParamsConfig()
 {
     auto variantList = config()->get(Config::Remote_Program_Params).toList();
-    QList<RemoteProgramParams*> typedList;
+    QList<RemoteSettings*> typedList;
     foreach (QVariant variant, variantList) {
-        auto remoteProgramParams = static_cast<RemoteProgramParams*>(variant.data());
+        auto* remoteProgramParams = new RemoteSettings(); // TODO: add `this` QObject in constructor?
+        remoteProgramParams->fromConfig(variant.toMap());
         typedList << remoteProgramParams;
     }
-    // TODO: restrict to m_numberOfEntries?
     this->m_lastRemoteProgramEntries = typedList;
 }
 
-QList<RemoteProgramParams*> RemoteParamsConfig::getLastRemoteProgramEntries()
+QList<RemoteSettings*> RemoteParamsConfig::getLastRemoteProgramEntries()
 {
     return this->m_lastRemoteProgramEntries;
 }
 
-void RemoteParamsConfig::updateRemoteProgramEntries(RemoteProgramParams* params)
+void RemoteParamsConfig::addRemoteSettingsEntry(RemoteSettings* newRemoteSettings)
 {
-    int indexOfParams = m_lastRemoteProgramEntries.indexOf(params);
-    if (indexOfParams == 0) {
-        // nothing changed
-        return ;
+    // TODO: cool logic so that add does in-place replacement
+    QList<RemoteSettings*> toRemove;
+    foreach (auto* remoteSettings, m_lastRemoteProgramEntries) {
+        if (newRemoteSettings->getName() == remoteSettings->getName()) {
+            toRemove << remoteSettings;
+        }
     }
-    // new entry or changed position
-    if (indexOfParams > 0) {
-        m_lastRemoteProgramEntries.removeAt(indexOfParams);
-    } else {
-        // entry did not exist before
-        m_lastRemoteProgramEntries.removeLast();
+    foreach (auto* removeSetting, toRemove) {
+        m_lastRemoteProgramEntries.removeOne(removeSetting);
     }
-    m_lastRemoteProgramEntries.prepend(params);
+
+    m_lastRemoteProgramEntries.append(newRemoteSettings);
     syncConfig();
+}
+
+void RemoteParamsConfig::removeRemoteSettingsEntry(const QString& name) {
+    QList<RemoteSettings*> toRemove;
+    foreach (auto* remoteSettings, m_lastRemoteProgramEntries) {
+        if (name == remoteSettings->getName()) {
+            toRemove << remoteSettings;
+        }
+    }
+    foreach (auto* removeSetting, toRemove) {
+        m_lastRemoteProgramEntries.removeOne(removeSetting);
+    }
+
+    syncConfig();
+}
+
+RemoteSettings* RemoteParamsConfig::getRemoteSettingsEntry(const QString& name) {
+    foreach (auto* remoteSettings, m_lastRemoteProgramEntries) {
+        if (name == remoteSettings->getName()) {
+            return remoteSettings;
+        }
+    }
+    return nullptr;
 }
 
 void RemoteParamsConfig::syncConfig()
 {
     QList<QVariant> lastRemoteProgramEntriesConfig;
-    foreach (RemoteProgramParams* params, m_lastRemoteProgramEntries) {
-        auto paramsConfig = convert(params);
-        if (!paramsConfig.isNull()) {
-            lastRemoteProgramEntriesConfig << convert(params);
-        }
+    foreach (RemoteSettings* remoteSettings, m_lastRemoteProgramEntries) {
+            lastRemoteProgramEntriesConfig << remoteSettings->toConfig();
     }
     config()->set(Config::Remote_Program_Params, lastRemoteProgramEntriesConfig);
-}
-
-QVariant RemoteParamsConfig::convert(RemoteProgramParams* params)
-{
-    auto* scpParams = dynamic_cast<ScpParams*>(params);
-    if (scpParams != nullptr) {
-        return QVariant::fromValue(*scpParams);
-    }
-    auto* anyCommandParams = dynamic_cast<AnyCommandParams*>(params);
-    if (anyCommandParams != nullptr) {
-        return QVariant::fromValue(*anyCommandParams);
-    }
-    // TODO: check that this QVariant returns true for `.isNull()`
-    return {};
-}
-
-//TODO: got stuck here
-template <class T> T* RemoteParamsConfig::getLastRemoteProgramOf(QString type)
-{
-    // Compile-time check
-    // see https://stackoverflow.com/questions/122316/template-constraints-c
-    // TODO: verify this works
-
-//    static_assert(std::is_convertible_v<T*, RemoteProgramParams*>, "type parameter of this class must derive from RemoteProgramParams");
-//    static_assert(std::is_base_of_v<RemoteProgramParams, T>, "type parameter of this class must derive from RemoteProgramParams");
-    foreach (RemoteProgramParams* params, m_lastRemoteProgramEntries) {
-        if (params->type() == type) {
-            return dynamic_cast<T*>(params);
-        }
-    }
-
-    return T();
 }

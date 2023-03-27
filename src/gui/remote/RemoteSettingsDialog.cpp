@@ -18,13 +18,10 @@
 #include "RemoteSettingsDialog.h"
 #include "ui_RemoteSettingsDialog.h"
 
-#include "RemoteSettingsWidgetAnyCommand.h"
-#include "RemoteSettingsWidgetScp.h"
 #include "RemoteParamsConfig.h"
 
 #include "core/Database.h"
 #include "core/Global.h"
-#include "gui/Icons.h"
 
 #include <QScrollArea>
 
@@ -33,25 +30,12 @@
 RemoteSettingsDialog::RemoteSettingsDialog(QWidget* parent)
     : DialogyWidget(parent)
     , m_ui(new Ui::RemoteSettingsDialog())
-    , m_remoteAnyCommandWidget(new RemoteSettingsWidgetAnyCommand(this))
-    , m_remoteScpWidget(new RemoteSettingsWidgetScp(this))
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->buttonBox, SIGNAL(accepted()), SLOT(save()));
-    connect(m_ui->buttonBox, SIGNAL(rejected()), SLOT(reject()));
-
-    m_ui->categoryList->addCategory(tr("scp"), icons()->icon("web"));
-    m_ui->categoryList->addCategory(tr("anyCommand"), icons()->icon("web"));
-    m_ui->stackedWidget->addWidget(m_remoteScpWidget);
-    m_ui->stackedWidget->addWidget(m_remoteAnyCommandWidget);
-
-    m_ui->categoryList->setCurrentCategory(0);
-    m_ui->stackedWidget->setCurrentIndex(0);
-
-    connect(m_ui->categoryList, SIGNAL(categoryChanged(int)), m_ui->stackedWidget, SLOT(setCurrentIndex(int)));
-
-    pageChanged();
+    connect(m_ui->cancelButton, &QPushButton::clicked, this, &RemoteSettingsDialog::reject);
+    connect(m_ui->remoteSaveButton, &QPushButton::clicked, this, &RemoteSettingsDialog::remoteSave);
+    connect(m_ui->remoteSyncButton, &QPushButton::clicked, this, &RemoteSettingsDialog::remoteSync);
 }
 
 RemoteSettingsDialog::~RemoteSettingsDialog()
@@ -60,44 +44,35 @@ RemoteSettingsDialog::~RemoteSettingsDialog()
 
 void RemoteSettingsDialog::initialize()
 {
-    m_remoteScpWidget->initialize();
-    m_remoteAnyCommandWidget->initialize();
+    m_ui->remoteSettingsCommandWidget->initialize();
 }
 
 void RemoteSettingsDialog::load(const QSharedPointer<Database>& db)
 {
-    m_remoteScpWidget->load(db);
-    m_remoteAnyCommandWidget->load(db);
+//    m_remoteSettingsCommandWidget->load(db);
 
     m_db = db;
 }
 
-void RemoteSettingsDialog::addSettingsPage(IRemoteSettingsPage* page)
+void RemoteSettingsDialog::remoteSave()
 {
-    const int category = m_ui->categoryList->currentCategory();
-    QWidget* widget = page->createWidget();
-    widget->setParent(this);
-    m_ui->stackedWidget->addWidget(widget);
-    m_ui->categoryList->addCategory(page->name(), page->icon());
-    m_ui->categoryList->setCurrentCategory(category);
+    auto remoteProgramParams = getCurrentParams();
+    emit saveToRemote(remoteProgramParams);
 }
 
-void RemoteSettingsDialog::save()
+void RemoteSettingsDialog::remoteSync()
 {
-    auto remoteSettingsWidget = dynamic_cast<RemoteSettingsWidget*>(m_ui->stackedWidget->currentWidget());
-    // Only save the current widget
-    remoteSettingsWidget->save();
-
-    auto remoteProgramParams = remoteSettingsWidget->getRemoteProgramParams();
-    remoteParamsConfig()->updateRemoteProgramEntries(remoteProgramParams);
+    auto remoteProgramParams = getCurrentParams();
     emit syncWithRemote(remoteProgramParams);
+}
+
+RemoteProgramParams* RemoteSettingsDialog::getCurrentParams()
+{
+    // TODO: should this be saved?
+    return m_ui->remoteSettingsCommandWidget->getRemoteProgramParams();
 }
 
 void RemoteSettingsDialog::reject()
 {
     emit cancel(false);
-}
-
-void RemoteSettingsDialog::pageChanged()
-{
 }

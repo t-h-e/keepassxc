@@ -26,8 +26,8 @@ class AnyCommandParams : public RemoteProgramParams
 {
 public:
     AnyCommandParams() = default;
-    AnyCommandParams(const AnyCommandParams &) = default;
-    AnyCommandParams &operator=(const AnyCommandParams &) = default;
+    AnyCommandParams(const AnyCommandParams&) = default;
+    AnyCommandParams &operator=(const AnyCommandParams&) = default;
 
     QString type() override {
         return "anyCommand";
@@ -40,6 +40,11 @@ public:
     QString getInputForDownload(QString destination) override;
     QString getCommandForUpload(QString source) override;
     QString getInputForUpload(QString source) override;
+
+    QString getRawCommandForDownload();
+    QString getRawInputForDownload();
+    QString getRawCommandForUpload();
+    QString getRawInputForUpload();
 
     void setCommandForDownload(QString downloadCommand);
     void setInputForDownload(QString downloadCommandInput);

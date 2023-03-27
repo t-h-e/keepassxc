@@ -255,6 +255,7 @@ void DatabaseTabWidget::addDatabaseTab(DatabaseWidget* dbWidget, bool inBackgrou
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(updateTabName()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(emitDatabaseLockChanged()));
     connect(dbWidget, SIGNAL(syncWithRemote(RemoteProgramParams*)), SLOT(syncDatabaseWithRemote(RemoteProgramParams*)));
+    connect(dbWidget, SIGNAL(saveToRemote(RemoteProgramParams*)), SLOT(saveDatabaseToRemote(RemoteProgramParams*)));
 }
 
 void DatabaseTabWidget::importCsv()
@@ -294,6 +295,16 @@ void DatabaseTabWidget::mergeDatabase()
 void DatabaseTabWidget::mergeDatabase(const QString& filePath)
 {
     unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::Merge, filePath);
+}
+
+void DatabaseTabWidget::saveDatabaseToRemote(RemoteProgramParams* remoteProgramParams)
+{
+    emit updateSyncProgress(50, "Uploading...");
+
+    this->currentDatabaseWidget()->setDisabled(true);
+    auto currentDatabase = this->currentDatabaseWidget()->database();
+    emit m_remoteHandler->uploadToRemote(currentDatabase, remoteProgramParams);
+    // TODO: should there be a success message, how do we add that? second remoteHandler for remote save only?
 }
 
 void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgramParams)

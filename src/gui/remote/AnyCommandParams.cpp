@@ -20,6 +20,23 @@
 #include "core/Entry.h"
 #include <utility>
 
+QString AnyCommandParams::getRawCommandForDownload()
+{
+    return m_downloadCommand;
+}
+QString AnyCommandParams::getRawInputForDownload()
+{
+    return m_downloadCommandInput;
+}
+QString AnyCommandParams::getRawCommandForUpload()
+{
+    return m_uploadCommand;
+}
+QString AnyCommandParams::getRawInputForUpload()
+{
+    return m_uploadCommandInput;
+}
+
 void AnyCommandParams::setCommandForDownload(QString downloadCommand)
 {
     m_downloadCommand = std::move(downloadCommand);

@@ -25,14 +25,13 @@
 #include <QPointer>
 
 class Database;
-class RemoteSettingsWidgetAnyCommand;
-class RemoteSettingsWidgetScp;
 
 namespace Ui
 {
     class RemoteSettingsDialog;
 }
 
+// TODO: remove
 class IRemoteSettingsPage
 {
 public:
@@ -55,22 +54,22 @@ public:
 
     void initialize();
     void load(const QSharedPointer<Database>& db);
-    void addSettingsPage(IRemoteSettingsPage* page);
 
 signals:
     void cancel(bool accepted);
+    void saveToRemote(RemoteProgramParams* remoteProgramParams);
     void syncWithRemote(RemoteProgramParams* remoteProgramParams);
 
 private slots:
-    void save();
+    void remoteSave();
+    void remoteSync();
     void reject();
-    void pageChanged();
 
 private:
+    RemoteProgramParams* getCurrentParams();
+
     QSharedPointer<Database> m_db;
     const QScopedPointer<Ui::RemoteSettingsDialog> m_ui;
-    QPointer<RemoteSettingsWidgetAnyCommand> m_remoteAnyCommandWidget;
-    QPointer<RemoteSettingsWidgetScp> m_remoteScpWidget;
 };
 
 #endif // KEEPASSX_REMOTESETTINGSWIDGET_H

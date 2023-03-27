@@ -65,7 +65,8 @@ public slots:
     DatabaseWidget* newDatabase();
     void openDatabase();
     void mergeDatabase();
-    void syncDatabaseWithRemote(RemoteProgramParams* RemoteProgramParams);
+    void syncDatabaseWithRemote(RemoteProgramParams* remoteProgramParams);
+    void saveDatabaseToRemote(RemoteProgramParams* remoteProgramParams);
     void remoteSyncDatabase(const QString& filePath);
 
     void importKeePass1Database();

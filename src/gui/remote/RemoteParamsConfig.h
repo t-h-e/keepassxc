@@ -18,7 +18,7 @@
 #ifndef KEEPASSXC_REMOTEPARAMSCONFIG_H
 #define KEEPASSXC_REMOTEPARAMSCONFIG_H
 
-#include "RemoteProgramParams.h"
+#include "RemoteSettings.h"
 
 #include <QList>
 #include <QVariant>
@@ -28,22 +28,18 @@ class RemoteParamsConfig
 public:
     static RemoteParamsConfig* instance();
 
-    QList<RemoteProgramParams*> getLastRemoteProgramEntries();
-    void updateRemoteProgramEntries(RemoteProgramParams* params);
-
-    // TODO: got stuck with this method
-    template<class T>
-    T* getLastRemoteProgramOf(QString type);
+    QList<RemoteSettings*> getLastRemoteProgramEntries();
+    void addRemoteSettingsEntry(RemoteSettings* params);
+    void removeRemoteSettingsEntry(const QString& name);
+    RemoteSettings* getRemoteSettingsEntry(const QString& name);
 
 private:
     RemoteParamsConfig();
-    int m_numberOfEntries = 5;
-    QList<RemoteProgramParams*> m_lastRemoteProgramEntries;
+    QList<RemoteSettings*> m_lastRemoteProgramEntries;
 
     static RemoteParamsConfig* m_instance;
 
     void syncConfig();
-    QVariant convert(RemoteProgramParams* params);
 };
 
 inline RemoteParamsConfig* remoteParamsConfig()
