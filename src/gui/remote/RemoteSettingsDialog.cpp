@@ -24,7 +24,7 @@
 #include "core/Global.h"
 
 #include <QScrollArea>
-
+#include <QMenu>
 #include <QDebug>
 
 RemoteSettingsDialog::RemoteSettingsDialog(QWidget* parent)

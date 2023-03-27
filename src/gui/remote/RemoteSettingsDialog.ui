@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>257</width>
+    <width>263</width>
     <height>51</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0">
      <item>
       <widget class="RemoteSettingsCommandWidget" name="remoteSettingsCommandWidget" native="true"/>
      </item>
