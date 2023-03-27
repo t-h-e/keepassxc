@@ -23,6 +23,7 @@
 RemoteFileDialog::RemoteFileDialog(QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::RemoteFileDialog())
+    // TODO: remove and use RemoteSettingsCommandWidget. Maybe directly in widget
     , m_remoteSettingsDialog(new RemoteSettingsDialog(this))
     , m_remoteHandler(new RemoteHandler(this))
 {
