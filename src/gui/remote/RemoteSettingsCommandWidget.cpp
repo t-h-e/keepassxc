@@ -77,7 +77,7 @@ void RemoteSettingsCommandWidget::removeCurrentSettings()
 {
     remoteParamsConfig()->removeRemoteSettingsEntry(m_ui->nameLineEdit->text());
     updateSettingsList();
-    if (!remoteParamsConfig()->getLastRemoteProgramEntries().empty()){
+    if (!remoteParamsConfig()->getRemoteProgramEntries().empty()){
         m_ui->settingsListWidget->setCurrentRow(0);
     }
 }
@@ -104,7 +104,7 @@ void RemoteSettingsCommandWidget::editCurrentSettings()
 void RemoteSettingsCommandWidget::updateSettingsList()
 {
     m_ui->settingsListWidget->clear();
-    foreach (auto remoteSetting, remoteParamsConfig()->getLastRemoteProgramEntries()) {
+    foreach (auto remoteSetting, remoteParamsConfig()->getRemoteProgramEntries()) {
         auto* item = new QListWidgetItem(m_ui->settingsListWidget);
         item->setText(remoteSetting->getName());
         m_ui->settingsListWidget->addItem(item);

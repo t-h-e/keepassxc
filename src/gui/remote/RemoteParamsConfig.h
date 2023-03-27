@@ -28,7 +28,7 @@ class RemoteParamsConfig
 public:
     static RemoteParamsConfig* instance();
 
-    QList<RemoteSettings*> getLastRemoteProgramEntries();
+    QList<RemoteSettings*> getRemoteProgramEntries();
     void addRemoteSettingsEntry(RemoteSettings* params);
     void removeRemoteSettingsEntry(const QString& name);
     RemoteSettings* getRemoteSettingsEntry(const QString& name);

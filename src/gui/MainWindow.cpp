@@ -44,6 +44,7 @@
 #include "gui/MessageBox.h"
 #include "gui/SearchWidget.h"
 #include "gui/entry/EntryView.h"
+#include "gui/remote/RemoteParamsConfig.h"
 #include "gui/osutils/OSUtils.h"
 
 #ifdef WITH_XC_UPDATECHECK
@@ -150,6 +151,8 @@ MainWindow::MainWindow()
 
     m_entryNewContextMenu = new QMenu(this);
     m_entryNewContextMenu->addAction(m_ui->actionEntryNew);
+
+    connect(m_ui->menuRemoteSync, &QMenu::aboutToShow, this, &MainWindow::updateRemoteSyncMenuEntries);
 
     // Build Entry Level Auto-Type menu
     auto autotypeMenu = new QMenu({}, this);
@@ -389,7 +392,7 @@ MainWindow::MainWindow()
     m_ui->actionLockAllDatabases->setIcon(icons()->icon("database-lock-all"));
     m_ui->actionQuit->setIcon(icons()->icon("application-exit"));
     m_ui->actionDatabaseMerge->setIcon(icons()->icon("database-merge"));
-    m_ui->actionRemoteDatabaseSync->setIcon(icons()->icon("web"));
+    m_ui->menuRemoteSync->setIcon(icons()->icon("web"));
     m_ui->menuImport->setIcon(icons()->icon("document-import"));
     m_ui->menuExport->setIcon(icons()->icon("document-export"));
 
@@ -891,7 +894,7 @@ void MainWindow::setMenuActionState(DatabaseWidget::Mode mode)
     bool inDatabaseTabWidgetOrWelcomeWidget = inDatabaseTabWidget || inWelcomeWidget;
 
     m_ui->actionDatabaseMerge->setEnabled(inDatabaseTabWidget);
-    m_ui->actionRemoteDatabaseSync->setEnabled(inDatabaseTabWidget);
+    m_ui->menuRemoteSync->setEnabled(inDatabaseTabWidget);
     m_ui->actionDatabaseNew->setEnabled(inDatabaseTabWidgetOrWelcomeWidget);
     m_ui->actionDatabaseOpen->setEnabled(inDatabaseTabWidgetOrWelcomeWidget);
     m_ui->menuRecentDatabases->setEnabled(inDatabaseTabWidgetOrWelcomeWidget);
@@ -989,7 +992,7 @@ void MainWindow::setMenuActionState(DatabaseWidget::Mode mode)
             m_ui->actionExportHtml->setEnabled(true);
             m_ui->actionExportXML->setEnabled(true);
             m_ui->actionDatabaseMerge->setEnabled(m_ui->tabWidget->currentIndex() != -1);
-            m_ui->actionRemoteDatabaseSync->setEnabled(m_ui->tabWidget->currentIndex() != -1);
+            m_ui->menuRemoteSync->setEnabled(m_ui->tabWidget->currentIndex() != -1);
 #ifdef WITH_XC_SSHAGENT
             bool singleEntryHasSshKey =
                 singleEntrySelected && sshAgent()->isEnabled() && dbWidget->currentEntryHasSshKey();
@@ -1046,7 +1049,7 @@ void MainWindow::setMenuActionState(DatabaseWidget::Mode mode)
             m_ui->actionExportCsv->setEnabled(false);
             m_ui->actionExportHtml->setEnabled(false);
             m_ui->actionDatabaseMerge->setEnabled(false);
-            m_ui->actionRemoteDatabaseSync->setEnabled(false);
+            m_ui->menuRemoteSync->setEnabled(false);
             // Only disable the action in the database menu so that the
             // menu remains active in the toolbar, if necessary
             m_ui->actionLockDatabase->setEnabled(false);
@@ -1080,7 +1083,7 @@ void MainWindow::setMenuActionState(DatabaseWidget::Mode mode)
         m_ui->actionExportCsv->setEnabled(false);
         m_ui->actionExportHtml->setEnabled(false);
         m_ui->actionDatabaseMerge->setEnabled(false);
-        m_ui->actionRemoteDatabaseSync->setEnabled(false);
+        m_ui->menuRemoteSync->setEnabled(false);
 
         m_searchWidgetAction->setEnabled(false);
     }
@@ -1319,6 +1322,27 @@ void MainWindow::switchToRemoteDatabase()
 {
     m_ui->tabWidget->openRemoteDatabase();
     switchToDatabases();
+}
+
+void MainWindow::updateRemoteSyncMenuEntries()
+{
+    m_ui->menuRemoteSync->clear();
+    m_ui->menuRemoteSync->addAction(m_ui->actionRemoteDatabaseSync);
+
+    // Build remote sync menu
+    if (remoteParamsConfig()->getRemoteProgramEntries().isEmpty()) {
+        return;
+    }
+
+    m_ui->menuRemoteSync->addSeparator();
+    foreach (auto entry, remoteParamsConfig()->getRemoteProgramEntries()) {
+        auto* remoteSyncAction = new QAction(entry->getName(), this);
+        m_ui->menuRemoteSync->addAction(remoteSyncAction);
+        entry->toRemoteProgramParams();
+        connect(remoteSyncAction, &QAction::triggered, [this, entry]() {
+            m_ui->tabWidget->syncDatabaseWithRemote(entry->toRemoteProgramParams());
+        });
+    }
 }
 
 void MainWindow::databaseStatusChanged(DatabaseWidget* dbWidget)

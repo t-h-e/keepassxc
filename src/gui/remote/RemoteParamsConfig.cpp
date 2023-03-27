@@ -41,7 +41,7 @@ RemoteParamsConfig::RemoteParamsConfig()
     this->m_lastRemoteProgramEntries = typedList;
 }
 
-QList<RemoteSettings*> RemoteParamsConfig::getLastRemoteProgramEntries()
+QList<RemoteSettings*> RemoteParamsConfig::getRemoteProgramEntries()
 {
     return this->m_lastRemoteProgramEntries;
 }
