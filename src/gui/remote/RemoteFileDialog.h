@@ -24,8 +24,6 @@
 #include "RemoteHandler.h"
 #include "RemoteProgramParams.h"
 
-class RemoteSettingsDialog;
-
 namespace Ui
 {
     class RemoteFileDialog;
@@ -42,14 +40,13 @@ signals:
     void downloadedSuccessfullyTo(const QString& filePath);
 
 private slots:
-    void acceptRemoteProgramParams(RemoteProgramParams* params);
+    void acceptRemoteProgramParams();
 
 private:
     void showRemoteDownloadErrorMessage(const QString& errorMessage);
     void handleSuccessfulDownload(const QString& downloadedFileName);
 
     QScopedPointer<Ui::RemoteFileDialog> m_ui;
-    QPointer<RemoteSettingsDialog> m_remoteSettingsDialog;
     QPointer<RemoteHandler> m_remoteHandler;
 };
 

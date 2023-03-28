@@ -6,28 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>510</width>
-    <height>443</height>
+    <width>579</width>
+    <height>526</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Open from remote</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
    <item>
     <widget class="MessageWidget" name="messageWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="RemoteSettingsCommandWidget" name="remoteSettingsCommandWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -36,6 +34,12 @@
    <class>MessageWidget</class>
    <extends>QWidget</extends>
    <header>gui/MessageWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>RemoteSettingsCommandWidget</class>
+   <extends>QWidget</extends>
+   <header>gui/remote/RemoteSettingsCommandWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

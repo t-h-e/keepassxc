@@ -23,36 +23,27 @@
 RemoteFileDialog::RemoteFileDialog(QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::RemoteFileDialog())
-    // TODO: remove and use RemoteSettingsCommandWidget. Maybe directly in widget
-    , m_remoteSettingsDialog(new RemoteSettingsDialog(this))
     , m_remoteHandler(new RemoteHandler(this))
 {
     m_ui->setupUi(this);
-
     m_ui->messageWidget->setHidden(true);
 
-    m_ui->verticalLayout->addWidget(m_remoteSettingsDialog);
-
-    connect(m_remoteSettingsDialog, SIGNAL(cancel(bool)), SLOT(close()));
-    connect(m_remoteSettingsDialog,
-            &RemoteSettingsDialog::syncWithRemote,
-            this,
-            &RemoteFileDialog::acceptRemoteProgramParams);
+    connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &RemoteFileDialog::close);
+    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &RemoteFileDialog::acceptRemoteProgramParams);
 
     connect(
         m_remoteHandler, &RemoteHandler::downloadedSuccessfullyTo, this, &RemoteFileDialog::handleSuccessfulDownload);
     connect(m_remoteHandler, &RemoteHandler::downloadError, this, &RemoteFileDialog::showRemoteDownloadErrorMessage);
-
-    m_remoteSettingsDialog->initialize();
 }
 
 RemoteFileDialog::~RemoteFileDialog()
 {
 }
 
-void RemoteFileDialog::acceptRemoteProgramParams(RemoteProgramParams* remoteProgramParams)
+void RemoteFileDialog::acceptRemoteProgramParams()
 {
     this->setDisabled(true);
+    auto* remoteProgramParams = m_ui->remoteSettingsCommandWidget->getRemoteProgramParams();
     emit m_remoteHandler->downloadFromRemote(remoteProgramParams);
 }
 
