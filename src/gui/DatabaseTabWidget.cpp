@@ -322,17 +322,21 @@ void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgra
 {
     emit updateSyncProgress(25, "Downloading...");
 
-    // one shot upload connection is needed to pass the same RemoteProgramParams to upload as used for download
-    auto* const oneShotUploadConnection = new QMetaObject::Connection;
-    auto uploadSyncedDatabase =
-        [this, oneShotUploadConnection, remoteProgramParams](const QSharedPointer<Database>& database) {
-            disconnect(*oneShotUploadConnection);
-            delete oneShotUploadConnection;
-            emit this->updateSyncProgress(75, "Uploading...");
-            emit m_remoteSyncHandler->uploadToRemote(database, remoteProgramParams);
-        };
-    *oneShotUploadConnection =
-        connect(this->currentDatabaseWidget(), &DatabaseWidget::databaseSyncedWith, uploadSyncedDatabase);
+    auto uploadSyncedDatabase = [this, remoteProgramParams](const QSharedPointer<Database>& database) {
+        disconnect(this->currentDatabaseWidget(), &DatabaseWidget::databaseSyncedWith, nullptr, nullptr);
+        disconnect(this->currentDatabaseWidget(), &DatabaseWidget::databaseSyncFailed, nullptr, nullptr);
+        emit this->updateSyncProgress(75, "Uploading...");
+        emit m_remoteSyncHandler->uploadToRemote(database, remoteProgramParams);
+    };
+    auto cleanupSyncFailed = [this]() {
+        disconnect(this->currentDatabaseWidget(), &DatabaseWidget::databaseSyncedWith, nullptr, nullptr);
+        disconnect(this->currentDatabaseWidget(), &DatabaseWidget::databaseSyncFailed, nullptr, nullptr);
+        this->currentDatabaseWidget()->setDisabled(false);
+        emit updateSyncProgress(-1, "");
+    };
+
+    connect(this->currentDatabaseWidget(), &DatabaseWidget::databaseSyncedWith, uploadSyncedDatabase);
+    connect(this->currentDatabaseWidget(), &DatabaseWidget::databaseSyncFailed, cleanupSyncFailed);
 
     this->currentDatabaseWidget()->setDisabled(true);
     emit m_remoteSyncHandler->downloadFromRemote(remoteProgramParams);

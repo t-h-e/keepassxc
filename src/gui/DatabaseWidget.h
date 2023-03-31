@@ -148,6 +148,7 @@ signals:
     requestOpenDatabase(const QString& filePath, bool inBackground, const QString& password, const QString& keyFile);
     void databaseMerged(QSharedPointer<Database> mergedDb);
     void databaseSyncedWith(QSharedPointer<Database> syncedDb);
+    void databaseSyncFailed();
     void syncWithRemote(RemoteProgramParams* remoteProgramParams);
     void saveToRemote(RemoteProgramParams* remoteProgramParams);
     void groupContextMenuRequested(const QPoint& globalPos);
@@ -275,7 +276,7 @@ private slots:
     void unlockDatabase(bool accepted);
     void mergeDatabase(bool accepted);
     void syncDatabase(bool accepted);
-    void syncDatabase(const QSharedPointer<Database>& srcDb, const QSharedPointer<Database>& destinationDb);
+    bool syncDatabase(const QSharedPointer<Database>& srcDb, const QSharedPointer<Database>& destinationDb);
     void emitCurrentModeChanged();
     // Database autoreload slots
     void reloadDatabaseFile();
