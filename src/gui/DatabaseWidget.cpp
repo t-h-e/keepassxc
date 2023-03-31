@@ -1222,10 +1222,13 @@ void DatabaseWidget::mergeDatabase(bool accepted)
 bool DatabaseWidget::attemptSyncDatabaseWithSameKey(const QString& filePath)
 {
     QString ignoreErrors;
-    QSharedPointer<Database> srcDb = QSharedPointer<Database>::create();
-    if (srcDb->open(filePath, m_db->key(), &ignoreErrors)) {
-        syncDatabase(m_db, srcDb);
-        emit databaseSyncedWith(srcDb);
+    QSharedPointer<Database> destinationDb = QSharedPointer<Database>::create();
+    if (destinationDb->open(filePath, m_db->key(), &ignoreErrors)) {
+        if (syncDatabase(m_db, destinationDb)) {
+            emit databaseSyncedWith(destinationDb);
+        } else {
+            emit databaseSyncFailed();
+        }
         return true;
     }
     return false;
@@ -1245,34 +1248,45 @@ void DatabaseWidget::syncDatabase(bool accepted)
         if (!senderDialog) {
             return;
         }
-        auto srcDb = senderDialog->database();
+        auto destinationDb = senderDialog->database();
 
-        if (!srcDb) {
+        if (!destinationDb) {
             showMessage(tr("No source database, nothing to do."), MessageWidget::Error);
             return;
         }
 
-        syncDatabase(srcDb, m_db);
-        emit databaseSyncedWith(srcDb);
+        if (syncDatabase(m_db, destinationDb)) {
+            emit databaseSyncedWith(destinationDb);
+        } else {
+            emit databaseSyncFailed();
+        }
     }
     switchToMainView();
 }
 
-void DatabaseWidget::syncDatabase(const QSharedPointer<Database>& srcDb, const QSharedPointer<Database>& destinationDb)
+bool DatabaseWidget::syncDatabase(const QSharedPointer<Database>& srcDb, const QSharedPointer<Database>& destinationDb)
 {
     Merger mergerToRemote(destinationDb.data(), srcDb.data());
     Merger mergerFromRemote(srcDb.data(), destinationDb.data());
     QStringList changeList = mergerToRemote.merge() + mergerFromRemote.merge();
 
     if (!changeList.isEmpty()) {
-        showMessage(tr("Successfully synced the database files."), MessageWidget::Information);
-
-        // Save synced database
+        // Save synced databases
         QString error;
-        srcDb->save(Database::Atomic, {}, &error);
+        if (!srcDb->save(Database::Atomic, {}, &error)) {
+            showMessage(tr("Error while saving source database: %1.").arg(error), MessageWidget::Error);
+            return false;
+        }
+        if (!destinationDb->save(Database::Atomic, {}, &error)) {
+            showMessage(tr("Error while saving destination database: %1.").arg(error), MessageWidget::Error);
+            return false;
+        }
+
+        showMessage(tr("Successfully synced the database files."), MessageWidget::Information);
     } else {
         showMessage(tr("Database was not modified by sync operation."), MessageWidget::Information);
     }
+    return true;
 }
 
 /**
