@@ -128,7 +128,7 @@ private slots:
 
 private:
     QSharedPointer<Database> execNewDatabaseWizard();
-    void updateLastDatabases(const QString& filename);
+    void updateLastDatabases(const QSharedPointer<Database>& database);
     bool warnOnExport();
     void displayUnlockDialog();
 

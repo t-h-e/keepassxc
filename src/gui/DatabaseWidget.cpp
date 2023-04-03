@@ -1224,6 +1224,7 @@ bool DatabaseWidget::attemptSyncDatabaseWithSameKey(const QString& filePath)
     QString ignoreErrors;
     QSharedPointer<Database> destinationDb = QSharedPointer<Database>::create();
     if (destinationDb->open(filePath, m_db->key(), &ignoreErrors)) {
+        destinationDb->markAsRemoteDatabase();
         if (syncDatabase(m_db, destinationDb)) {
             emit databaseSyncedWith(destinationDb);
         } else {
