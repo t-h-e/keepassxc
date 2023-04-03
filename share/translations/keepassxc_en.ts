@@ -2509,6 +2509,14 @@ Disable safe saves and try again?</source>
         <source>Database was not modified by sync operation.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Error while saving source database: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while saving destination database: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditEntryWidget</name>
@@ -8343,10 +8351,6 @@ Kernel: %3 %4</source>
 </context>
 <context>
     <name>RemoteSettingsCommandWidget</name>
-    <message>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Settings</source>
         <translation type="unfinished"></translation>
