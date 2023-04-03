@@ -19,7 +19,10 @@
 #define KEEPASSXC_REMOTEFILEDIALOG_H
 
 #include <QDialog>
+#include <QLabel>
 #include <QPointer>
+#include <QProgressBar>
+#include <QStatusBar>
 
 #include "RemoteHandler.h"
 #include "RemoteProgramParams.h"
@@ -45,6 +48,12 @@ private slots:
 private:
     void showRemoteDownloadErrorMessage(const QString& errorMessage);
     void handleSuccessfulDownload(const QString& downloadedFileName);
+
+    void updateProgressBar(int percentage, const QString& message);
+
+    QPointer<QStatusBar> m_statusBar;
+    QPointer<QLabel> m_progressBarLabel;
+    QPointer<QProgressBar> m_progressBar;
 
     QScopedPointer<Ui::RemoteFileDialog> m_ui;
     QPointer<RemoteHandler> m_remoteHandler;
