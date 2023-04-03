@@ -194,7 +194,7 @@ void DatabaseTabWidget::addDatabaseTab(const QString& filePath,
     auto* dbWidget = new DatabaseWidget(QSharedPointer<Database>::create(cleanFilePath), this);
     addDatabaseTab(dbWidget, inBackground);
     dbWidget->performUnlockDatabase(password, keyfile);
-    updateLastDatabases(cleanFilePath);
+    updateLastDatabases(dbWidget->database());
 }
 
 /**
@@ -513,8 +513,8 @@ bool DatabaseTabWidget::saveDatabaseAs(int index)
 
     auto* dbWidget = databaseWidgetFromIndex(index);
     bool ok = dbWidget->saveAs();
-    if (ok) {
-        updateLastDatabases(dbWidget->database()->filePath());
+    if (ok && !dbWidget->database()->isRemoteDatabase()) {
+        updateLastDatabases(dbWidget->database());
     }
     return ok;
 }
@@ -527,8 +527,8 @@ bool DatabaseTabWidget::saveDatabaseBackup(int index)
 
     auto* dbWidget = databaseWidgetFromIndex(index);
     bool ok = dbWidget->saveBackup();
-    if (ok) {
-        updateLastDatabases(dbWidget->database()->filePath());
+    if (ok && !dbWidget->database()->isRemoteDatabase()) {
+        updateLastDatabases(dbWidget->database());
     }
     return ok;
 }
@@ -890,6 +890,9 @@ void DatabaseTabWidget::handleDatabaseUnlockDialogFinished(bool accepted, Databa
         if (index != -1) {
             setCurrentIndex(index);
         }
+        if (intent == DatabaseOpenDialog::Intent::RemoteSync) {
+            dbWidget->database()->markAsRemoteDatabase();
+        }
     }
 
     // if unlocked for AutoType, set pending lock flag if needed
@@ -920,8 +923,12 @@ void DatabaseTabWidget::relockPendingDatabase()
     m_dbWidgetPendingLock = nullptr;
 }
 
-void DatabaseTabWidget::updateLastDatabases(const QString& filename)
+void DatabaseTabWidget::updateLastDatabases(const QSharedPointer<Database>& database)
 {
+    if (database->isRemoteDatabase() || database->filePath().isEmpty()) {
+        return;
+    }
+    auto filename = database->filePath();
     if (!config()->get(Config::RememberLastDatabases).toBool()) {
         config()->remove(Config::LastDatabases);
     } else {
@@ -941,10 +948,7 @@ void DatabaseTabWidget::updateLastDatabases()
     auto dbWidget = currentDatabaseWidget();
 
     if (dbWidget) {
-        auto filePath = dbWidget->database()->filePath();
-        if (!filePath.isEmpty()) {
-            updateLastDatabases(filePath);
-        }
+        updateLastDatabases(dbWidget->database());
     }
 }
 
