@@ -28,6 +28,21 @@ RemoteFileDialog::RemoteFileDialog(QWidget* parent)
     m_ui->setupUi(this);
     m_ui->messageWidget->setHidden(true);
 
+    // setup status bar
+    m_statusBar = new QStatusBar(this);
+    m_statusBar->setFixedHeight(24);
+    m_progressBarLabel = new QLabel(m_statusBar);
+    m_progressBarLabel->setVisible(false);
+    m_statusBar->addPermanentWidget(m_progressBarLabel);
+    m_progressBar = new QProgressBar(m_statusBar);
+    m_progressBar->setVisible(false);
+    m_progressBar->setTextVisible(false);
+    m_progressBar->setMaximumWidth(100);
+    m_progressBar->setFixedHeight(15);
+    m_progressBar->setMaximum(100);
+    m_statusBar->addPermanentWidget(m_progressBar);
+    m_ui->verticalLayout->addWidget(m_statusBar);
+
     connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &RemoteFileDialog::close);
     connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &RemoteFileDialog::acceptRemoteProgramParams);
 
@@ -42,7 +57,8 @@ RemoteFileDialog::~RemoteFileDialog()
 
 void RemoteFileDialog::acceptRemoteProgramParams()
 {
-    this->setDisabled(true);
+    m_ui->remoteSettingsCommandWidget->setDisabled(true);
+    updateProgressBar(50, "Downloading...");
     auto* remoteProgramParams = m_ui->remoteSettingsCommandWidget->getRemoteProgramParams();
     emit m_remoteHandler->downloadFromRemote(remoteProgramParams);
 }
@@ -55,6 +71,20 @@ void RemoteFileDialog::handleSuccessfulDownload(const QString& downloadedFileNam
 
 void RemoteFileDialog::showRemoteDownloadErrorMessage(const QString& errorMessage)
 {
-    this->setDisabled(false);
-    this->m_ui->messageWidget->showMessage(errorMessage, MessageWidget::Error);
+    m_ui->remoteSettingsCommandWidget->setDisabled(false);
+    updateProgressBar(-1, "");
+    m_ui->messageWidget->showMessage(errorMessage, MessageWidget::Error);
+}
+
+void RemoteFileDialog::updateProgressBar(int percentage, const QString& message)
+{
+    if (percentage < 0) {
+        m_progressBar->setVisible(false);
+        m_progressBarLabel->setVisible(false);
+    } else {
+        m_progressBar->setValue(percentage);
+        m_progressBar->setVisible(true);
+        m_progressBarLabel->setText(message);
+        m_progressBarLabel->setVisible(true);
+    }
 }
