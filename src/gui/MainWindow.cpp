@@ -44,8 +44,8 @@
 #include "gui/MessageBox.h"
 #include "gui/SearchWidget.h"
 #include "gui/entry/EntryView.h"
-#include "gui/remote/RemoteParamsConfig.h"
 #include "gui/osutils/OSUtils.h"
+#include "gui/remote/RemoteParamsConfig.h"
 
 #ifdef WITH_XC_UPDATECHECK
 #include "gui/UpdateCheckDialog.h"
@@ -1579,7 +1579,7 @@ bool MainWindow::saveLastDatabases()
 {
     if (config()->get(Config::OpenPreviousDatabasesOnStartup).toBool()) {
         auto currentDbWidget = m_ui->tabWidget->currentDatabaseWidget();
-        if (currentDbWidget) {
+        if (currentDbWidget && !currentDbWidget->database()->isRemoteDatabase()) {
             config()->set(Config::LastActiveDatabase, currentDbWidget->database()->filePath());
         } else {
             config()->remove(Config::LastActiveDatabase);
@@ -1588,7 +1588,9 @@ bool MainWindow::saveLastDatabases()
         QStringList openDatabases;
         for (int i = 0; i < m_ui->tabWidget->count(); ++i) {
             auto dbWidget = m_ui->tabWidget->databaseWidgetFromIndex(i);
-            openDatabases.append(QDir::toNativeSeparators(dbWidget->database()->filePath()));
+            if (!dbWidget->database()->isRemoteDatabase()) {
+                openDatabases.append(QDir::toNativeSeparators(dbWidget->database()->filePath()));
+            }
         }
 
         config()->set(Config::LastOpenedDatabases, openDatabases);

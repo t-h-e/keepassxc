@@ -201,6 +201,9 @@ void DatabaseOpenDialog::complete(bool accepted)
 {
     // save DB, since DatabaseOpenWidget will reset its data after accept() is called
     m_db = m_view->database();
+    if (m_intent == Intent::RemoteSync) {
+        m_db->markAsRemoteDatabase();
+    }
 
     if (accepted) {
         accept();

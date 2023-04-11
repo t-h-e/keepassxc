@@ -1761,8 +1761,8 @@ void TestGui::testOpenRemoteDatabase()
     QTest::keyClicks(editPasswordSync, "a");
     QTest::keyClick(editPasswordSync, Qt::Key_Enter);
 
-    // database has been opened
-    QTRY_COMPARE(m_tabWidget->tabText(m_tabWidget->currentIndex()), QString("SyncDatabase.kdbx"));
+    // remote database has been opened
+    QTRY_COMPARE(m_tabWidget->tabText(m_tabWidget->currentIndex()), QString("SyncDatabase.kdbx [Remote]"));
 }
 
 void TestGui::testDatabaseLocking()
