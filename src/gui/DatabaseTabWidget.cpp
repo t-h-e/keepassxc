@@ -367,7 +367,13 @@ void DatabaseTabWidget::remoteSyncDatabase(const QString& filePath)
 void DatabaseTabWidget::openRemoteDatabase()
 {
     auto* dialog = new RemoteFileDialog(this);
-    connect(dialog, &RemoteFileDialog::downloadedSuccessfullyTo, this, &DatabaseTabWidget::openDatabaseFromFile);
+    connect(dialog, &RemoteFileDialog::downloadedSuccessfullyTo, [this](const QString& filePath) {
+        auto db = QSharedPointer<Database>::create();
+        db->markAsRemoteDatabase();
+        auto* dbWidget = new DatabaseWidget(db, this);
+        addDatabaseTab(dbWidget);
+        dbWidget->switchToOpenDatabase(filePath);
+    });
     dialog->open();
 }
 
@@ -742,6 +748,11 @@ QString DatabaseTabWidget::tabName(int index)
         tabName = tr("%1 [Locked]", "Database tab name modifier").arg(tabName);
     }
 
+    if (db->isRemoteDatabase()) {
+        tabName = tr("%1 [Remote]", "Database tab name modifier").arg(tabName);
+    }
+
+    // needs to be last check, as MainWindow may remove the asterisk again
     if (db->isModified()) {
         tabName.append("*");
     }
@@ -894,9 +905,6 @@ void DatabaseTabWidget::handleDatabaseUnlockDialogFinished(bool accepted, Databa
         int index = indexOf(dbWidget);
         if (index != -1) {
             setCurrentIndex(index);
-        }
-        if (intent == DatabaseOpenDialog::Intent::RemoteSync) {
-            dbWidget->database()->markAsRemoteDatabase();
         }
     }
 
