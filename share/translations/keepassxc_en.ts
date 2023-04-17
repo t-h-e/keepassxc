@@ -8389,10 +8389,6 @@ Kernel: %3 %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>e.g.: sftp user@hostname</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Input:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8428,6 +8424,14 @@ exit
 ---
 {TEMP_DATABASE} is used as placeholder to store the database in a temporary location
 The command has to exit. In case of `sftp` as last commend `exit` has to be sent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g.: &quot;sftp user@hostname&quot; or &quot;scp user@hostname:DatabaseOnRemote.kdbx {TEMP_DATABASE}&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>e.g.: &quot;sftp user@hostname&quot; or &quot;scp {TEMP_DATABASE} user@hostname:DatabaseOnRemote.kdbx&quot;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
