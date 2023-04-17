@@ -124,7 +124,7 @@
           <string>Download command field</string>
          </property>
          <property name="placeholderText">
-          <string>e.g.: sftp user@hostname</string>
+          <string>e.g.: "sftp user@hostname" or "scp user@hostname:DatabaseOnRemote.kdbx {TEMP_DATABASE}"</string>
          </property>
         </widget>
        </item>
@@ -173,7 +173,7 @@ The command has to exit. In case of `sftp` as last commend `exit` has to be sent
           <string>Upload command field</string>
          </property>
          <property name="placeholderText">
-          <string>e.g.: sftp user@hostname</string>
+          <string>e.g.: "sftp user@hostname" or "scp {TEMP_DATABASE} user@hostname:DatabaseOnRemote.kdbx"</string>
          </property>
         </widget>
        </item>
