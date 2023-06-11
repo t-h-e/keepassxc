@@ -19,8 +19,8 @@
 #define KEEPASSXC_REMOTEHANDLER_H
 
 #include "core/Database.h"
+#include "gui/remote/RemoteParams.h"
 #include "gui/remote/RemoteProcess.h"
-#include "gui/remote/RemoteProgramParams.h"
 
 #include <QObject>
 
@@ -31,11 +31,11 @@ class RemoteHandler : public QObject
 public:
     explicit RemoteHandler(QObject* parent = 0);
     ~RemoteHandler() override;
-    void download(RemoteProgramParams* remoteProgramParams);
+    void download(RemoteParams* remoteProgramParams);
 
 signals:
-    void downloadFromRemote(RemoteProgramParams*);
-    void uploadToRemote(const QSharedPointer<Database>&, RemoteProgramParams*);
+    void downloadFromRemote(RemoteParams*);
+    void uploadToRemote(const QSharedPointer<Database>&, RemoteParams*);
 
     void downloadedSuccessfullyTo(const QString& filePath);
     void downloadError(const QString& errorMessage);
@@ -43,11 +43,11 @@ signals:
     void uploadError(const QString& errorMessage);
 
 private slots:
-    void upload(const QSharedPointer<Database>&, RemoteProgramParams* remoteProgramParams);
+    void upload(const QSharedPointer<Database>&, RemoteParams* remoteProgramParams);
 
 private:
-    void downloadInternal(RemoteProgramParams* remoteProgramParams);
-    void uploadInternal(const QSharedPointer<Database>& remoteSyncedDb, RemoteProgramParams* remoteProgramParams);
+    void downloadInternal(RemoteParams* remoteProgramParams);
+    void uploadInternal(const QSharedPointer<Database>& remoteSyncedDb, RemoteParams* remoteProgramParams);
 };
 
 #endif // KEEPASSXC_REMOTEHANDLER_H

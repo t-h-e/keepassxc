@@ -28,7 +28,7 @@
 #include "gui/MessageWidget.h"
 #include "gui/csvImport/CsvImportWizard.h"
 #include "gui/entry/EntryModel.h"
-#include "gui/remote/RemoteProgramParams.h"
+#include "gui/remote/RemoteParams.h"
 
 class DatabaseOpenWidget;
 class KeePass1OpenWidget;
@@ -149,8 +149,8 @@ signals:
     void databaseMerged(QSharedPointer<Database> mergedDb);
     void databaseSyncedWith(QSharedPointer<Database> syncedDb);
     void databaseSyncFailed();
-    void syncWithRemote(RemoteProgramParams* remoteProgramParams);
-    void saveToRemote(RemoteProgramParams* remoteProgramParams);
+    void syncWithRemote(RemoteParams* remoteProgramParams);
+    void saveToRemote(RemoteParams* remoteProgramParams);
     void groupContextMenuRequested(const QPoint& globalPos);
     void entryContextMenuRequested(const QPoint& globalPos);
     void listModeAboutToActivate();
@@ -210,8 +210,8 @@ public slots:
     void createGroup();
     void cloneGroup();
     void deleteGroup();
-    void syncWithRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams);
-    void saveToRemoteAndSwitchToMainView(RemoteProgramParams* remoteProgramParams);
+    void syncWithRemoteAndSwitchToMainView(RemoteParams* remoteProgramParams);
+    void saveToRemoteAndSwitchToMainView(RemoteParams* remoteProgramParams);
     bool attemptSyncDatabaseWithSameKey(const QString& filePath);
     void switchToMainView(bool previousDialogAccepted = false);
     void switchToEntryEdit();

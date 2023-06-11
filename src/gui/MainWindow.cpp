@@ -1364,7 +1364,6 @@ void MainWindow::switchToRemoteDatabase()
 void MainWindow::updateRemoteSyncMenuEntries()
 {
     m_ui->menuRemoteSync->clear();
-    m_ui->menuRemoteSync->addAction(m_ui->actionRemoteDatabaseSync);
 
     QList<RemoteSettings*> remoteSettingsForMenu;
     foreach (auto entry, remoteParamsConfig()->getRemoteProgramEntries()) {
@@ -1374,19 +1373,18 @@ void MainWindow::updateRemoteSyncMenuEntries()
     }
 
     // Build remote sync menu
-    if (remoteSettingsForMenu.isEmpty()) {
-        return;
+    if (!remoteSettingsForMenu.isEmpty()) {
+        foreach (auto entryForMenu, remoteSettingsForMenu) {
+            auto* remoteSyncAction = new QAction(entryForMenu->getName(), this);
+            m_ui->menuRemoteSync->addAction(remoteSyncAction);
+            connect(remoteSyncAction, &QAction::triggered, [this, entryForMenu]() {
+                m_ui->tabWidget->syncDatabaseWithRemote(entryForMenu->toRemoteProgramParams());
+            });
+        }
+        m_ui->menuRemoteSync->addSeparator();
     }
 
-    m_ui->menuRemoteSync->addSeparator();
-    foreach (auto entryForMenu, remoteSettingsForMenu) {
-        auto* remoteSyncAction = new QAction(entryForMenu->getName(), this);
-        m_ui->menuRemoteSync->addAction(remoteSyncAction);
-        entryForMenu->toRemoteProgramParams();
-        connect(remoteSyncAction, &QAction::triggered, [this, entryForMenu]() {
-            m_ui->tabWidget->syncDatabaseWithRemote(entryForMenu->toRemoteProgramParams());
-        });
-    }
+    m_ui->menuRemoteSync->addAction(m_ui->actionRemoteDatabaseSync);
 }
 
 void MainWindow::databaseStatusChanged(DatabaseWidget* dbWidget)

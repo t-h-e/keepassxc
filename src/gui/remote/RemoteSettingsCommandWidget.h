@@ -18,7 +18,7 @@
 #ifndef KEEPASSXC_REMOTESETTINGSCOMMANDWIDGET_H
 #define KEEPASSXC_REMOTESETTINGSCOMMANDWIDGET_H
 
-#include "RemoteProgramParams.h"
+#include "RemoteParams.h"
 
 #include <QWidget>
 
@@ -38,8 +38,7 @@ public:
     Q_DISABLE_COPY(RemoteSettingsCommandWidget);
     ~RemoteSettingsCommandWidget() override;
 
-    void initialize();
-    RemoteProgramParams* getRemoteProgramParams();
+    RemoteParams* getRemoteProgramParams();
 
 private slots:
     void saveCurrentSettings();

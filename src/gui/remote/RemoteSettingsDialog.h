@@ -18,13 +18,11 @@
 #ifndef KEEPASSX_REMOTESETTINGSDIALOG_H
 #define KEEPASSX_REMOTESETTINGSDIALOG_H
 
-#include "RemoteProgramParams.h"
+#include "RemoteParams.h"
 #include "config-keepassx.h"
 #include "gui/DialogyWidget.h"
 
 #include <QPointer>
-
-class Database;
 
 namespace Ui
 {
@@ -40,13 +38,10 @@ public:
     ~RemoteSettingsDialog() override;
     Q_DISABLE_COPY(RemoteSettingsDialog);
 
-    void initialize();
-    void load(const QSharedPointer<Database>& db);
-
 signals:
     void cancel(bool accepted);
-    void saveToRemote(RemoteProgramParams* remoteProgramParams);
-    void syncWithRemote(RemoteProgramParams* remoteProgramParams);
+    void saveToRemote(RemoteParams* remoteProgramParams);
+    void syncWithRemote(RemoteParams* remoteProgramParams);
 
 protected:
     void keyPressEvent(QKeyEvent* e) override;
@@ -57,10 +52,9 @@ private slots:
     void reject();
 
 private:
-    RemoteProgramParams* getCurrentParams();
+    RemoteParams* getCurrentParams();
     static bool clickButton(QPushButton* button);
 
-    QSharedPointer<Database> m_db;
     const QScopedPointer<Ui::RemoteSettingsDialog> m_ui;
 };
 

@@ -38,19 +38,7 @@ RemoteSettingsDialog::RemoteSettingsDialog(QWidget* parent)
     connect(m_ui->remoteSyncButton, &QPushButton::clicked, this, &RemoteSettingsDialog::remoteSync);
 }
 
-RemoteSettingsDialog::~RemoteSettingsDialog()
-{
-}
-
-void RemoteSettingsDialog::initialize()
-{
-    m_ui->remoteSettingsCommandWidget->initialize();
-}
-
-void RemoteSettingsDialog::load(const QSharedPointer<Database>& db)
-{
-    m_db = db;
-}
+RemoteSettingsDialog::~RemoteSettingsDialog() = default;
 
 void RemoteSettingsDialog::remoteSave()
 {
@@ -64,7 +52,7 @@ void RemoteSettingsDialog::remoteSync()
     emit syncWithRemote(remoteProgramParams);
 }
 
-RemoteProgramParams* RemoteSettingsDialog::getCurrentParams()
+RemoteParams* RemoteSettingsDialog::getCurrentParams()
 {
     return m_ui->remoteSettingsCommandWidget->getRemoteProgramParams();
 }

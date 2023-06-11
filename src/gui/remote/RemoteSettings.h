@@ -22,7 +22,7 @@
 #include <QObject>
 #include <QVariant>
 
-#include "RemoteProgramParams.h"
+#include "RemoteParams.h"
 
 class RemoteSettings : QObject
 {
@@ -49,7 +49,7 @@ public:
     QMap<QString, QVariant> toConfig();
     void fromConfig(const QMap<QString, QVariant>&);
 
-    RemoteProgramParams* toRemoteProgramParams();
+    RemoteParams* toRemoteProgramParams();
 
 private:
     QString m_name;

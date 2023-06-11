@@ -19,8 +19,6 @@
 #include "RemoteProcessFactory.h"
 #include "core/AsyncTask.h"
 
-#include <QDebug>
-
 RemoteHandler::RemoteHandler(QObject* parent)
     : QObject(parent)
 {
@@ -32,22 +30,19 @@ RemoteHandler::~RemoteHandler()
 {
 }
 
-void RemoteHandler::download(RemoteProgramParams* remoteProgramParams)
+void RemoteHandler::download(RemoteParams* remoteProgramParams)
 {
     AsyncTask::runAndWaitForFinished([&] { this->downloadInternal(remoteProgramParams); });
 }
 
-void RemoteHandler::downloadInternal(RemoteProgramParams* remoteProgramParams)
+void RemoteHandler::downloadInternal(RemoteParams* remoteProgramParams)
 {
     auto remoteProcess = RemoteProcessFactory::createRemoteProcess();
     QString destination = remoteProcess->getTempFileLocation();
     auto downloadCommand = remoteProgramParams->getCommandForDownload(destination);
-    qDebug() << "download command" << downloadCommand;
     remoteProcess->start(downloadCommand);
     auto input = remoteProgramParams->getInputForDownload(destination);
     if (!input.isEmpty()) {
-        qDebug() << "download input" << input;
-
         remoteProcess->write(input + "\n");
         remoteProcess->waitForBytesWritten();
         remoteProcess->closeWriteChannel();
@@ -68,23 +63,19 @@ void RemoteHandler::downloadInternal(RemoteProgramParams* remoteProgramParams)
     }
 }
 
-void RemoteHandler::upload(const QSharedPointer<Database>& remoteSyncedDb, RemoteProgramParams* remoteProgramParams)
+void RemoteHandler::upload(const QSharedPointer<Database>& remoteSyncedDb, RemoteParams* remoteProgramParams)
 {
     AsyncTask::runAndWaitForFinished([&] { this->uploadInternal(remoteSyncedDb, remoteProgramParams); });
 }
 
-void RemoteHandler::uploadInternal(const QSharedPointer<Database>& remoteSyncedDb,
-                                   RemoteProgramParams* remoteProgramParams)
+void RemoteHandler::uploadInternal(const QSharedPointer<Database>& remoteSyncedDb, RemoteParams* remoteProgramParams)
 {
     auto remoteProcess = RemoteProcessFactory::createRemoteProcess();
     QString source = remoteSyncedDb->filePath();
     auto uploadCommand = remoteProgramParams->getCommandForUpload(source);
-    qDebug() << "upload command" << uploadCommand;
     remoteProcess->start(uploadCommand);
     auto input = remoteProgramParams->getInputForUpload(source);
     if (!input.isEmpty()) {
-        qDebug() << "upload input" << input;
-
         remoteProcess->write(input + "\n");
         remoteProcess->waitForBytesWritten();
         remoteProcess->closeWriteChannel();

@@ -22,7 +22,7 @@
 #include "config-keepassx.h"
 #include "gui/MessageWidget.h"
 #include "gui/remote/RemoteHandler.h"
-#include "gui/remote/RemoteProgramParams.h"
+#include "gui/remote/RemoteParams.h"
 
 #include <QTabWidget>
 #include <QTimer>
@@ -66,8 +66,8 @@ public slots:
     DatabaseWidget* newDatabase();
     void openDatabase();
     void mergeDatabase();
-    void syncDatabaseWithRemote(RemoteProgramParams* remoteProgramParams);
-    void saveDatabaseToRemote(RemoteProgramParams* remoteProgramParams);
+    void syncDatabaseWithRemote(RemoteParams* remoteProgramParams);
+    void saveDatabaseToRemote(RemoteParams* remoteProgramParams);
     void remoteSyncDatabase(const QString& filePath);
 
     void importKeePass1Database();

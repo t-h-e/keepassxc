@@ -18,7 +18,7 @@
 #include "RemoteSettingsCommandWidget.h"
 #include "ui_RemoteSettingsCommandWidget.h"
 
-#include "AnyCommandParams.h"
+#include "RemoteParams.h"
 #include "RemoteParamsConfig.h"
 #include "RemoteSettings.h"
 #include "core/Config.h"
@@ -45,19 +45,14 @@ RemoteSettingsCommandWidget::RemoteSettingsCommandWidget(QWidget* parent)
 
 RemoteSettingsCommandWidget::~RemoteSettingsCommandWidget() = default;
 
-void RemoteSettingsCommandWidget::initialize()
+RemoteParams* RemoteSettingsCommandWidget::getRemoteProgramParams()
 {
-    updateSettingsList();
-}
-
-RemoteProgramParams* RemoteSettingsCommandWidget::getRemoteProgramParams()
-{
-    auto* anyCommandParams = new AnyCommandParams();
-    anyCommandParams->setCommandForDownload(m_ui->downloadCommand->text());
-    anyCommandParams->setInputForDownload(m_ui->inputForDownload->toPlainText());
-    anyCommandParams->setCommandForUpload(m_ui->uploadCommand->text());
-    anyCommandParams->setInputForUpload(m_ui->inputForUpload->toPlainText());
-    return anyCommandParams;
+    auto* remoteProgramParams = new RemoteParams();
+    remoteProgramParams->setCommandForDownload(m_ui->downloadCommand->text());
+    remoteProgramParams->setInputForDownload(m_ui->inputForDownload->toPlainText());
+    remoteProgramParams->setCommandForUpload(m_ui->uploadCommand->text());
+    remoteProgramParams->setInputForUpload(m_ui->inputForUpload->toPlainText());
+    return remoteProgramParams;
 }
 
 void RemoteSettingsCommandWidget::saveCurrentSettings()
