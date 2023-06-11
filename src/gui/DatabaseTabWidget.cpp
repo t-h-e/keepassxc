@@ -259,8 +259,8 @@ void DatabaseTabWidget::addDatabaseTab(DatabaseWidget* dbWidget, bool inBackgrou
     connect(dbWidget, SIGNAL(databaseUnlocked()), SLOT(emitDatabaseLockChanged()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(updateTabName()));
     connect(dbWidget, SIGNAL(databaseLocked()), SLOT(emitDatabaseLockChanged()));
-    connect(dbWidget, SIGNAL(syncWithRemote(RemoteProgramParams*)), SLOT(syncDatabaseWithRemote(RemoteProgramParams*)));
-    connect(dbWidget, SIGNAL(saveToRemote(RemoteProgramParams*)), SLOT(saveDatabaseToRemote(RemoteProgramParams*)));
+    connect(dbWidget, SIGNAL(syncWithRemote(RemoteParams*)), SLOT(syncDatabaseWithRemote(RemoteParams*)));
+    connect(dbWidget, SIGNAL(saveToRemote(RemoteParams*)), SLOT(saveDatabaseToRemote(RemoteParams*)));
 }
 
 void DatabaseTabWidget::importCsv()
@@ -302,7 +302,7 @@ void DatabaseTabWidget::mergeDatabase(const QString& filePath)
     unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::Merge, filePath);
 }
 
-void DatabaseTabWidget::saveDatabaseToRemote(RemoteProgramParams* remoteProgramParams)
+void DatabaseTabWidget::saveDatabaseToRemote(RemoteParams* remoteProgramParams)
 {
     emit updateSyncProgress(50, "Uploading...");
 
@@ -318,7 +318,7 @@ void DatabaseTabWidget::remoteUploadSuccess()
     currentDatabaseWidget()->showMessage("Upload successful.", MessageWidget::MessageType::Information);
 }
 
-void DatabaseTabWidget::syncDatabaseWithRemote(RemoteProgramParams* remoteProgramParams)
+void DatabaseTabWidget::syncDatabaseWithRemote(RemoteParams* remoteProgramParams)
 {
     emit updateSyncProgress(25, "Downloading...");
 

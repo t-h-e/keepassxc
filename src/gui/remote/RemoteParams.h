@@ -15,22 +15,23 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KEEPASSXC_ANYCOMMANDPARAMS_H
-#define KEEPASSXC_ANYCOMMANDPARAMS_H
+#ifndef KEEPASSXC_REMOTEPARAMS_H
+#define KEEPASSXC_REMOTEPARAMS_H
 
-#include "RemoteProgramParams.h"
+#include "RemoteParams.h"
 #include <QMetaType>
 #include <QStringList>
 
-class AnyCommandParams : public RemoteProgramParams
+class RemoteParams
 {
 public:
-    AnyCommandParams() = default;
+    RemoteParams() = default;
+    ~RemoteParams() = default;
 
-    QString getCommandForDownload(QString destination) override;
-    QString getInputForDownload(QString destination) override;
-    QString getCommandForUpload(QString source) override;
-    QString getInputForUpload(QString source) override;
+    QString getCommandForDownload(QString destination);
+    QString getInputForDownload(QString destination);
+    QString getCommandForUpload(QString source);
+    QString getInputForUpload(QString source);
 
     void setCommandForDownload(QString downloadCommand);
     void setInputForDownload(QString downloadCommandInput);
@@ -46,6 +47,6 @@ private:
     QString m_uploadCommandInput;
 };
 
-Q_DECLARE_METATYPE(AnyCommandParams);
+Q_DECLARE_METATYPE(RemoteParams);
 
-#endif // KEEPASSXC_ANYCOMMANDPARAMS_H
+#endif // KEEPASSXC_REMOTEPARAMS_H

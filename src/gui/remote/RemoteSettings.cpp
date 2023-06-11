@@ -17,7 +17,7 @@
 
 #include "RemoteSettings.h"
 
-#include "AnyCommandParams.h"
+#include "RemoteParams.h"
 #include <utility>
 
 RemoteSettings::RemoteSettings(QObject* parent)
@@ -96,9 +96,9 @@ void RemoteSettings::fromConfig(const QMap<QString, QVariant>& config)
     setUploadCommandInput(config.value("uploadCommandInput", "").toString());
 }
 
-RemoteProgramParams* RemoteSettings::toRemoteProgramParams()
+RemoteParams* RemoteSettings::toRemoteProgramParams()
 {
-    auto* remoteProgramParams = new AnyCommandParams();
+    auto* remoteProgramParams = new RemoteParams();
     remoteProgramParams->setCommandForDownload(m_downloadCommand);
     remoteProgramParams->setInputForDownload(m_downloadCommandInput);
     remoteProgramParams->setCommandForUpload(m_uploadCommand);

@@ -15,57 +15,51 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AnyCommandParams.h"
+#include "RemoteParams.h"
 
-#include "core/Entry.h"
 #include <utility>
 
-void AnyCommandParams::setCommandForDownload(QString downloadCommand)
+void RemoteParams::setCommandForDownload(QString downloadCommand)
 {
     m_downloadCommand = std::move(downloadCommand);
 }
 
-void AnyCommandParams::setInputForDownload(QString downloadCommandInput)
+void RemoteParams::setInputForDownload(QString downloadCommandInput)
 {
     m_downloadCommandInput = std::move(downloadCommandInput);
 }
 
-void AnyCommandParams::setCommandForUpload(QString uploadCommand)
+void RemoteParams::setCommandForUpload(QString uploadCommand)
 {
     m_uploadCommand = std::move(uploadCommand);
 }
-void AnyCommandParams::setInputForUpload(QString uploadCommandInput)
+void RemoteParams::setInputForUpload(QString uploadCommandInput)
 {
     m_uploadCommandInput = std::move(uploadCommandInput);
 }
 
-QString AnyCommandParams::getCommandForDownload(QString destination)
+QString RemoteParams::getCommandForDownload(QString destination)
 {
     return resolveCommandOrInput(m_downloadCommand, destination);
 }
 
-QString AnyCommandParams::getInputForDownload(QString destination)
+QString RemoteParams::getInputForDownload(QString destination)
 {
     return resolveCommandOrInput(m_downloadCommandInput, destination);
 }
 
-QString AnyCommandParams::getCommandForUpload(QString source)
+QString RemoteParams::getCommandForUpload(QString source)
 {
     return resolveCommandOrInput(m_uploadCommand, source);
 }
 
-QString AnyCommandParams::getInputForUpload(QString source)
+QString RemoteParams::getInputForUpload(QString source)
 {
     return resolveCommandOrInput(m_uploadCommandInput, source);
 }
 
-QString AnyCommandParams::resolveCommandOrInput(QString input, const QString& tempDatabasePath)
+QString RemoteParams::resolveCommandOrInput(QString input, const QString& tempDatabasePath)
 {
     auto resolved = input.replace("{TEMP_DATABASE}", tempDatabasePath);
-    // TODO: Question for the reviewer: currently `Entry::resolveReferencePlaceholderRecursive` is private,
-    //  but the method does not rely on any field of `Entry`.
-    //  Therefore the method could be made static.
-    //  Should `Entry::resolveReferencePlaceholderRecursive` in some way be reused to also resolve other placeholders?
-    // result = Entry::resolveReferencePlaceholderRecursive(result, 5);
     return resolved;
 }

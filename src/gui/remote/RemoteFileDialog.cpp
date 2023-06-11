@@ -51,9 +51,7 @@ RemoteFileDialog::RemoteFileDialog(QWidget* parent)
     connect(m_remoteHandler, &RemoteHandler::downloadError, this, &RemoteFileDialog::showRemoteDownloadErrorMessage);
 }
 
-RemoteFileDialog::~RemoteFileDialog()
-{
-}
+RemoteFileDialog::~RemoteFileDialog() = default;
 
 void RemoteFileDialog::acceptRemoteProgramParams()
 {

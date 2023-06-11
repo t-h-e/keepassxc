@@ -25,7 +25,7 @@
 #include <QStatusBar>
 
 #include "RemoteHandler.h"
-#include "RemoteProgramParams.h"
+#include "RemoteParams.h"
 
 namespace Ui
 {
