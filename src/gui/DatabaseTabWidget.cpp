@@ -315,17 +315,17 @@ void DatabaseTabWidget::remoteUploadSuccess()
 {
     this->currentDatabaseWidget()->setDisabled(false);
     emit updateSyncProgress(-1, "");
-    currentDatabaseWidget()->showMessage("Upload successful.", MessageWidget::MessageType::Information);
+    currentDatabaseWidget()->showMessage(tr("Upload successful."), MessageWidget::MessageType::Information);
 }
 
 void DatabaseTabWidget::syncDatabaseWithRemote(RemoteParams* remoteProgramParams)
 {
-    emit updateSyncProgress(25, "Downloading...");
+    emit updateSyncProgress(25, tr("Downloading..."));
 
     auto uploadSyncedDatabase = [this, remoteProgramParams](const QSharedPointer<Database>& database) {
         disconnect(this->currentDatabaseWidget(), &DatabaseWidget::databaseSyncedWith, nullptr, nullptr);
         disconnect(this->currentDatabaseWidget(), &DatabaseWidget::databaseSyncFailed, nullptr, nullptr);
-        emit this->updateSyncProgress(75, "Uploading...");
+        emit this->updateSyncProgress(75, tr("Uploading..."));
         emit m_remoteSyncHandler->uploadToRemote(database, remoteProgramParams);
     };
     auto cleanupSyncFailed = [this]() {
@@ -357,7 +357,7 @@ void DatabaseTabWidget::showRemoteErrorMessage(const QString& errorMessage)
 
 void DatabaseTabWidget::remoteSyncDatabase(const QString& filePath)
 {
-    emit this->updateSyncProgress(50, "Syncing...");
+    emit this->updateSyncProgress(50, tr("Syncing..."));
     bool syncSuccessful = this->currentDatabaseWidget()->attemptSyncDatabaseWithSameKey(filePath);
     if (!syncSuccessful) {
         unlockDatabaseInDialog(currentDatabaseWidget(), DatabaseOpenDialog::Intent::RemoteSync, filePath);

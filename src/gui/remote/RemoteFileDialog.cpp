@@ -56,7 +56,7 @@ RemoteFileDialog::~RemoteFileDialog() = default;
 void RemoteFileDialog::acceptRemoteProgramParams()
 {
     m_ui->remoteSettingsCommandWidget->setDisabled(true);
-    updateProgressBar(50, "Downloading...");
+    updateProgressBar(50, tr("Downloading..."));
     auto* remoteProgramParams = m_ui->remoteSettingsCommandWidget->getRemoteProgramParams();
     emit m_remoteHandler->downloadFromRemote(remoteProgramParams);
 }

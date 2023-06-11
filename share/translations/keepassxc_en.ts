@@ -2332,6 +2332,22 @@ This is definitely a bug, please report it to the developers.</source>
         <comment>Database tab name modifier</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Upload successful.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uploading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Syncing...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DatabaseWidget</name>
@@ -8327,6 +8343,10 @@ Kernel: %3 %4</source>
     <name>RemoteFileDialog</name>
     <message>
         <source>Open from remote</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
