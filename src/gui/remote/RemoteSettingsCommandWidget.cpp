@@ -21,13 +21,13 @@
 #include "RemoteParams.h"
 #include "RemoteParamsConfig.h"
 #include "RemoteSettings.h"
-#include "core/Config.h"
 
 RemoteSettingsCommandWidget::RemoteSettingsCommandWidget(QWidget* parent)
     : QWidget(parent)
     , m_ui(new Ui::RemoteSettingsCommandWidget())
 {
     m_ui->setupUi(this);
+    m_ui->messageWidget->setHidden(true);
 
     connect(m_ui->saveSettingsButton, &QPushButton::clicked, this, &RemoteSettingsCommandWidget::saveCurrentSettings);
     connect(
@@ -58,6 +58,11 @@ RemoteParams* RemoteSettingsCommandWidget::getRemoteProgramParams()
 void RemoteSettingsCommandWidget::saveCurrentSettings()
 {
     QString name = m_ui->nameLineEdit->text();
+    if (name.isEmpty()) {
+        m_ui->messageWidget->showMessage(tr("Name cannot be empty."), MessageWidget::Warning);
+        return;
+    }
+
     auto* remoteSettings = new RemoteSettings();
     remoteSettings->setName(m_ui->nameLineEdit->text());
     remoteSettings->setAddToMenu(m_ui->addToMenuCheckBox->isChecked());
