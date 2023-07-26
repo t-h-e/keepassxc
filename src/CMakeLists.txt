@@ -164,6 +164,8 @@ set(keepassx_SOURCES
         gui/dbsettings/DatabaseSettingsWidgetMetaDataSimple.cpp
         gui/dbsettings/DatabaseSettingsWidgetEncryption.cpp
         gui/dbsettings/DatabaseSettingsWidgetDatabaseKey.cpp
+        gui/remote/DatabaseSettingsWidgetRemote.cpp
+        gui/remote/DeleteableItemWidget.cpp
         gui/remote/RemoteFileDialog.cpp
         gui/remote/RemoteHandler.cpp
         gui/remote/RemoteParams.cpp
@@ -172,6 +174,7 @@ set(keepassx_SOURCES
         gui/remote/RemoteProcessFactory.cpp
         gui/remote/RemoteSettings.cpp
         gui/remote/RemoteSettingsCommandWidget.cpp
+        gui/remote/RemoteSettingsCustomDataHandler.cpp
         gui/remote/RemoteSettingsDialog.cpp
         gui/reports/ReportsWidget.cpp
         gui/reports/ReportsDialog.cpp

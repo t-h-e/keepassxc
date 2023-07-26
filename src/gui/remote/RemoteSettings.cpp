@@ -29,10 +29,6 @@ QString RemoteSettings::getName()
 {
     return m_name;
 }
-bool RemoteSettings::getAddToMenu()
-{
-    return m_addToMenu;
-}
 QString RemoteSettings::getDownloadCommand()
 {
     return m_downloadCommand;
@@ -53,10 +49,6 @@ void RemoteSettings::setName(QString name)
 {
     m_name = std::move(name);
 }
-void RemoteSettings::setAddToMenu(bool addToMenu)
-{
-    m_addToMenu = addToMenu;
-}
 void RemoteSettings::setDownloadCommand(QString downloadCommand)
 {
     m_downloadCommand = std::move(downloadCommand);
@@ -74,26 +66,24 @@ void RemoteSettings::setUploadCommandInput(QString uploadCommandInput)
     m_uploadCommandInput = std::move(uploadCommandInput);
 }
 
-QMap<QString, QVariant> RemoteSettings::toConfig()
+QJsonObject RemoteSettings::toConfig()
 {
-    QMap<QString, QVariant> config;
-    config.insert("name", m_name);
-    config.insert("addToMenu", m_addToMenu);
-    config.insert("downloadCommand", m_downloadCommand);
-    config.insert("downloadCommandInput", m_downloadCommandInput);
-    config.insert("uploadCommand", m_uploadCommand);
-    config.insert("uploadCommandInput", m_uploadCommandInput);
+    QJsonObject config;
+    config["name"] = m_name;
+    config["downloadCommand"] = m_downloadCommand;
+    config["downloadCommandInput"] = m_downloadCommandInput;
+    config["uploadCommand"] = m_uploadCommand;
+    config["uploadCommandInput"] = m_uploadCommandInput;
     return config;
 }
 
-void RemoteSettings::fromConfig(const QMap<QString, QVariant>& config)
+void RemoteSettings::fromConfig(const QJsonObject& config)
 {
-    setName(config.value("name", "").toString());
-    setAddToMenu(config.value("addToMenu", false).toBool());
-    setDownloadCommand(config.value("downloadCommand", "").toString());
-    setDownloadCommandInput(config.value("downloadCommandInput", "").toString());
-    setUploadCommand(config.value("uploadCommand", "").toString());
-    setUploadCommandInput(config.value("uploadCommandInput", "").toString());
+    setName(config["name"].toString());
+    setDownloadCommand(config["downloadCommand"].toString());
+    setDownloadCommandInput(config["downloadCommandInput"].toString());
+    setUploadCommand(config["uploadCommand"].toString());
+    setUploadCommandInput(config["uploadCommandInput"].toString());
 }
 
 RemoteParams* RemoteSettings::toRemoteProgramParams()

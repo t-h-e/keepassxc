@@ -15,38 +15,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "RemoteParamsConfig.h"
+#include "RemoteSettingsCustomDataHandler.h"
 
-#include "core/Config.h"
+#include "core/Metadata.h"
+#include <QDataStream>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <utility>
 
-RemoteParamsConfig* RemoteParamsConfig::m_instance(nullptr);
-
-RemoteParamsConfig* RemoteParamsConfig::instance()
+RemoteSettingsCustomDataHandler::RemoteSettingsCustomDataHandler(QObject* parent, QSharedPointer<Database> db)
+    : QObject(parent)
+    , m_db(std::move(db))
 {
-    if (!m_instance) {
-        m_instance = new RemoteParamsConfig();
-    }
-    return m_instance;
-}
+    QString data = m_db->metadata()->customData()->value(CustomData::RemoteProgramSettings);
+    QJsonDocument configAsJson = QJsonDocument::fromJson(data.toUtf8());
 
-RemoteParamsConfig::RemoteParamsConfig()
-{
-    auto variantList = config()->get(Config::Remote_Program_Settings).toList();
     QList<RemoteSettings*> typedList;
-    foreach (QVariant variant, variantList) {
+    foreach (auto variant, configAsJson.array()) {
         auto* remoteProgramParams = new RemoteSettings();
-        //        remoteProgramParams->fromConfig(variant.toMap());
+        remoteProgramParams->fromConfig(variant.toObject());
         typedList << remoteProgramParams;
     }
     this->m_lastRemoteProgramEntries = typedList;
 }
 
-QList<RemoteSettings*> RemoteParamsConfig::getRemoteProgramEntries()
+RemoteSettingsCustomDataHandler::~RemoteSettingsCustomDataHandler() = default;
+
+QList<RemoteSettings*> RemoteSettingsCustomDataHandler::getRemoteProgramEntries()
 {
     return this->m_lastRemoteProgramEntries;
 }
 
-void RemoteParamsConfig::addRemoteSettingsEntry(RemoteSettings* newRemoteSettings)
+void RemoteSettingsCustomDataHandler::addRemoteSettingsEntry(RemoteSettings* newRemoteSettings)
 {
     QList<RemoteSettings*> toRemove;
     foreach (auto* remoteSettings, m_lastRemoteProgramEntries) {
@@ -66,11 +66,9 @@ void RemoteParamsConfig::addRemoteSettingsEntry(RemoteSettings* newRemoteSetting
         }
         m_lastRemoteProgramEntries.append(newRemoteSettings);
     }
-
-    syncConfig();
 }
 
-void RemoteParamsConfig::removeRemoteSettingsEntry(const QString& name)
+void RemoteSettingsCustomDataHandler::removeRemoteSettingsEntry(const QString& name)
 {
     QList<RemoteSettings*> toRemove;
     foreach (auto* remoteSettings, m_lastRemoteProgramEntries) {
@@ -81,11 +79,9 @@ void RemoteParamsConfig::removeRemoteSettingsEntry(const QString& name)
     foreach (auto* removeSetting, toRemove) {
         m_lastRemoteProgramEntries.removeOne(removeSetting);
     }
-
-    syncConfig();
 }
 
-RemoteSettings* RemoteParamsConfig::getRemoteSettingsEntry(const QString& name)
+RemoteSettings* RemoteSettingsCustomDataHandler::getRemoteSettingsEntry(const QString& name)
 {
     foreach (auto* remoteSettings, m_lastRemoteProgramEntries) {
         if (name == remoteSettings->getName()) {
@@ -95,11 +91,16 @@ RemoteSettings* RemoteParamsConfig::getRemoteSettingsEntry(const QString& name)
     return nullptr;
 }
 
-void RemoteParamsConfig::syncConfig()
+void RemoteSettingsCustomDataHandler::syncConfig()
 {
-    QList<QVariant> lastRemoteProgramEntriesConfig;
+    QJsonArray lastRemoteProgramEntriesConfig;
     foreach (RemoteSettings* remoteSettings, m_lastRemoteProgramEntries) {
         lastRemoteProgramEntriesConfig << remoteSettings->toConfig();
     }
-    config()->set(Config::Remote_Program_Settings, lastRemoteProgramEntriesConfig);
+
+    QByteArray configAsJson = QJsonDocument(lastRemoteProgramEntriesConfig).toJson(QJsonDocument::Compact);
+    m_db->metadata()->customData()->set(CustomData::RemoteProgramSettings, configAsJson);
+
+    // TODO: maybe add a check beforehand if the entries have changed!!
+    m_db->markAsModified();
 }

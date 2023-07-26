@@ -18,6 +18,7 @@
 #ifndef KEEPASSXC_REMOTESETTINGS_H
 #define KEEPASSXC_REMOTESETTINGS_H
 
+#include <QJsonObject>
 #include <QMap>
 #include <QObject>
 #include <QVariant>
@@ -33,27 +34,24 @@ public:
     ~RemoteSettings() override = default;
 
     QString getName();
-    bool getAddToMenu();
     QString getDownloadCommand();
     QString getDownloadCommandInput();
     QString getUploadCommand();
     QString getUploadCommandInput();
 
     void setName(QString name);
-    void setAddToMenu(bool addToMenu);
     void setDownloadCommand(QString downloadCommand);
     void setDownloadCommandInput(QString downloadCommandInput);
     void setUploadCommand(QString uploadCommand);
     void setUploadCommandInput(QString uploadCommandInput);
 
-    QMap<QString, QVariant> toConfig();
-    void fromConfig(const QMap<QString, QVariant>&);
+    QJsonObject toConfig();
+    void fromConfig(const QJsonObject&);
 
     RemoteParams* toRemoteProgramParams();
 
 private:
     QString m_name;
-    bool m_addToMenu;
     QString m_downloadCommand;
     QString m_downloadCommandInput;
     QString m_uploadCommand;
