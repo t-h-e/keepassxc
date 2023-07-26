@@ -29,7 +29,7 @@ class RemoteHandler : public QObject
     Q_OBJECT
 
 public:
-    explicit RemoteHandler(QObject* parent = 0);
+    explicit RemoteHandler(QObject* parent = nullptr);
     ~RemoteHandler() override;
     void download(RemoteParams* remoteProgramParams);
 

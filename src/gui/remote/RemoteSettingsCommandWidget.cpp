@@ -65,7 +65,6 @@ void RemoteSettingsCommandWidget::saveCurrentSettings()
 
     auto* remoteSettings = new RemoteSettings();
     remoteSettings->setName(m_ui->nameLineEdit->text());
-    remoteSettings->setAddToMenu(m_ui->addToMenuCheckBox->isChecked());
     remoteSettings->setDownloadCommand(m_ui->downloadCommand->text());
     remoteSettings->setDownloadCommandInput(m_ui->inputForDownload->toPlainText());
     remoteSettings->setUploadCommand(m_ui->uploadCommand->text());
@@ -100,7 +99,6 @@ void RemoteSettingsCommandWidget::editCurrentSettings()
     }
 
     m_ui->nameLineEdit->setText(remoteSettings->getName());
-    m_ui->addToMenuCheckBox->setChecked(remoteSettings->getAddToMenu());
     m_ui->downloadCommand->setText(remoteSettings->getDownloadCommand());
     m_ui->inputForDownload->setPlainText(remoteSettings->getDownloadCommandInput());
     m_ui->uploadCommand->setText(remoteSettings->getUploadCommand());

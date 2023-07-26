@@ -45,7 +45,7 @@
 #include "gui/SearchWidget.h"
 #include "gui/entry/EntryView.h"
 #include "gui/osutils/OSUtils.h"
-#include "gui/remote/RemoteParamsConfig.h"
+#include "gui/remote/RemoteSettingsCustomDataHandler.h"
 
 #ifdef WITH_XC_UPDATECHECK
 #include "gui/UpdateCheckDialog.h"
@@ -999,7 +999,7 @@ void MainWindow::setMenuActionState(DatabaseWidget::Mode mode)
             m_ui->actionPasskeys->setEnabled(true);
             m_ui->actionImportPasskey->setEnabled(true);
 #endif
-            m_ui->menuRemoteSync->setEnabled(m_ui->tabWidget->currentIndex() != -1);
+            m_ui->menuRemoteSync->setEnabled(true);
 #ifdef WITH_XC_SSHAGENT
             bool singleEntryHasSshKey =
                 singleEntrySelected && sshAgent()->isEnabled() && dbWidget->currentEntryHasSshKey();
@@ -1356,26 +1356,28 @@ void MainWindow::updateRemoteSyncMenuEntries()
 {
     m_ui->menuRemoteSync->clear();
 
-    QList<RemoteSettings*> remoteSettingsForMenu;
-    foreach (auto entry, remoteParamsConfig()->getRemoteProgramEntries()) {
-        if (entry->getAddToMenu()) {
-            remoteSettingsForMenu << entry;
-        }
-    }
+    auto dbWidget = m_ui->tabWidget->currentDatabaseWidget();
+    if (dbWidget) {
+        auto remoteSettingsConfig = new RemoteSettingsCustomDataHandler(this, dbWidget->database());
 
-    // Build remote sync menu
-    if (!remoteSettingsForMenu.isEmpty()) {
-        foreach (auto entryForMenu, remoteSettingsForMenu) {
+        // Build remote sync menu
+        foreach (auto entryForMenu, remoteSettingsConfig->getRemoteProgramEntries()) {
             auto* remoteSyncAction = new QAction(entryForMenu->getName(), this);
             m_ui->menuRemoteSync->addAction(remoteSyncAction);
             connect(remoteSyncAction, &QAction::triggered, [this, entryForMenu]() {
                 m_ui->tabWidget->syncDatabaseWithRemote(entryForMenu->toRemoteProgramParams());
             });
         }
-        m_ui->menuRemoteSync->addSeparator();
     }
 
-    m_ui->menuRemoteSync->addAction(m_ui->actionRemoteDatabaseSync);
+    // If no remote settings exist in the database then show a tip to the user
+    if (m_ui->menuRemoteSync->isEmpty()) {
+        auto action = m_ui->menuRemoteSync->addAction(tr("No Remote Sync Settings"));
+        action->setEnabled(false);
+    }
+
+    // TODO: remove action altogether:
+    //    m_ui->menuRemoteSync->addAction(m_ui->actionRemoteDatabaseSync);
 }
 
 void MainWindow::databaseStatusChanged(DatabaseWidget* dbWidget)
