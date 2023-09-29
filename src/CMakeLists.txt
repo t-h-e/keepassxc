@@ -165,7 +165,6 @@ set(keepassx_SOURCES
         gui/dbsettings/DatabaseSettingsWidgetEncryption.cpp
         gui/dbsettings/DatabaseSettingsWidgetDatabaseKey.cpp
         gui/remote/DatabaseSettingsWidgetRemote.cpp
-        gui/remote/DeleteableItemWidget.cpp
         gui/remote/RemoteFileDialog.cpp
         gui/remote/RemoteHandler.cpp
         gui/remote/RemoteParams.cpp
