@@ -1306,6 +1306,9 @@ void DatabaseWidget::unlockDatabase(bool accepted)
         if (!senderDialog && (!m_db || !m_db->isInitialized())) {
             emit closeRequest();
         }
+        if (senderDialog && senderDialog->intent() == DatabaseOpenDialog::Intent::RemoteSync) {
+            emit databaseSyncFailed();
+        }
         return;
     }
 
