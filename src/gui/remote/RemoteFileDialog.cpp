@@ -18,8 +18,6 @@
 #include "RemoteFileDialog.h"
 #include "ui_RemoteFileDialog.h"
 
-#include "RemoteSettingsDialog.h"
-
 RemoteFileDialog::RemoteFileDialog(QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::RemoteFileDialog())

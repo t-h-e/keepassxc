@@ -34,7 +34,6 @@ class DatabaseOpenWidget;
 class KeePass1OpenWidget;
 class OpVaultOpenWidget;
 class DatabaseSettingsDialog;
-class RemoteSettingsDialog;
 class ReportsDialog;
 class Database;
 class FileWatcher;
@@ -225,7 +224,6 @@ public slots:
     void switchToPasskeys();
     void showImportPasskeyDialog(bool isEntry = false);
 #endif
-    void switchToRemoteSettings();
     void switchToOpenDatabase();
     void switchToOpenDatabase(const QString& filePath);
     void switchToOpenDatabase(const QString& filePath, const QString& password, const QString& keyFile);
@@ -306,7 +304,6 @@ private:
     QPointer<EditEntryWidget> m_historyEditEntryWidget;
     QPointer<ReportsDialog> m_reportsDialog;
     QPointer<DatabaseSettingsDialog> m_databaseSettingDialog;
-    QPointer<RemoteSettingsDialog> m_remoteSettingDialog;
     QPointer<DatabaseOpenWidget> m_databaseOpenWidget;
     QPointer<KeePass1OpenWidget> m_keepass1OpenWidget;
     QPointer<OpVaultOpenWidget> m_opVaultOpenWidget;
