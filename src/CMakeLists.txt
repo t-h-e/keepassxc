@@ -174,7 +174,6 @@ set(keepassx_SOURCES
         gui/remote/RemoteSettings.cpp
         gui/remote/RemoteSettingsCommandWidget.cpp
         gui/remote/RemoteSettingsCustomDataHandler.cpp
-        gui/remote/RemoteSettingsDialog.cpp
         gui/reports/ReportsWidget.cpp
         gui/reports/ReportsDialog.cpp
         gui/reports/ReportsWidgetHealthcheck.cpp

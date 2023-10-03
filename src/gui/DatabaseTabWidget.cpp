@@ -664,11 +664,6 @@ void DatabaseTabWidget::importPasskey()
 }
 #endif
 
-void DatabaseTabWidget::showRemoteSettings()
-{
-    currentDatabaseWidget()->switchToRemoteSettings();
-}
-
 bool DatabaseTabWidget::isModified(int index) const
 {
     if (count() == 0) {

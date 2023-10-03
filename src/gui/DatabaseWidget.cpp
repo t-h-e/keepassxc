@@ -51,7 +51,6 @@
 #include "gui/entry/EntryView.h"
 #include "gui/group/EditGroupWidget.h"
 #include "gui/group/GroupView.h"
-#include "gui/remote/RemoteSettingsDialog.h"
 #include "gui/reports/ReportsDialog.h"
 #include "gui/tag/TagView.h"
 #include "gui/widgets/ElidedLabel.h"
@@ -86,7 +85,6 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     , m_historyEditEntryWidget(new EditEntryWidget(this))
     , m_reportsDialog(new ReportsDialog(this))
     , m_databaseSettingDialog(new DatabaseSettingsDialog(this))
-    , m_remoteSettingDialog(new RemoteSettingsDialog(this))
     , m_databaseOpenWidget(new DatabaseOpenWidget(this))
     , m_keepass1OpenWidget(new KeePass1OpenWidget(this))
     , m_opVaultOpenWidget(new OpVaultOpenWidget(this))
@@ -184,7 +182,6 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     m_csvImportWizard->setObjectName("csvImportWizard");
     m_reportsDialog->setObjectName("reportsDialog");
     m_databaseSettingDialog->setObjectName("databaseSettingsDialog");
-    m_remoteSettingDialog->setObjectName("remoteSettingsDialog");
     m_databaseOpenWidget->setObjectName("databaseOpenWidget");
     m_keepass1OpenWidget->setObjectName("keepass1OpenWidget");
     m_opVaultOpenWidget->setObjectName("opVaultOpenWidget");
@@ -194,7 +191,6 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     addChildWidget(m_editGroupWidget);
     addChildWidget(m_reportsDialog);
     addChildWidget(m_databaseSettingDialog);
-    addChildWidget(m_remoteSettingDialog);
     addChildWidget(m_historyEditEntryWidget);
     addChildWidget(m_databaseOpenWidget);
     addChildWidget(m_csvImportWizard);
@@ -219,9 +215,6 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     connect(m_editGroupWidget, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
     connect(m_reportsDialog, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
     connect(m_databaseSettingDialog, SIGNAL(editFinished(bool)), SLOT(switchToMainView(bool)));
-    connect(m_remoteSettingDialog, SIGNAL(cancel(bool)), SLOT(switchToMainView(bool)));
-    connect(m_remoteSettingDialog, SIGNAL(syncWithRemote(RemoteParams*)), SLOT(syncWithRemoteAndSwitchToMainView(RemoteParams*)));
-    connect(m_remoteSettingDialog, SIGNAL(saveToRemote(RemoteParams*)), SLOT(saveToRemoteAndSwitchToMainView(RemoteParams*)));
     connect(m_databaseOpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
     connect(m_keepass1OpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
     connect(m_opVaultOpenWidget, SIGNAL(dialogFinished(bool)), SLOT(loadDatabase(bool)));
@@ -1417,11 +1410,6 @@ void DatabaseWidget::switchToDatabaseSettings()
 {
     m_databaseSettingDialog->load(m_db);
     setCurrentWidget(m_databaseSettingDialog);
-}
-
-void DatabaseWidget::switchToRemoteSettings()
-{
-    setCurrentWidget(m_remoteSettingDialog);
 }
 
 void DatabaseWidget::switchToOpenDatabase()

@@ -97,7 +97,6 @@ public slots:
     void showPasskeys();
     void importPasskey();
 #endif
-    void showRemoteSettings();
     void performGlobalAutoType(const QString& search);
     void performBrowserUnlock();
 
