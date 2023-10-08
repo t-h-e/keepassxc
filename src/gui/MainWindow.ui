@@ -250,7 +250,7 @@
     </widget>
     <widget class="QMenu" name="menuRemoteSync">
      <property name="title">
-      <string>&amp;Remote Sync…</string>
+      <string>Remote S&amp;ync…</string>
      </property>
     </widget>
     <addaction name="actionDatabaseNew"/>

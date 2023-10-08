@@ -88,6 +88,7 @@ private:
                     Qt::KeyboardModifiers stateKey = 0);
     void checkSaveDatabase();
     void checkStatusBarText(const QString& textFragment);
+    void prepareAndTriggerRemoteSync(const QString& sourceToSync);
 
     QScopedPointer<MainWindow> m_mainWindow;
     QPointer<QLabel> m_statusBarLabel;
