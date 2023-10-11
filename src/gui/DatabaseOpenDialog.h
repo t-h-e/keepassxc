@@ -63,7 +63,7 @@ protected:
     void showEvent(QShowEvent* event) override;
 
 private:
-    void closeEvent(QCloseEvent *e) override;
+    void closeEvent(QCloseEvent* e) override;
     void selectTabOffset(int offset);
 
     QPointer<DatabaseOpenWidget> m_view;
