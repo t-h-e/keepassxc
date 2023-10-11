@@ -53,9 +53,13 @@ RemoteFileDialog::~RemoteFileDialog() = default;
 
 void RemoteFileDialog::acceptRemoteProgramParams()
 {
-    m_ui->remoteSettingsCommandWidget->setDisabled(true);
+    if (m_ui->downloadCommand->text().isEmpty()) {
+        m_ui->messageWidget->showMessage(tr("No download command specified."), MessageWidget::Error);
+        return;
+    }
+    setInputDisabled(true);
     updateProgressBar(50, tr("Downloading..."));
-    auto* remoteProgramParams = m_ui->remoteSettingsCommandWidget->getRemoteProgramParams();
+    auto* remoteProgramParams = getRemoteParams();
     emit m_remoteHandler->downloadFromRemote(remoteProgramParams);
 }
 
@@ -67,9 +71,23 @@ void RemoteFileDialog::handleSuccessfulDownload(const QString& downloadedFileNam
 
 void RemoteFileDialog::showRemoteDownloadErrorMessage(const QString& errorMessage)
 {
-    m_ui->remoteSettingsCommandWidget->setDisabled(false);
+    setInputDisabled(false);
     updateProgressBar(-1, "");
     m_ui->messageWidget->showMessage(errorMessage, MessageWidget::Error);
+}
+
+void RemoteFileDialog::setInputDisabled(bool disabled)
+{
+    m_ui->downloadCommand->setDisabled(disabled);
+    m_ui->inputForDownload->setDisabled(disabled);
+}
+
+RemoteParams* RemoteFileDialog::getRemoteParams()
+{
+    auto* remoteParams = new RemoteParams();
+    remoteParams->setCommandForDownload(m_ui->downloadCommand->text());
+    remoteParams->setInputForDownload(m_ui->inputForDownload->toPlainText());
+    return remoteParams;
 }
 
 void RemoteFileDialog::updateProgressBar(int percentage, const QString& message)

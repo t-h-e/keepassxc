@@ -1383,9 +1383,6 @@ void MainWindow::updateRemoteSyncMenuEntries()
         auto action = m_ui->menuRemoteSync->addAction(tr("No Remote Sync Settings"));
         action->setEnabled(false);
     }
-
-    // TODO: remove action altogether:
-    //    m_ui->menuRemoteSync->addAction(m_ui->actionRemoteDatabaseSync);
 }
 
 void MainWindow::databaseStatusChanged(DatabaseWidget* dbWidget)

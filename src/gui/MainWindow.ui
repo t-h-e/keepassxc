@@ -660,14 +660,6 @@
     <enum>QAction::NoRole</enum>
    </property>
   </action>
-  <action name="actionRemoteDatabaseSync">
-   <property name="text">
-    <string>Open Remote Sync Settings…</string>
-   </property>
-   <property name="toolTip">
-    <string>Open remote sync settings</string>
-   </property>
-  </action>
   <action name="actionEntryClone">
    <property name="enabled">
     <bool>false</bool>

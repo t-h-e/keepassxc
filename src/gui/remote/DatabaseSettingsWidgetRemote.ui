@@ -166,11 +166,11 @@
               </property>
               <property name="placeholderText">
                <string>e.g.:
-             get DatabaseOnRemote.kdbx {TEMP_DATABASE}
-             exit
-             ---
-             {TEMP_DATABASE} is used as placeholder to store the database in a temporary location
-             The command has to exit. In case of `sftp` as last commend `exit` has to be sent
+get DatabaseOnRemote.kdbx {TEMP_DATABASE}
+exit
+---
+{TEMP_DATABASE} is used as placeholder to store the database in a temporary location
+The command has to exit. In case of `sftp` as last commend `exit` has to be sent
             </string>
               </property>
              </widget>
@@ -216,11 +216,11 @@
               </property>
               <property name="placeholderText">
                <string>e.g.:
-             put {TEMP_DATABASE} DatabaseOnRemote.kdbx
-             exit
-             ---
-             {TEMP_DATABASE} is used as placeholder to store the database in a temporary location
-             The command has to exit. In case of `sftp` as last commend `exit` has to be sent
+put {TEMP_DATABASE} DatabaseOnRemote.kdbx
+exit
+---
+{TEMP_DATABASE} is used as placeholder to store the database in a temporary location
+The command has to exit. In case of `sftp` as last commend `exit` has to be sent
             </string>
               </property>
              </widget>
