@@ -49,6 +49,9 @@ private:
     void showRemoteDownloadErrorMessage(const QString& errorMessage);
     void handleSuccessfulDownload(const QString& downloadedFileName);
 
+    void setInputDisabled(bool disabled);
+    RemoteParams* getRemoteParams();
+
     void updateProgressBar(int percentage, const QString& message);
 
     QPointer<QStatusBar> m_statusBar;
