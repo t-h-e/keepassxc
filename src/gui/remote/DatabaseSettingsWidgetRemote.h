@@ -42,11 +42,6 @@ public:
     Q_DISABLE_COPY(DatabaseSettingsWidgetRemote);
     ~DatabaseSettingsWidgetRemote() override;
 
-    inline bool hasAdvancedMode() const override
-    {
-        return false;
-    }
-
 public slots:
     void initialize() override;
     void uninitialize() override;
@@ -64,7 +59,6 @@ private:
 
     QPointer<RemoteSettingsCustomDataHandler> m_customDataHandler;
     const QScopedPointer<Ui::DatabaseSettingsWidgetRemote> m_ui;
-
 };
 
 #endif // KEEPASSX_DATABASESETTINGSWIDGETREMOTE_H
