@@ -99,8 +99,9 @@ void RemoteSettingsCustomDataHandler::syncConfig()
     }
 
     QByteArray configAsJson = QJsonDocument(lastRemoteProgramEntriesConfig).toJson(QJsonDocument::Compact);
-    m_db->metadata()->customData()->set(CustomData::RemoteProgramSettings, configAsJson);
-
-    // TODO: maybe add a check beforehand if the entries have changed!!
-    m_db->markAsModified();
+    auto previousConfig = m_db->metadata()->customData()->value(CustomData::RemoteProgramSettings);
+    if (configAsJson != previousConfig) {
+        m_db->metadata()->customData()->set(CustomData::RemoteProgramSettings, configAsJson);
+        m_db->markAsModified();
+    }
 }
