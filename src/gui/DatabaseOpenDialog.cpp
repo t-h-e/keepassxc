@@ -215,7 +215,7 @@ void DatabaseOpenDialog::complete(bool accepted)
     clearForms();
 }
 
-void DatabaseOpenDialog::closeEvent(QCloseEvent *e)
+void DatabaseOpenDialog::closeEvent(QCloseEvent* e)
 {
     emit dialogFinished(false, m_currentDbWidget);
     clearForms();
