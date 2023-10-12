@@ -76,9 +76,6 @@ int main(int argc, char* argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
-#ifdef Q_OS_MAC
-    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
-#endif
 
     Application app(argc, argv);
     app.setApplicationName("KeePassXC");
@@ -471,10 +468,22 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     //    //        cur = cur->parentWidget();
     //    //    }
 
+    qDebug() << QApplication::focusWidget();
+    qDebug() << QApplication::focusWidget()->objectName();
+    qDebug() << "check all children currently focused widget";
+    for (auto* child : QApplication::focusWidget()->children()) {
+        qDebug() << child;
+        qDebug() << child->objectName();
+    }
     qDebug() << "setActiveWindow";
     QApplication::setActiveWindow(m_mainWindow.data());
     qDebug() << QApplication::focusWidget();
     qDebug() << QApplication::focusWidget()->objectName();
+    qDebug() << "check all children of m_mainWindow";
+    for (auto* child : m_mainWindow->children()) {
+        qDebug() << child;
+        qDebug() << child->objectName();
+    }
     qDebug() << "before check";
     QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
     qDebug() << "Yeah";
