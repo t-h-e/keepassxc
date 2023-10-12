@@ -400,18 +400,10 @@ void TestGui::prepareAndTriggerRemoteSync(const QString& sourceToSync)
     QApplication::processEvents();
 
     // trigger aboutToShow to create remote actions
-    auto* menuBar = m_mainWindow->findChild<QMenuBar*>("menubar");
-    QVERIFY(menuBar != nullptr);
-    auto* menuFile = m_mainWindow->findChild<QMenu*>("menuFile");
-    QTest::mouseClick(
-        menuBar, Qt::LeftButton, Qt::NoModifier, menuBar->actionGeometry(menuFile->menuAction()).center());
     auto* menuRemoteSync = m_mainWindow->findChild<QMenu*>("menuRemoteSync");
-    QTest::mouseClick(
-        menuFile, Qt::LeftButton, Qt::NoModifier, menuFile->actionGeometry(menuRemoteSync->menuAction()).center());
+    menuRemoteSync->popup(QPoint(0, 0));
     QApplication::processEvents();
     QTRY_COMPARE(remoteAboutToShow.count(), 1);
-    // close the opened menu
-    QTest::keyClick(menuBar, Qt::Key::Key_Escape);
 
     // trigger remote sync action
     for (auto* remoteAction : menu->actions()) {
