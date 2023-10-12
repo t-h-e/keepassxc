@@ -76,7 +76,9 @@ int main(int argc, char* argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
-
+#ifdef Q_OS_MAC
+    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
+#endif
     Application app(argc, argv);
     app.setApplicationName("KeePassXC");
     app.setApplicationVersion(KEEPASSXC_VERSION);
@@ -401,10 +403,20 @@ void TestGui::prepareAndTriggerRemoteSync(const QString& sourceToSync)
     QApplication::processEvents();
 
     // trigger aboutToShow to create remote actions
-    menuRemoteSync->popup(QPoint(0, 0));
+    auto* menuBar = m_mainWindow->findChild<QMenuBar*>("menubar");
+    QVERIFY(menuBar != nullptr);
+    auto* menuFile = m_mainWindow->findChild<QMenu*>("menuFile");
+    QTest::mouseClick(
+        menuBar, Qt::LeftButton, Qt::NoModifier, menuBar->actionGeometry(menuFile->menuAction()).center());
+    QTest::mouseClick(
+        menuFile, Qt::LeftButton, Qt::NoModifier, menuFile->actionGeometry(menuRemoteSync->menuAction()).center());
+    QApplication::processEvents();
     QTRY_COMPARE(remoteAboutToShow.count(), 1);
     // close the opened menu
-    QTest::keyClick(menuRemoteSync, Qt::Key::Key_Escape);
+    QTest::keyClick(menuBar, Qt::Key::Key_Escape);
+
+    qDebug() << "here1" << QApplication::focusWidget();
+    qDebug() << QApplication::focusWidget()->objectName();
 
     // trigger remote sync action
     for (auto* remoteAction : menuRemoteSync->actions()) {
@@ -414,6 +426,9 @@ void TestGui::prepareAndTriggerRemoteSync(const QString& sourceToSync)
         }
     }
     QApplication::processEvents();
+
+    qDebug() << "here2" << QApplication::focusWidget();
+    //    qDebug() << QApplication::focusWidget()->objectName();
 }
 
 void TestGui::testRemoteSyncDatabaseSameKey()
@@ -450,40 +465,24 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
 
     // need to process more events as opening with the same key did not work and more events have been fired
     QApplication::processEvents(QEventLoop::WaitForMoreEvents);
-    //    QTest::qSleep(100);
-    //    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
+
     qDebug() << "WaitForMoreEvents";
+    qDebug() << "here3" << QApplication::focusWidget();
+    //    qDebug() << QApplication::focusWidget()->objectName();
+
+    m_mainWindow->findChild<DatabaseOpenDialog*>()->activateWindow();
+
+    qDebug() << "here4" << QApplication::focusWidget();
+    //    qDebug() << QApplication::focusWidget()->objectName();
+
+    qDebug() << "setActiveWindow";
+    // QApplication::setActiveWindow(m_mainWindow.data());
     //    qDebug() << QApplication::focusWidget();
     //    qDebug() << QApplication::focusWidget()->objectName();
-    //    //    qDebug() << m_mainWindow;
-    //    //    qDebug() << m_mainWindow->objectName();
-    //    for (auto* child : QApplication::allWidgets()) {
-    //        qDebug() << child;
-    //        qDebug() << child->objectName();
-    //    }
-    //    //    QWidget* cur = QApplication::focusWidget();
-    //    //    while (cur != nullptr) {
-    //    //        qDebug() << cur;
-    //    //        qDebug() << cur->objectName();
-    //    //        cur = cur->parentWidget();
-    //    //    }
-
-    qDebug() << QApplication::focusWidget();
-    qDebug() << QApplication::focusWidget()->objectName();
-    qDebug() << "check all children currently focused widget";
-    for (auto* child : QApplication::focusWidget()->children()) {
-        qDebug() << child;
-        qDebug() << child->objectName();
-    }
-    qDebug() << "setActiveWindow";
-    QApplication::setActiveWindow(m_mainWindow.data());
-    qDebug() << QApplication::focusWidget();
-    qDebug() << QApplication::focusWidget()->objectName();
-    qDebug() << "check all children of m_mainWindow";
-    for (auto* child : m_mainWindow->children()) {
-        qDebug() << child;
-        qDebug() << child->objectName();
-    }
+    //    qDebug() << "find password Edit";
+    //    auto* passwordEdit = m_mainWindow->findChild<QLineEdit*>("passwordEdit");
+    //    qDebug() << passwordEdit;
+    //    qDebug() << passwordEdit->objectName();
     qDebug() << "before check";
     QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
     qDebug() << "Yeah";
