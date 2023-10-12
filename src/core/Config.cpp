@@ -219,9 +219,6 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
     {Config::Messages_Qt55CompatibilityWarning, {QS("Messages/Qt55CompatibilityWarning"), Local, false}},
     {Config::Messages_HidePreReleaseWarning, {QS("Messages/HidePreReleaseWarning"), Local, {}}},
 
-    // Remote
-    {Config::Remote_Program_Settings,{QS("Remote/ProgramSetting"), Local, {}}}
-
     };
 // clang-format on
 
