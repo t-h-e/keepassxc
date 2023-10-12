@@ -76,6 +76,10 @@ int main(int argc, char* argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
+#ifdef Q_OS_MAC
+    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
+#endif
+
     Application app(argc, argv);
     app.setApplicationName("KeePassXC");
     app.setApplicationVersion(KEEPASSXC_VERSION);
@@ -400,11 +404,17 @@ void TestGui::prepareAndTriggerRemoteSync(const QString& sourceToSync)
     QApplication::processEvents();
 
     // trigger aboutToShow to create remote actions
+    auto* menuBar = m_mainWindow->findChild<QMenuBar*>("menubar");
+    QVERIFY(menuBar != nullptr);
+    auto* menuFile = m_mainWindow->findChild<QMenu*>("menuFile");
+    QTest::mouseClick(
+        menuBar, Qt::LeftButton, Qt::NoModifier, menuBar->actionGeometry(menuFile->menuAction()).center());
     auto* menuRemoteSync = m_mainWindow->findChild<QMenu*>("menuRemoteSync");
-    menuRemoteSync->popup(QPoint(0, 0));
-    QApplication::processEvents();
+    QTest::mouseClick(
+        menuFile, Qt::LeftButton, Qt::NoModifier, menuFile->actionGeometry(menuRemoteSync->menuAction()).center());
     QTRY_COMPARE(remoteAboutToShow.count(), 1);
-    QTest::keyClick(menuRemoteSync, Qt::Key::Key_Escape);
+    // close the opened menu
+    QTest::keyClick(menuBar, Qt::Key::Key_Escape);
 
     // trigger remote sync action
     for (auto* remoteAction : menu->actions()) {
