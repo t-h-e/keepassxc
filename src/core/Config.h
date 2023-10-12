@@ -193,8 +193,6 @@ public:
         Messages_Qt55CompatibilityWarning,
         Messages_HidePreReleaseWarning,
 
-        Remote_Program_Settings,
-
         // Special internal value
         Deleted
     };
