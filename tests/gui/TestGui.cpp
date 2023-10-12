@@ -416,7 +416,6 @@ void TestGui::prepareAndTriggerRemoteSync(const QString& sourceToSync)
     QTest::keyClick(menuBar, Qt::Key::Key_Escape);
 
     qDebug() << "here1" << QApplication::focusWidget();
-    qDebug() << QApplication::focusWidget()->objectName();
 
     // trigger remote sync action
     for (auto* remoteAction : menuRemoteSync->actions()) {
