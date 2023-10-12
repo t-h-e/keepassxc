@@ -473,14 +473,22 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     // need to process more events as opening with the same key did not work and more events have been fired
     QApplication::processEvents(QEventLoop::WaitForMoreEvents);
     qDebug() << "WaitForMoreEvents";
+    qDebug() << QApplication::focusWidget();
+    qDebug() << QApplication::focusWidget()->objectName();
     QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
+    qDebug() << "here1";
     auto* editPasswordSync = QApplication::focusWidget();
+    qDebug() << "here2";
     QVERIFY(editPasswordSync->isVisible());
+    qDebug() << "here3";
 
     QTest::keyClicks(editPasswordSync, "b");
+    qDebug() << "here4";
     QTest::keyClick(editPasswordSync, Qt::Key_Enter);
+    qDebug() << "here5";
 
     QTRY_COMPARE(dbSyncSpy.count(), 1);
+    qDebug() << "here6";
     m_db = m_tabWidget->currentDatabaseWidget()->database();
 
     // there are seven child groups of the root group
