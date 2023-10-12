@@ -404,6 +404,7 @@ void TestGui::prepareAndTriggerRemoteSync(const QString& sourceToSync)
     menuRemoteSync->popup(QPoint(0, 0));
     QApplication::processEvents();
     QTRY_COMPARE(remoteAboutToShow.count(), 1);
+    QTest::keyClick(menuRemoteSync, Qt::Key::Key_Escape);
 
     // trigger remote sync action
     for (auto* remoteAction : menu->actions()) {
