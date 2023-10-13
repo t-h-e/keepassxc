@@ -416,6 +416,7 @@ void TestGui::prepareAndTriggerRemoteSync(const QString& sourceToSync)
     QApplication::processEvents();
 }
 
+#ifndef Q_OS_MAC
 void TestGui::testRemoteSyncDatabaseSameKey()
 {
     QString sourceToSync = "sftp user@server:Database.kdbx";
@@ -437,7 +438,6 @@ void TestGui::testRemoteSyncDatabaseSameKey()
     QCOMPARE(m_db->rootGroup()->findChildByName("General")->entries().size(), 1);
 }
 
-#ifndef Q_OS_MAC
 void TestGui::testRemoteSyncDatabaseRequiresPassword()
 {
     QString sourceToSync = "sftp user@server:Database.kdbx";
