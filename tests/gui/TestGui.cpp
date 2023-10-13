@@ -415,8 +415,6 @@ void TestGui::prepareAndTriggerRemoteSync(const QString& sourceToSync)
     // close the opened menu
     QTest::keyClick(menuBar, Qt::Key::Key_Escape);
 
-    qDebug() << "here1" << QApplication::focusWidget();
-
     // trigger remote sync action
     for (auto* remoteAction : menuRemoteSync->actions()) {
         if (remoteAction->text() == name) {
@@ -425,9 +423,6 @@ void TestGui::prepareAndTriggerRemoteSync(const QString& sourceToSync)
         }
     }
     QApplication::processEvents();
-
-    qDebug() << "here2" << QApplication::focusWidget();
-    //    qDebug() << QApplication::focusWidget()->objectName();
 }
 
 void TestGui::testRemoteSyncDatabaseSameKey()
@@ -460,22 +455,14 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     });
     QSignalSpy dbSyncSpy(m_dbWidget.data(), &DatabaseWidget::databaseSyncedWith);
     prepareAndTriggerRemoteSync(sourceToSync);
-    qDebug() << "prepareAndTriggerRemoteSync done";
 
     // need to process more events as opening with the same key did not work and more events have been fired
     QApplication::processEvents(QEventLoop::WaitForMoreEvents);
 
-    qDebug() << "WaitForMoreEvents";
-    qDebug() << "here3" << QApplication::focusWidget();
-    //    qDebug() << QApplication::focusWidget()->objectName();
-
-    m_mainWindow->findChild<DatabaseOpenDialog*>()->activateWindow();
-
-    qDebug() << "here4" << QApplication::focusWidget();
-    //    qDebug() << QApplication::focusWidget()->objectName();
+//    m_mainWindow->findChild<DatabaseOpenDialog*>()->activateWindow();
 
     qDebug() << "setActiveWindow";
-    // QApplication::setActiveWindow(m_mainWindow.data());
+     QApplication::setActiveWindow(m_mainWindow.data());
     //    qDebug() << QApplication::focusWidget();
     //    qDebug() << QApplication::focusWidget()->objectName();
     //    qDebug() << "find password Edit";
@@ -489,15 +476,15 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     //    qDebug() << "DatabaseOpenDialog PasswordWidget count"
     //             <<
     //             m_mainWindow->findChild<DatabaseOpenDialog*>()->findChildren<PasswordWidget*>("editPassword").count();
-    qDebug() << "passwordEdit in DatabaseOpenDialog PasswordWidget count"
-             << m_mainWindow->findChild<DatabaseOpenDialog*>()
-                    ->findChild<PasswordWidget*>("editPassword")
-                    ->findChildren<QLineEdit*>("passwordEdit")
-                    .count();
 
+     QApplication::processEvents(QEventLoop::WaitForMoreEvents);
+     qDebug() << QApplication::focusWidget();
     auto* passwordEdit = m_mainWindow->findChild<DatabaseOpenDialog*>()
                              ->findChild<PasswordWidget*>("editPassword")
                              ->findChild<QLineEdit*>("passwordEdit");
+    passwordEdit->setFocus();
+
+    qDebug() << QApplication::focusWidget();
     qDebug() << passwordEdit;
     qDebug() << passwordEdit->isVisible();
     qDebug() << (passwordEdit == QApplication::focusWidget());
