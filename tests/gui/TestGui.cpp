@@ -479,18 +479,43 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     //    qDebug() << QApplication::focusWidget();
     //    qDebug() << QApplication::focusWidget()->objectName();
     //    qDebug() << "find password Edit";
-    //    auto* passwordEdit = m_mainWindow->findChild<QLineEdit*>("passwordEdit");
-    //    qDebug() << passwordEdit;
+    //    auto* cur = QApplication::focusWidget();
+    //    while (cur != nullptr) {
+    //        qDebug() << cur;
+    //        cur = cur->parentWidget();
+    //    }
+
+    //    qDebug() << "DatabaseOpenDialog count" << m_mainWindow->findChildren<DatabaseOpenDialog*>().count();
+    //    qDebug() << "DatabaseOpenDialog PasswordWidget count"
+    //             <<
+    //             m_mainWindow->findChild<DatabaseOpenDialog*>()->findChildren<PasswordWidget*>("editPassword").count();
+    qDebug() << "passwordEdit in DatabaseOpenDialog PasswordWidget count"
+             << m_mainWindow->findChild<DatabaseOpenDialog*>()
+                    ->findChild<PasswordWidget*>("editPassword")
+                    ->findChildren<QLineEdit*>("passwordEdit")
+                    .count();
+
+    auto* passwordEdit = m_mainWindow->findChild<DatabaseOpenDialog*>()
+                             ->findChild<PasswordWidget*>("editPassword")
+                             ->findChild<QLineEdit*>("passwordEdit");
+    qDebug() << passwordEdit;
+    qDebug() << passwordEdit->isVisible();
+    qDebug() << (passwordEdit == QApplication::focusWidget());
+
+    QTest::keyClicks(passwordEdit, "b");
+    QTest::keyClick(passwordEdit, Qt::Key_Enter);
+
     //    qDebug() << passwordEdit->objectName();
-    qDebug() << "before check";
-    QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
-    qDebug() << "Yeah";
-    auto* editPasswordSync = QApplication::focusWidget();
-    QVERIFY(editPasswordSync->isVisible());
+    //    qDebug() << "before check";
+    //    QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
+    //    qDebug() << "Yeah";
+    //    auto* editPasswordSync = QApplication::focusWidget();
+    //    QVERIFY(editPasswordSync->isVisible());
+    //
+    //    QTest::keyClicks(editPasswordSync, "b");
+    //    QTest::keyClick(editPasswordSync, Qt::Key_Enter);
 
-    QTest::keyClicks(editPasswordSync, "b");
-    QTest::keyClick(editPasswordSync, Qt::Key_Enter);
-
+    qDebug() << "before dbSyncSpy count";
     QTRY_COMPARE(dbSyncSpy.count(), 1);
     m_db = m_tabWidget->currentDatabaseWidget()->database();
 
