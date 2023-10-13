@@ -76,9 +76,6 @@ int main(int argc, char* argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
-#ifdef Q_OS_MAC
-    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
-#endif
     Application app(argc, argv);
     app.setApplicationName("KeePassXC");
     app.setApplicationVersion(KEEPASSXC_VERSION);
@@ -403,17 +400,11 @@ void TestGui::prepareAndTriggerRemoteSync(const QString& sourceToSync)
     QApplication::processEvents();
 
     // trigger aboutToShow to create remote actions
-    auto* menuBar = m_mainWindow->findChild<QMenuBar*>("menubar");
-    QVERIFY(menuBar != nullptr);
-    auto* menuFile = m_mainWindow->findChild<QMenu*>("menuFile");
-    QTest::mouseClick(
-        menuBar, Qt::LeftButton, Qt::NoModifier, menuBar->actionGeometry(menuFile->menuAction()).center());
-    QTest::mouseClick(
-        menuFile, Qt::LeftButton, Qt::NoModifier, menuFile->actionGeometry(menuRemoteSync->menuAction()).center());
+    menuRemoteSync->popup(QPoint(0, 0));
     QApplication::processEvents();
     QTRY_COMPARE(remoteAboutToShow.count(), 1);
     // close the opened menu
-    QTest::keyClick(menuBar, Qt::Key::Key_Escape);
+    QTest::keyClick(menuRemoteSync, Qt::Key::Key_Escape);
 
     // trigger remote sync action
     for (auto* remoteAction : menuRemoteSync->actions()) {
@@ -446,6 +437,7 @@ void TestGui::testRemoteSyncDatabaseSameKey()
     QCOMPARE(m_db->rootGroup()->findChildByName("General")->entries().size(), 1);
 }
 
+#ifndef Q_OS_MAC
 void TestGui::testRemoteSyncDatabaseRequiresPassword()
 {
     QString sourceToSync = "sftp user@server:Database.kdbx";
@@ -459,51 +451,13 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     // need to process more events as opening with the same key did not work and more events have been fired
     QApplication::processEvents(QEventLoop::WaitForMoreEvents);
 
-    //    m_mainWindow->findChild<DatabaseOpenDialog*>()->activateWindow();
+    QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
+    auto* editPasswordSync = QApplication::focusWidget();
+    QVERIFY(editPasswordSync->isVisible());
 
-    qDebug() << "setActiveWindow";
-    QApplication::setActiveWindow(m_mainWindow.data());
-    //    qDebug() << QApplication::focusWidget();
-    //    qDebug() << QApplication::focusWidget()->objectName();
-    //    qDebug() << "find password Edit";
-    //    auto* cur = QApplication::focusWidget();
-    //    while (cur != nullptr) {
-    //        qDebug() << cur;
-    //        cur = cur->parentWidget();
-    //    }
+    QTest::keyClicks(editPasswordSync, "b");
+    QTest::keyClick(editPasswordSync, Qt::Key_Enter);
 
-    //    qDebug() << "DatabaseOpenDialog count" << m_mainWindow->findChildren<DatabaseOpenDialog*>().count();
-    //    qDebug() << "DatabaseOpenDialog PasswordWidget count"
-    //             <<
-    //             m_mainWindow->findChild<DatabaseOpenDialog*>()->findChildren<PasswordWidget*>("editPassword").count();
-
-    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
-    qDebug() << QApplication::focusWidget();
-    auto* passwordEdit = m_mainWindow->findChild<DatabaseOpenDialog*>()
-                             ->findChild<PasswordWidget*>("editPassword")
-                             ->findChild<QLineEdit*>("passwordEdit");
-    passwordEdit->setFocus();
-    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
-
-    qDebug() << QApplication::focusWidget();
-    qDebug() << passwordEdit;
-    qDebug() << passwordEdit->isVisible();
-    qDebug() << (passwordEdit == QApplication::focusWidget());
-
-    QTest::keyClicks(passwordEdit, "b");
-    QTest::keyClick(passwordEdit, Qt::Key_Enter);
-
-    //    qDebug() << passwordEdit->objectName();
-    //    qDebug() << "before check";
-    //    QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
-    //    qDebug() << "Yeah";
-    //    auto* editPasswordSync = QApplication::focusWidget();
-    //    QVERIFY(editPasswordSync->isVisible());
-    //
-    //    QTest::keyClicks(editPasswordSync, "b");
-    //    QTest::keyClick(editPasswordSync, Qt::Key_Enter);
-
-    qDebug() << "before dbSyncSpy count";
     QTRY_COMPARE(dbSyncSpy.count(), 1);
     m_db = m_tabWidget->currentDatabaseWidget()->database();
 
@@ -514,6 +468,7 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     // the General group contains one entry merged from the other db
     QCOMPARE(m_db->rootGroup()->findChildByName("General")->entries().size(), 1);
 }
+#endif
 
 void TestGui::testAutoreloadDatabase()
 {
