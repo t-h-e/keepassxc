@@ -459,10 +459,10 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     // need to process more events as opening with the same key did not work and more events have been fired
     QApplication::processEvents(QEventLoop::WaitForMoreEvents);
 
-//    m_mainWindow->findChild<DatabaseOpenDialog*>()->activateWindow();
+    //    m_mainWindow->findChild<DatabaseOpenDialog*>()->activateWindow();
 
     qDebug() << "setActiveWindow";
-     QApplication::setActiveWindow(m_mainWindow.data());
+    QApplication::setActiveWindow(m_mainWindow.data());
     //    qDebug() << QApplication::focusWidget();
     //    qDebug() << QApplication::focusWidget()->objectName();
     //    qDebug() << "find password Edit";
@@ -477,12 +477,13 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     //             <<
     //             m_mainWindow->findChild<DatabaseOpenDialog*>()->findChildren<PasswordWidget*>("editPassword").count();
 
-     QApplication::processEvents(QEventLoop::WaitForMoreEvents);
-     qDebug() << QApplication::focusWidget();
+    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    qDebug() << QApplication::focusWidget();
     auto* passwordEdit = m_mainWindow->findChild<DatabaseOpenDialog*>()
                              ->findChild<PasswordWidget*>("editPassword")
                              ->findChild<QLineEdit*>("passwordEdit");
     passwordEdit->setFocus();
+    QApplication::processEvents(QEventLoop::WaitForMoreEvents);
 
     qDebug() << QApplication::focusWidget();
     qDebug() << passwordEdit;
