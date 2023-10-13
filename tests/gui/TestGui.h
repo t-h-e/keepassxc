@@ -41,7 +41,9 @@ private slots:
     void testCreateDatabase();
     void testMergeDatabase();
     void testRemoteSyncDatabaseSameKey();
+#ifndef Q_OS_MAC
     void testRemoteSyncDatabaseRequiresPassword();
+#endif
     void testAutoreloadDatabase();
     void testTabs();
     void testEditEntry();
