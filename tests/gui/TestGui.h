@@ -40,10 +40,8 @@ private slots:
     void testSettingsDefaultTabOrder();
     void testCreateDatabase();
     void testMergeDatabase();
-#ifndef Q_OS_MAC
     void testRemoteSyncDatabaseSameKey();
     void testRemoteSyncDatabaseRequiresPassword();
-#endif
     void testAutoreloadDatabase();
     void testTabs();
     void testEditEntry();

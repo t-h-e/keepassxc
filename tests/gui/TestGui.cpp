@@ -416,7 +416,6 @@ void TestGui::prepareAndTriggerRemoteSync(const QString& sourceToSync)
     QApplication::processEvents();
 }
 
-#ifndef Q_OS_MAC
 void TestGui::testRemoteSyncDatabaseSameKey()
 {
     QString sourceToSync = "sftp user@server:Database.kdbx";
@@ -468,7 +467,6 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     // the General group contains one entry merged from the other db
     QCOMPARE(m_db->rootGroup()->findChildByName("General")->entries().size(), 1);
 }
-#endif
 
 void TestGui::testAutoreloadDatabase()
 {
