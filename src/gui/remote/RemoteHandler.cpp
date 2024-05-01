@@ -95,7 +95,8 @@ RemoteHandler::RemoteResult RemoteHandler::download(const RemoteParams* params)
                 tr("Command `%1` did not finish in time. Process was killed.").arg(params->downloadCommand);
         }
 
-        emit downloadFinished(result);
+        // TODO: remove, only used for "old" open remote dialog
+        // emit downloadFinished(result);
         return result;
     });
 }

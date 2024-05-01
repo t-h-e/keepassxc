@@ -27,15 +27,43 @@
 #include "gui/csvImport/CsvImportWidget.h"
 #include "gui/wizard/ImportWizard.h"
 
+#include "cli/Utils.h"
+#include "keys/FileKey.h"
+#include "keys/PasswordKey.h"
+
 #include <QBoxLayout>
 #include <QDir>
 #include <QHeaderView>
 #include <QTableWidget>
 
+#include "gui/remote/RemoteSettings.h"
+#include <QDebug>
+
+struct RemoteParams;
+
 ImportWizardPageReview::ImportWizardPageReview(QWidget* parent)
     : QWizardPage(parent)
     , m_ui(new Ui::ImportWizardPageReview)
+    , m_remoteHandler(new RemoteHandler(this))
 {
+    // setup status bar
+    m_statusBar = new QStatusBar(this);
+    m_statusBar->setFixedHeight(24);
+    m_progressBarLabel = new QLabel(m_statusBar);
+    m_progressBarLabel->setVisible(false);
+    m_statusBar->addPermanentWidget(m_progressBarLabel);
+    m_progressBar = new QProgressBar(m_statusBar);
+    m_progressBar->setVisible(false);
+    m_progressBar->setTextVisible(false);
+    m_progressBar->setMaximumWidth(100);
+    m_progressBar->setFixedHeight(15);
+    m_progressBar->setMaximum(100);
+    m_statusBar->addPermanentWidget(m_progressBar);
+    // TODO: how or where to add the status bar?
+    //    m_ui->verticalLayout->addWidget(m_statusBar);
+
+    // TODO: not needed?
+    // connect(m_remoteHandler, &RemoteHandler::downloadFinished, this, &ImportWizardPageReview::onDownloadFinished);
 }
 
 ImportWizardPageReview::~ImportWizardPageReview()
@@ -80,6 +108,12 @@ void ImportWizardPageReview::initializePage()
         m_db = importBitwarden(filename, field("ImportPassword").toString());
         setupDatabasePreview();
         break;
+    case ImportWizard::IMPORT_REMOTE:
+        m_db = importRemote(field("DownloadCommand").toString(),
+                            field("DownloadInput").toString(),
+                            field("ImportPassword").toString(),
+                            field("ImportKeyFile").toString());
+        setupDatabasePreview();
     default:
         break;
     }
@@ -199,4 +233,55 @@ ImportWizardPageReview::importKeePass1(const QString& filename, const QString& p
     }
 
     return db;
+}
+
+QSharedPointer<Database> ImportWizardPageReview::importRemote(const QString& downloadCommand,
+                                                              const QString& downloadInput,
+                                                              const QString& password,
+                                                              const QString& keyfile)
+{
+    auto* params = new RemoteParams();
+    params->downloadCommand = downloadCommand;
+    params->downloadInput = downloadInput;
+    auto result = m_remoteHandler->download(params);
+
+    if (!result.success) {
+        m_ui->messageWidget->showMessage(result.errorMessage, KMessageWidget::Error, -1);
+    }
+
+    auto key = QSharedPointer<CompositeKey>::create();
+
+    if (!password.isEmpty()) {
+        key->addKey(QSharedPointer<PasswordKey>::create(password));
+    }
+    if (!keyfile.isEmpty()) {
+        QSharedPointer<FileKey> fileKey = QSharedPointer<FileKey>::create();
+        if (Utils::loadFileKey(keyfile, fileKey)) {
+            key->addKey(fileKey);
+        } else {
+            m_ui->messageWidget->showMessage(tr("Could not load key file."), KMessageWidget::Error, -1);
+        }
+    }
+
+    QString error;
+    QSharedPointer<Database> remoteDb = QSharedPointer<Database>::create();
+    if (!remoteDb->open(result.filePath, key, &error)) {
+        m_ui->messageWidget->showMessage(
+            tr("Could not open remote database. Password or key file may be incorrect."), KMessageWidget::Error, -1);
+    }
+
+    return remoteDb;
+}
+
+void ImportWizardPageReview::updateProgressBar(int percentage, const QString& message)
+{
+    if (percentage < 0) {
+        m_progressBar->setVisible(false);
+        m_progressBarLabel->setVisible(false);
+    } else {
+        m_progressBar->setValue(percentage);
+        m_progressBar->setVisible(true);
+        m_progressBarLabel->setText(message);
+        m_progressBarLabel->setVisible(true);
+    }
 }

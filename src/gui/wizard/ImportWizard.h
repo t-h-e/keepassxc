@@ -48,7 +48,8 @@ public:
         IMPORT_OPVAULT,
         IMPORT_OPUX,
         IMPORT_BITWARDEN,
-        IMPORT_KEEPASS1
+        IMPORT_KEEPASS1,
+        IMPORT_REMOTE,
     };
 
 private:
