@@ -61,9 +61,6 @@ ImportWizardPageReview::ImportWizardPageReview(QWidget* parent)
     m_statusBar->addPermanentWidget(m_progressBar);
     // TODO: how or where to add the status bar?
     //    m_ui->verticalLayout->addWidget(m_statusBar);
-
-    // TODO: not needed?
-    // connect(m_remoteHandler, &RemoteHandler::downloadFinished, this, &ImportWizardPageReview::onDownloadFinished);
 }
 
 ImportWizardPageReview::~ImportWizardPageReview()

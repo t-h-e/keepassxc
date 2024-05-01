@@ -95,8 +95,6 @@ RemoteHandler::RemoteResult RemoteHandler::download(const RemoteParams* params)
                 tr("Command `%1` did not finish in time. Process was killed.").arg(params->downloadCommand);
         }
 
-        // TODO: remove, only used for "old" open remote dialog
-        // emit downloadFinished(result);
         return result;
     });
 }
@@ -143,8 +141,6 @@ RemoteHandler::RemoteResult RemoteHandler::upload(const QSharedPointer<Database>
                     .arg(statusCode);
         }
 
-        // TODO: is this signal needed?
-        emit uploadFinished(result);
         return result;
     });
 }
