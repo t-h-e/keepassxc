@@ -1126,6 +1126,9 @@ void DatabaseWidget::syncWithRemote(const RemoteParams* params)
             QString error;
             QSharedPointer<Database> remoteDb = QSharedPointer<Database>::create();
             if (!remoteDb->open(result.filePath, m_db->key(), &error)) {
+                // TODO: handle different password case, then continue
+                unlockDatabaseInDialog(this, DatabaseOpenDialog::Intent::RemoteSync, result.filePath);
+
                 // Failed to open downloaded remote database
                 result.success = false;
                 result.errorMessage = error;
@@ -1328,6 +1331,36 @@ void DatabaseWidget::mergeDatabase(bool accepted)
     emit databaseMerged(m_db);
 }
 
+void DatabaseWidget::syncDatabase(bool accepted)
+{
+    if (accepted) {
+        if (!m_db) {
+            showMessage(tr("No current database."), MessageWidget::Error);
+            return;
+        }
+
+        auto* senderDialog = qobject_cast<DatabaseOpenDialog*>(sender());
+
+        Q_ASSERT(senderDialog);
+        if (!senderDialog) {
+            return;
+        }
+        auto destinationDb = senderDialog->database();
+
+        if (!destinationDb) {
+            showMessage(tr("No source database, nothing to do."), MessageWidget::Error);
+            return;
+        }
+
+        if (syncDatabase(m_db, destinationDb)) {
+            emit databaseSyncedWith(destinationDb);
+        } else {
+            emit databaseSyncFailed();
+        }
+    }
+    switchToMainView();
+}
+
 bool DatabaseWidget::syncWithDatabase(const QSharedPointer<Database>& otherDb, QString& error)
 {
     qDebug() << m_db->filePath();
@@ -1371,6 +1404,9 @@ void DatabaseWidget::unlockDatabase(bool accepted)
     if (senderDialog) {
         if (senderDialog->intent() == DatabaseOpenDialog::Intent::Merge) {
             mergeDatabase(accepted);
+            return;
+        } else if (senderDialog->intent() == DatabaseOpenDialog::Intent::RemoteSync) {
+            syncDatabase(accepted);
             return;
         }
     }
