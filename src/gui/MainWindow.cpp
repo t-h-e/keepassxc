@@ -1305,12 +1305,6 @@ void MainWindow::updateRemoteSyncMenuEntries()
         auto action = m_ui->menuRemoteSync->addAction(tr("Setup new sync…"));
         connect(action, &QAction::triggered, dbWidget, &DatabaseWidget::switchToDatabaseSettings);
 
-        // TODO: Sync all shortcut
-        // action = m_ui->menuRemoteSync->addAction(tr("Run every sync…"));
-        // connect(action, &QAction::triggered, dbWidget, [=] {
-        //     dbWidget->syncWithAllRemotes(remoteProgramEntries);
-        // });
-
         m_ui->menuRemoteSync->addSeparator();
 
         // Build remote sync menu
