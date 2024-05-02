@@ -1738,44 +1738,6 @@ void TestGui::testDatabaseSettings()
     config()->set(Config::AutoSaveAfterEveryChange, false);
 }
 
-// TODO: remove. Add in separate PR with import wizard
-void TestGui::testOpenRemoteDatabase()
-{
-    // close current database
-    cleanup();
-
-    // TODO: Replace with listening for the remote result and extracting the database file
-    // TODO: MockRemoteProcess should be able to return the contents of a database
-    QString remoteFileToOpen = "sftp user@server:Database.kdbx";
-    RemoteHandler::setRemoteProcessFunc([remoteFileToOpen](QObject* parent) {
-        return QScopedPointer<RemoteProcess>(new MockRemoteProcess(
-            parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx")));
-    });
-    auto* openRemoteButton = QApplication::activeWindow()->findChild<QPushButton*>("buttonOpenRemote");
-    QTest::mouseClick(openRemoteButton, Qt::LeftButton);
-    QApplication::processEvents();
-
-    auto* downloadCommandEdit = QApplication::activeModalWidget()->findChild<QLineEdit*>("downloadCommand");
-    QTest::keyClicks(downloadCommandEdit, remoteFileToOpen);
-    auto* dialogButtonBox = QApplication::activeModalWidget()->findChild<QDialogButtonBox*>("buttonBox");
-    QTest::mouseClick(dialogButtonBox->button(QDialogButtonBox::Ok), Qt::LeftButton);
-    QApplication::processEvents();
-
-    // set active window explicitly, as this seems to get lost in the test after the dialog has been accepted and closed
-    // this only fails in the CI pipeline (Ubuntu and Windows)
-    QApplication::setActiveWindow(m_mainWindow.data());
-
-    QTRY_COMPARE(QApplication::focusWidget()->objectName(), QString("passwordEdit"));
-    auto* editPasswordSync = QApplication::focusWidget();
-    QVERIFY(editPasswordSync->isVisible());
-
-    QTest::keyClicks(editPasswordSync, "a");
-    QTest::keyClick(editPasswordSync, Qt::Key_Enter);
-
-    // remote database has been opened
-    QTRY_COMPARE(m_tabWidget->tabText(m_tabWidget->currentIndex()), QString("SyncDatabase.kdbx [Remote]"));
-}
-
 void TestGui::testDatabaseLocking()
 {
     QString origDbName = m_tabWidget->tabText(0);
