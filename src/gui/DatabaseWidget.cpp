@@ -1074,45 +1074,6 @@ void DatabaseWidget::syncWithRemote(const RemoteParams* params)
 {
     setDisabled(true);
 
-    //    auto result = AsyncTask::runAndWaitForFuture([this, params] {
-    //        QScopedPointer<RemoteHandler> remoteHandler(new RemoteHandler(this));
-    //        RemoteHandler::RemoteResult result;
-    //        result.success = false;
-    //        result.errorMessage = tr("Remote Sync did not contain any download or upload commands.");
-    //
-    //        // Download the database
-    //        if (!params->downloadCommand.isEmpty()) {
-    //            // Start a download first then merge and upload in the callback
-    //            result = remoteHandler->download(params);
-    //            if (result.success) {
-    //                QString error;
-    //                QSharedPointer<Database> remoteDb = QSharedPointer<Database>::create();
-    //                if (!remoteDb->open(result.filePath, m_db->key(), &error)) {
-    //                    // Failed to open downloaded remote database
-    //                    result.success = false;
-    //                    result.errorMessage = error;
-    //                    return result;
-    //                }
-    //                remoteDb->markAsRemoteDatabase();
-    //                if (!syncWithDatabase(remoteDb, error)) {
-    //                    // Something failed during the sync process
-    //                    result.success = false;
-    //                    result.errorMessage = error;
-    //                    return result;
-    //                }
-    //            } else {
-    //                // Download failed, bail out now
-    //                return result;
-    //            }
-    //        }
-    //
-    //        // Upload the database
-    //        if (!params->uploadCommand.isEmpty()) {
-    //            result = remoteHandler->upload(m_db, params);
-    //        }
-    //        return result;
-    //    });
-
     QScopedPointer<RemoteHandler> remoteHandler(new RemoteHandler(this));
     RemoteHandler::RemoteResult result;
     result.success = false;
@@ -1126,12 +1087,11 @@ void DatabaseWidget::syncWithRemote(const RemoteParams* params)
             QString error;
             QSharedPointer<Database> remoteDb = QSharedPointer<Database>::create();
             if (!remoteDb->open(result.filePath, m_db->key(), &error)) {
-                // TODO: handle different password case, then continue
-                unlockDatabaseInDialog(this, DatabaseOpenDialog::Intent::RemoteSync, result.filePath);
-
-                // Failed to open downloaded remote database
-                result.success = false;
-                result.errorMessage = error;
+                // Failed to open downloaded remote database with same key
+                // Unlock downloaded remote database via dialog
+                // TODO: BUG database stays disabled if the user does not unlock remote db. E.g. user clicks on cancel
+                syncDatabaseWithLockedDatabase(result.filePath, params);
+                return;
             }
             remoteDb->markAsRemoteDatabase();
             if (!syncWithDatabase(remoteDb, error)) {
@@ -1142,8 +1102,27 @@ void DatabaseWidget::syncWithRemote(const RemoteParams* params)
         }
     }
 
-    // Upload the database
+    uploadAndFinishSync(params, result);
+}
+
+void DatabaseWidget::syncDatabaseWithLockedDatabase(const QString& filePath, const RemoteParams* params)
+{
+    setDisabled(true);
+
+    auto uploadSyncedDatabase = [this, params](RemoteHandler::RemoteResult result) {
+        disconnect(this, &DatabaseWidget::databaseSyncUnlocked, nullptr, nullptr);
+        uploadAndFinishSync(params, result);
+    };
+    connect(this, &DatabaseWidget::databaseSyncUnlocked, uploadSyncedDatabase);
+
+    emit unlockDatabaseInDialogForSync(filePath);
+}
+
+void DatabaseWidget::uploadAndFinishSync(const RemoteParams* params, RemoteHandler::RemoteResult result)
+{
+    QScopedPointer<RemoteHandler> remoteHandler(new RemoteHandler(this));
     if (result.success && !params->uploadCommand.isEmpty()) {
+        // TODO: BUG need to upload the remote db not the current one!!!
         result = remoteHandler->upload(m_db, params);
     }
 
@@ -1331,7 +1310,7 @@ void DatabaseWidget::mergeDatabase(bool accepted)
     emit databaseMerged(m_db);
 }
 
-void DatabaseWidget::syncDatabase(bool accepted)
+void DatabaseWidget::syncUnlockedDatabase(bool accepted)
 {
     if (accepted) {
         if (!m_db) {
@@ -1352,11 +1331,13 @@ void DatabaseWidget::syncDatabase(bool accepted)
             return;
         }
 
-        if (syncDatabase(m_db, destinationDb)) {
-            emit databaseSyncedWith(destinationDb);
-        } else {
-            emit databaseSyncFailed();
-        }
+        RemoteHandler::RemoteResult result;
+        QString error;
+        result.success = syncWithDatabase(destinationDb, error);
+        result.errorMessage = error;
+        result.filePath = m_db->filePath();
+
+        emit databaseSyncUnlocked(result);
     }
     switchToMainView();
 }
@@ -1406,7 +1387,7 @@ void DatabaseWidget::unlockDatabase(bool accepted)
             mergeDatabase(accepted);
             return;
         } else if (senderDialog->intent() == DatabaseOpenDialog::Intent::RemoteSync) {
-            syncDatabase(accepted);
+            syncUnlockedDatabase(accepted);
             return;
         }
     }
