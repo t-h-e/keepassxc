@@ -99,18 +99,18 @@ RemoteHandler::RemoteResult RemoteHandler::download(const RemoteParams* params)
     });
 }
 
-RemoteHandler::RemoteResult RemoteHandler::upload(const QSharedPointer<Database>& db, const RemoteParams* params)
+RemoteHandler::RemoteResult RemoteHandler::upload(const QString& filePath, const RemoteParams* params)
 {
-    return AsyncTask::runAndWaitForFuture([this, db, params] {
+    return AsyncTask::runAndWaitForFuture([this, filePath, params] {
         RemoteResult result;
-        if (!db || !params) {
+        if (!params) {
             result.success = false;
             result.errorMessage = tr("Invalid database pointer or upload parameters provided.");
             return result;
         }
 
         auto remoteProcess = m_createRemoteProcess(nullptr); // use nullptr parent, otherwise there is a warning
-        remoteProcess->setTempFileLocation(db->filePath());
+        remoteProcess->setTempFileLocation(filePath);
         remoteProcess->start(params->uploadCommand);
         if (!params->uploadInput.isEmpty()) {
             remoteProcess->write(params->uploadInput + "\n");

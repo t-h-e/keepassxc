@@ -150,7 +150,7 @@ signals:
     void databaseMerged(QSharedPointer<Database> mergedDb);
     void databaseSyncCompleted(const QString& syncName);
     void databaseSyncFailed(const QString& syncName, const QString& error);
-    void databaseSyncUnlocked(RemoteHandler::RemoteResult result);
+    void databaseSyncUnlocked(const RemoteHandler::RemoteResult& result);
     void unlockDatabaseInDialogForSync(const QString& filePath);
     void groupContextMenuRequested(const QPoint& globalPos);
     void entryContextMenuRequested(const QPoint& globalPos);

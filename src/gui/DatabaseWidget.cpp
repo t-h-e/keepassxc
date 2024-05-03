@@ -1089,7 +1089,8 @@ void DatabaseWidget::syncWithRemote(const RemoteParams* params)
             if (!remoteDb->open(result.filePath, m_db->key(), &error)) {
                 // Failed to open downloaded remote database with same key
                 // Unlock downloaded remote database via dialog
-                // TODO: BUG database stays disabled if the user does not unlock remote db. E.g. user clicks on cancel
+                // enable widget again in case remote database can not be unlocked
+                setDisabled(false);
                 syncDatabaseWithLockedDatabase(result.filePath, params);
                 return;
             }
@@ -1107,23 +1108,22 @@ void DatabaseWidget::syncWithRemote(const RemoteParams* params)
 
 void DatabaseWidget::syncDatabaseWithLockedDatabase(const QString& filePath, const RemoteParams* params)
 {
-    setDisabled(true);
+    // disconnect any previously added slots to this signal
+    disconnect(this, &DatabaseWidget::databaseSyncUnlocked, nullptr, nullptr);
 
-    auto uploadSyncedDatabase = [this, params](RemoteHandler::RemoteResult result) {
-        disconnect(this, &DatabaseWidget::databaseSyncUnlocked, nullptr, nullptr);
+    connect(this, &DatabaseWidget::databaseSyncUnlocked, [this, params](const RemoteHandler::RemoteResult& result) {
         uploadAndFinishSync(params, result);
-    };
-    connect(this, &DatabaseWidget::databaseSyncUnlocked, uploadSyncedDatabase);
+    });
 
     emit unlockDatabaseInDialogForSync(filePath);
 }
 
 void DatabaseWidget::uploadAndFinishSync(const RemoteParams* params, RemoteHandler::RemoteResult result)
 {
+    setDisabled(true);
     QScopedPointer<RemoteHandler> remoteHandler(new RemoteHandler(this));
     if (result.success && !params->uploadCommand.isEmpty()) {
-        // TODO: BUG need to upload the remote db not the current one!!!
-        result = remoteHandler->upload(m_db, params);
+        result = remoteHandler->upload(result.filePath, params);
     }
 
     setDisabled(false);
