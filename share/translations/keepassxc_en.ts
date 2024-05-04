@@ -1673,7 +1673,7 @@ Are you sure you want to continue with this file?.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remote</source>
+        <source>Remote Sync</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2409,22 +2409,6 @@ This is definitely a bug, please report it to the developers.</source>
         <comment>Database tab name modifier</comment>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Upload successful.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Downloading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Uploading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Syncing...</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>DatabaseWidget</name>
@@ -2609,19 +2593,28 @@ Disable safe saves and try again?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Successfully synced the database files.</source>
+        <source>New Database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Database was not modified by sync operation.</source>
+        <source>%1 [New Database]</source>
+        <comment>Database tab name modifier</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error while saving source database: %1.</source>
+        <source>Remote Sync did not contain any download or upload commands.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error while saving destination database: %1.</source>
+        <source>Remote sync &apos;%1&apos; completed successfully!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote sync &apos;%1&apos; failed: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while saving database %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5987,19 +5980,11 @@ We recommend you use the AppImage available on our downloads page.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open remote database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open remote database…</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Remote S&amp;ync…</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No Remote Sync Settings</source>
+        <source>Setup new sync…</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8869,55 +8854,6 @@ This option is deprecated, use --set-key-file instead.</source>
     </message>
 </context>
 <context>
-    <name>RemoteFileDialog</name>
-    <message>
-        <source>Open from remote</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Downloading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This dialog allows you to access a remote database.&lt;br/&gt;Consult the &lt;a href=&quot;https://keepassxc.org/docs/KeePassXC_UserGuide/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;User Guide&lt;/span&gt;&lt;/a&gt; for more information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Download command:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Download command field</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>e.g.: &quot;sftp user@hostname&quot; or &quot;scp user@hostname:DatabaseOnRemote.kdbx {TEMP_DATABASE}&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Input:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Download input field</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>e.g.:
-get DatabaseOnRemote.kdbx {TEMP_DATABASE}
-exit
----
-{TEMP_DATABASE} is used as placeholder to store the database in a temporary location
-The command has to exit. In case of `sftp` as last commend `exit` has to be sent
-        </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No download command specified.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>RemoteHandler</name>
     <message>
         <source>Command `%1` exited with status code: %3</source>
@@ -8933,6 +8869,18 @@ The command has to exit. In case of `sftp` as last commend `exit` has to be sent
     </message>
     <message>
         <source>Failed to upload merged database. Command `%1` did not finish in time. Process was killed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid download parameters provided.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command `%1` failed to download database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid database pointer or upload parameters provided.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9983,18 +9931,6 @@ Example: JBSWY3DPEHPK3PXP</source>
     </message>
     <message>
         <source>Import File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open a recent database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Welcome to KeePassXC %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open from remote</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
