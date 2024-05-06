@@ -2617,6 +2617,18 @@ Disable safe saves and try again?</source>
         <source>Error while saving database %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Downloading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uploading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Syncing...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditEntryWidget</name>
