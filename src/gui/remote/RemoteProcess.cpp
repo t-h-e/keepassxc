@@ -41,10 +41,11 @@ void RemoteProcess::start(const QString& command)
     QStringList cmdList = QProcess::splitCommand(commandResolved);
     if (!cmdList.isEmpty()) {
         const QString program = cmdList.takeFirst();
+        m_process->setProcessChannelMode(QProcess::MergedChannels);
         m_process->start(program, cmdList);
     }
 #else
-    m_process->start(resolveTemplateVariables(commandResolved));
+    m_process->start(commandResolved);
 #endif
 
     m_process->waitForStarted();
@@ -79,11 +80,6 @@ int RemoteProcess::exitCode() const
 QString RemoteProcess::readOutput()
 {
     return m_process->readAllStandardOutput();
-}
-
-QString RemoteProcess::readError()
-{
-    return m_process->readAllStandardError();
 }
 
 void RemoteProcess::kill() const

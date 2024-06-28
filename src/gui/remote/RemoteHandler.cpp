@@ -70,9 +70,7 @@ RemoteHandler::RemoteResult RemoteHandler::download(const RemoteParams* params)
         bool finished = remoteProcess->waitForFinished(10000);
         int statusCode = remoteProcess->exitCode();
 
-        // TODO: For future use
         result.stdOutput = remoteProcess->readOutput();
-        result.stdError = remoteProcess->readError();
 
         if (finished && statusCode == 0) {
             // Check if the file actually downloaded
@@ -121,9 +119,7 @@ RemoteHandler::RemoteResult RemoteHandler::upload(const QString& filePath, const
         bool finished = remoteProcess->waitForFinished(10000);
         int statusCode = remoteProcess->exitCode();
 
-        // TODO: For future use
         result.stdOutput = remoteProcess->readOutput();
-        result.stdError = remoteProcess->readError();
 
         if (finished && statusCode == 0) {
             result.success = true;

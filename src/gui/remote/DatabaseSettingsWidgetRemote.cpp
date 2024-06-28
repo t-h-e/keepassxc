@@ -22,6 +22,7 @@
 #include "core/Metadata.h"
 
 #include "RemoteHandler.h"
+#include "RemoteProcessDialog.h"
 #include "RemoteSettings.h"
 #include "gui/MessageBox.h"
 
@@ -187,14 +188,20 @@ void DatabaseSettingsWidgetRemote::testDownload()
     if (!result.success) {
         m_ui->messageWidget->showMessage(tr("Download failed with error: %1").arg(result.errorMessage),
                                          MessageWidget::Error);
+        auto dialog = new RemoteProcessDialog(this, params->downloadCommand, result);
+        dialog->show();
         return;
     }
 
     if (!QFile::exists(result.filePath)) {
         m_ui->messageWidget->showMessage(tr("Download finished, but file %1 could not be found.").arg(result.filePath),
                                          MessageWidget::Error);
+        auto dialog = new RemoteProcessDialog(this, params->downloadCommand, result);
+        dialog->show();
         return;
     }
 
     m_ui->messageWidget->showMessage(tr("Download successful."), MessageWidget::Positive);
+    auto dialog = new RemoteProcessDialog(this, params->downloadCommand, result);
+    dialog->show();
 }

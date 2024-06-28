@@ -34,7 +34,6 @@ public:
     virtual void closeWriteChannel();
     virtual bool waitForFinished(int msecs);
     virtual QString readOutput();
-    virtual QString readError();
     virtual int exitCode() const;
     void kill() const;
 

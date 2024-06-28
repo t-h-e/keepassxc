@@ -20,7 +20,6 @@
 #include "core/Database.h"
 #include "core/Metadata.h"
 
-#include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>

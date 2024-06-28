@@ -18,6 +18,7 @@
 #ifndef KEEPASSXC_REMOTESETTINGS_H
 #define KEEPASSXC_REMOTESETTINGS_H
 
+#include <QMap>
 #include <QObject>
 #include <QSharedPointer>
 
@@ -54,7 +55,7 @@ private:
     void fromConfig(const QString& data);
     QString toConfig() const;
 
-    QHash<QString, RemoteParams*> m_remoteParams;
+    QMap<QString, RemoteParams*> m_remoteParams;
     QSharedPointer<Database> m_db;
 };
 

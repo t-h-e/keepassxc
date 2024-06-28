@@ -38,7 +38,6 @@ public:
         QString errorMessage;
         QString filePath;
         QString stdOutput;
-        QString stdError;
     };
 
     RemoteResult download(const RemoteParams* params);
