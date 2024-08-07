@@ -10,7 +10,7 @@
     <height>289</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
    <item>
     <widget class="MessageWidget" name="messageWidget" native="true">
      <property name="sizePolicy">
@@ -22,16 +22,28 @@
     </widget>
    </item>
    <item>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Output:</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QPlainTextEdit" name="output"/>
+     <item>
+      <widget class="QPlainTextEdit" name="output">
+       <property name="font">
+        <font>
+         <family>Noto Sans Mono</family>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: black; color: white;</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

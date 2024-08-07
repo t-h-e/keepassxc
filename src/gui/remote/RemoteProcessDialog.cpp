@@ -20,26 +20,34 @@
 
 #include "gui/MessageBox.h"
 
-// TODO: make this a real dialog
 RemoteProcessDialog::RemoteProcessDialog(QWidget* parent,
                                          const QString& command,
-                                         const RemoteHandler::RemoteResult& remoteResult)
-    : DialogyWidget(parent)
+                                         const RemoteHandler::RemoteResult& remoteResult,
+                                         const QString& translatedMessage)
+    : QDialog(parent)
     , m_ui(new Ui::RemoteProcessDialog())
 {
     m_ui->setupUi(this);
-    //    m_ui->messageWidget->setHidden(true);
+    setWindowModality(Qt::ApplicationModal);
 
     m_ui->messageWidget->setCloseButtonVisible(false);
     m_ui->messageWidget->setAutoHideTimeout(0);
-    // TODO: pass in error message
     if (remoteResult.success) {
-        m_ui->messageWidget->showMessage(tr("Download command cannot be empty."), MessageWidget::Positive);
+        m_ui->messageWidget->showMessage(translatedMessage, MessageWidget::Positive);
     } else {
-        m_ui->messageWidget->showMessage(tr("Download command cannot be empty."), MessageWidget::Error);
+        m_ui->messageWidget->showMessage(translatedMessage, MessageWidget::Error);
     }
 
     m_ui->output->setPlainText(QString("$ %1\n%2").arg(command, remoteResult.stdOutput));
+
+    QFont courierFont("Courier");
+    courierFont.setStyleHint(QFont::Courier);
+    m_ui->output->setFont(courierFont);
 }
 
 RemoteProcessDialog::~RemoteProcessDialog() = default;
+
+// TODO:
+//  - close button does not do anything
+//  - Settings are responsive while testing. Should be disabled
+//  - little info in output window. e.g. if host is not known. Why is nothing displayed?

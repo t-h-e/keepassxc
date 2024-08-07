@@ -18,6 +18,8 @@
 #ifndef KEEPASSXC_REMOTEPROCESSDIALOG_H
 #define KEEPASSXC_REMOTEPROCESSDIALOG_H
 
+#include <QDialog>
+
 #include "RemoteHandler.h"
 #include "gui/DialogyWidget.h"
 
@@ -26,16 +28,16 @@ namespace Ui
     class RemoteProcessDialog;
 }
 
-class RemoteProcessDialog : public DialogyWidget
+class RemoteProcessDialog : public QDialog
 {
     Q_OBJECT
 
 public:
     explicit RemoteProcessDialog(QWidget* parent,
                                  const QString& command,
-                                 const RemoteHandler::RemoteResult& remoteResult);
+                                 const RemoteHandler::RemoteResult& remoteResult,
+                                 const QString& translatedMessage);
     ~RemoteProcessDialog() override;
-    Q_DISABLE_COPY(RemoteProcessDialog);
 
 private:
     const QScopedPointer<Ui::RemoteProcessDialog> m_ui;
