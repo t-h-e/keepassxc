@@ -19,8 +19,11 @@
 - `libsodium-dev` - Additional crypto
 
 ### GUI Tests
-GUI tests require X11 display or virtual framebuffer:
+GUI tests require X11 display, virtual framebuffer, or Qt offscreen mode:
 ```bash
+# Run with Qt offscreen mode (no display needed)
+QT_QPA_PLATFORM=offscreen ctest --test-dir build -R testgui -V
+
 # Run with virtual display
 xvfb-run ctest --test-dir build -R testgui -V
 ```
