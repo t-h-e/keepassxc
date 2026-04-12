@@ -228,3 +228,26 @@ void TestGui::testRemoteSyncOnSave()
 7. **Mocking**: Use `tests/mock/MockRemoteProcess.h` for testing remote functionality without actual network calls.
 
 8. **Error Handling**: Return `RemoteResult` struct with `success`, `errorMessage`, `filePath` for remote operations.
+
+9. **Testing Modal Dialogs**: Avoid `QTimer::singleShot` with non-zero timeout values in tests. Using arbitrary delays makes tests flaky and slow. Instead, use the `TEST_MODAL` macro which uses delay 0, or use `QTRY_VERIFY` inside the timer callback to wait for the dialog to appear:
+
+   **Bad (flaky, slow):**
+   ```cpp
+   QTimer::singleShot(100, [&]() {
+       // May fire too early or waste time waiting
+       QWidget* dialog = QApplication::activeModalWidget();
+       // ...
+   });
+   triggerAction();
+   ```
+
+   **Good (deterministic, fast):**
+   ```cpp
+   TEST_MODAL(QWidget* dialog;
+              QTRY_VERIFY(dialog = QApplication::activeModalWidget());
+              // interact with dialog...);
+   triggerAction(); // This blocks on dialog->exec()
+   ```
+
+   The `TEST_MODAL` macro schedules code to run in the dialog's local event loop (via delay 0), which fires after `exec()` starts. If the dialog appears after async processing, use `QTRY_VERIFY` inside the callback to wait for it.
+
