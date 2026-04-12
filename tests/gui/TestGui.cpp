@@ -653,17 +653,8 @@ void TestGui::testRemoteSyncTrustDialogShown()
     QApplication::processEvents();
     menuRemoteSync->close();
 
-    QTimer::singleShot(0, [this, remoteName]() {
-        auto menu = m_mainWindow->findChild<QMenu*>("menuRemoteSync");
-        for (const auto action : menu->actions()) {
-            if (action->text() == remoteName) {
-                action->trigger();
-                break;
-            }
-        }
-    });
-
-    QTimer::singleShot(100, []() {
+    bool dialogFinished = false;
+    QTimer::singleShot(100, [&]() {
         QWidget* modalWidget = QApplication::activeModalWidget();
         if (!modalWidget) {
             return;
@@ -681,8 +672,17 @@ void TestGui::testRemoteSyncTrustDialogShown()
             return;
         }
         QTest::mouseClick(okBtn, Qt::LeftButton);
+        dialogFinished = true;
     });
 
+    for (const auto remoteAction : menuRemoteSync->actions()) {
+        if (remoteAction->text() == remoteName) {
+            remoteAction->trigger();
+            break;
+        }
+    }
+
+    QTRY_VERIFY(dialogFinished);
     QTRY_COMPARE(dbSyncSpy.count(), 1);
 
     trustedCommands = config()->get(Config::RemoteTrustedCommands).toMap();
