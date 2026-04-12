@@ -17,13 +17,22 @@
 
 #include "RemoteSettings.h"
 
+#include "core/Config.h"
+#include "core/CustomData.h"
 #include "core/Database.h"
 #include "core/Metadata.h"
+#include "crypto/CryptoHash.h"
+#include "crypto/Random.h"
 
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+
+namespace
+{
+    const int SaltSize = 32;
+}
 
 RemoteSettings::RemoteSettings(const QSharedPointer<Database>& db, QObject* parent)
     : QObject(parent)
@@ -119,4 +128,73 @@ void RemoteSettings::fromConfig(const QString& data)
 
         m_remoteParams.insert(params->name, params);
     }
+}
+
+QByteArray RemoteSettings::getOrCreateSalt(const QSharedPointer<Database>& db)
+{
+    if (!db || !db->metadata()) {
+        return {};
+    }
+
+    auto customData = db->metadata()->customData();
+    QString saltBase64 = customData->value(CustomData::RemoteSalt);
+
+    if (!saltBase64.isEmpty()) {
+        return QByteArray::fromBase64(saltBase64.toLatin1());
+    }
+
+    QByteArray salt = randomGen()->randomArray(SaltSize);
+    customData->set(CustomData::RemoteSalt, salt.toBase64());
+    return salt;
+}
+
+QString RemoteSettings::computeCommandHash(const QString& command, const QString& input, const QByteArray& salt)
+{
+    if (command.isEmpty() && input.isEmpty()) {
+        return {};
+    }
+
+    QByteArray data;
+    data.append(command.toUtf8());
+    data.append('\n');
+    data.append(input.toUtf8());
+    data.append(salt);
+
+    QByteArray hash = CryptoHash::hash(data, CryptoHash::Sha256);
+    return QString::fromLatin1(hash.toHex());
+}
+
+void RemoteSettings::saveTrustedHash(const QString& dbUuid,
+                                     const QString& remoteName,
+                                     const QString& operation,
+                                     const QString& hash)
+{
+    if (dbUuid.isEmpty() || remoteName.isEmpty() || operation.isEmpty() || hash.isEmpty()) {
+        return;
+    }
+
+    QVariantMap trustedCommands = config()->get(Config::RemoteTrustedCommands).toMap();
+    QVariantMap dbHashes = trustedCommands.value(dbUuid).toMap();
+
+    QString key = QString("%1_%2").arg(remoteName, operation);
+    dbHashes.insert(key, hash);
+    trustedCommands.insert(dbUuid, dbHashes);
+
+    config()->set(Config::RemoteTrustedCommands, trustedCommands);
+}
+
+bool RemoteSettings::isCommandTrusted(const QString& dbUuid,
+                                      const QString& remoteName,
+                                      const QString& operation,
+                                      const QString& hash)
+{
+    if (dbUuid.isEmpty() || remoteName.isEmpty() || operation.isEmpty() || hash.isEmpty()) {
+        return false;
+    }
+
+    QVariantMap trustedCommands = config()->get(Config::RemoteTrustedCommands).toMap();
+    QVariantMap dbHashes = trustedCommands.value(dbUuid).toMap();
+
+    QString key = QString("%1_%2").arg(remoteName, operation);
+    return dbHashes.value(key).toString() == hash;
 }

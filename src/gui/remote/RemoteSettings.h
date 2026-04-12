@@ -53,6 +53,13 @@ public:
     void loadSettings();
     void saveSettings() const;
 
+    static QByteArray getOrCreateSalt(const QSharedPointer<Database>& db);
+    static QString computeCommandHash(const QString& command, const QString& input, const QByteArray& salt);
+    static void
+    saveTrustedHash(const QString& dbUuid, const QString& remoteName, const QString& operation, const QString& hash);
+    static bool
+    isCommandTrusted(const QString& dbUuid, const QString& remoteName, const QString& operation, const QString& hash);
+
 private:
     void fromConfig(const QString& data);
     QString toConfig() const;

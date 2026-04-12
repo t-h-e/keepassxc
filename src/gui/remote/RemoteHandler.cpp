@@ -19,9 +19,12 @@
 
 #include "RemoteProcess.h"
 #include "RemoteSettings.h"
+#include "RemoteTrustDialog.h"
 
 #include "core/AsyncTask.h"
 #include "core/Database.h"
+
+#include <QMessageBox>
 
 namespace
 {
@@ -47,9 +50,40 @@ void RemoteHandler::setRemoteProcessFunc(std::function<QScopedPointer<RemoteProc
     m_createRemoteProcess = std::move(func);
 }
 
-RemoteHandler::RemoteResult RemoteHandler::download(const RemoteParams* params)
+bool RemoteHandler::checkAndConfirmCommand(const QSharedPointer<Database>& db,
+                                           const QString& remoteName,
+                                           const QString& operation,
+                                           const QString& command,
+                                           const QString& input)
 {
-    return AsyncTask::runAndWaitForFuture([params] {
+    if (!db) {
+        return true;
+    }
+
+    QByteArray salt = RemoteSettings::getOrCreateSalt(db);
+    QString hash = RemoteSettings::computeCommandHash(command, input, salt);
+    QString dbUuid = db->uuid().toString();
+
+    if (RemoteSettings::isCommandTrusted(dbUuid, remoteName, operation, hash)) {
+        return true;
+    }
+
+    QScopedPointer<RemoteTrustDialog> dialog(new RemoteTrustDialog(nullptr));
+    dialog->setRemoteName(remoteName);
+    dialog->setCommand(command);
+    dialog->setInput(input);
+
+    if (dialog->exec() == QDialog::Accepted) {
+        RemoteSettings::saveTrustedHash(dbUuid, remoteName, operation, hash);
+        return true;
+    }
+
+    return false;
+}
+
+RemoteHandler::RemoteResult RemoteHandler::download(const QSharedPointer<Database>& db, const RemoteParams* params)
+{
+    return AsyncTask::runAndWaitForFuture([this, db, params] {
         RemoteResult result;
         if (!params) {
             result.success = false;
@@ -57,8 +91,14 @@ RemoteHandler::RemoteResult RemoteHandler::download(const RemoteParams* params)
             return result;
         }
 
+        if (!checkAndConfirmCommand(db, params->name, "download", params->downloadCommand, params->downloadInput)) {
+            result.success = false;
+            result.errorMessage = tr("Command not trusted by user.");
+            return result;
+        }
+
         auto filePath = getTempFileLocation();
-        auto remoteProcess = m_createRemoteProcess(nullptr); // use nullptr parent, otherwise there is a warning
+        auto remoteProcess = m_createRemoteProcess(nullptr);
         remoteProcess->setTempFileLocation(filePath);
         remoteProcess->start(params->downloadCommand);
         if (!params->downloadInput.isEmpty()) {
@@ -70,12 +110,10 @@ RemoteHandler::RemoteResult RemoteHandler::download(const RemoteParams* params)
         bool finished = remoteProcess->waitForFinished(params->downloadTimeoutMsec);
         int statusCode = remoteProcess->exitCode();
 
-        // TODO: For future use
         result.stdOutput = remoteProcess->readOutput();
         result.stdError = remoteProcess->readError();
 
         if (finished && statusCode == 0) {
-            // Check if the file actually downloaded
             QFileInfo fileInfo(filePath);
             if (!fileInfo.exists() || fileInfo.size() == 0) {
                 result.success = false;
@@ -99,9 +137,10 @@ RemoteHandler::RemoteResult RemoteHandler::download(const RemoteParams* params)
     });
 }
 
-RemoteHandler::RemoteResult RemoteHandler::upload(const QString& filePath, const RemoteParams* params)
+RemoteHandler::RemoteResult
+RemoteHandler::upload(const QSharedPointer<Database>& db, const QString& filePath, const RemoteParams* params)
 {
-    return AsyncTask::runAndWaitForFuture([filePath, params] {
+    return AsyncTask::runAndWaitForFuture([this, db, filePath, params] {
         RemoteResult result;
         if (!params) {
             result.success = false;
@@ -109,7 +148,13 @@ RemoteHandler::RemoteResult RemoteHandler::upload(const QString& filePath, const
             return result;
         }
 
-        auto remoteProcess = m_createRemoteProcess(nullptr); // use nullptr parent, otherwise there is a warning
+        if (!checkAndConfirmCommand(db, params->name, "upload", params->uploadCommand, params->uploadInput)) {
+            result.success = false;
+            result.errorMessage = tr("Command not trusted by user.");
+            return result;
+        }
+
+        auto remoteProcess = m_createRemoteProcess(nullptr);
         remoteProcess->setTempFileLocation(filePath);
         remoteProcess->start(params->uploadCommand);
         if (!params->uploadInput.isEmpty()) {
@@ -121,7 +166,6 @@ RemoteHandler::RemoteResult RemoteHandler::upload(const QString& filePath, const
         bool finished = remoteProcess->waitForFinished(params->uploadTimeoutMsec);
         int statusCode = remoteProcess->exitCode();
 
-        // TODO: For future use
         result.stdOutput = remoteProcess->readOutput();
         result.stdError = remoteProcess->readError();
 

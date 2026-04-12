@@ -206,6 +206,8 @@ public:
         Messages_NoLegacyKeyFileWarning,
         Messages_HidePreReleaseWarning,
 
+        RemoteTrustedCommands,
+
         // Special internal value
         Deleted
     };
