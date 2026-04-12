@@ -38,6 +38,14 @@ public:
 private:
     QByteArray m_data;
     QString m_dbPath;
+    QString m_command;
+    bool m_uploadCalled = false;
+
+public:
+    [[nodiscard]] bool uploadCalled() const
+    {
+        return m_uploadCalled;
+    }
 };
 
 #endif // KEEPASSXC_MOCKREMOTEPROCESS_H

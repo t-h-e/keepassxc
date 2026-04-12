@@ -62,6 +62,7 @@
 #include "gui/group/GroupModel.h"
 #include "gui/group/GroupView.h"
 #include "gui/remote/RemoteHandler.h"
+#include "gui/remote/RemoteSettings.h"
 #include "gui/tag/TagsEdit.h"
 #include "gui/wizard/NewDatabaseWizard.h"
 #include "keys/FileKey.h"
@@ -479,6 +480,67 @@ void TestGui::testRemoteSyncDatabaseRequiresPassword()
     QCOMPARE(m_db->rootGroup()->children().at(6)->entries().size(), 1);
     // the General group contains one entry merged from the other db
     QCOMPARE(m_db->rootGroup()->findChildByName("General")->entries().size(), 1);
+}
+
+void TestGui::testRemoteSyncOnSave()
+{
+    RemoteHandler::setRemoteProcessFunc([](QObject* parent) {
+        return QScopedPointer<RemoteProcess>(
+            new MockRemoteProcess(parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx")));
+    });
+
+    triggerAction("actionDatabaseSettings");
+    auto dbSettingsDialog = m_dbWidget->findChild<DatabaseSettingsDialog*>("databaseSettingsDialog");
+    QVERIFY(dbSettingsDialog);
+    dbSettingsDialog->showRemoteSettings();
+
+    auto nameEdit = dbSettingsDialog->findChild<QLineEdit*>("nameLineEdit");
+    QVERIFY(nameEdit);
+    nameEdit->setText("testSyncOnSave");
+
+    auto downloadCommandEdit = dbSettingsDialog->findChild<QLineEdit*>("downloadCommand");
+    QVERIFY(downloadCommandEdit);
+    downloadCommandEdit->setText("sftp user@server:Database.kdbx");
+
+    auto uploadCommandEdit = dbSettingsDialog->findChild<QLineEdit*>("uploadCommand");
+    QVERIFY(uploadCommandEdit);
+    uploadCommandEdit->setText("sftp put {TEMP_DATABASE} user@server:Database.kdbx");
+
+    auto syncOnSaveCheckBox = dbSettingsDialog->findChild<QCheckBox*>("syncOnSaveCheckBox");
+    QVERIFY(syncOnSaveCheckBox);
+    QVERIFY(!syncOnSaveCheckBox->isChecked());
+    syncOnSaveCheckBox->setChecked(true);
+    QVERIFY(syncOnSaveCheckBox->isChecked());
+
+    auto saveSettingsButton = dbSettingsDialog->findChild<QPushButton*>("saveSettingsButton");
+    QVERIFY(saveSettingsButton);
+    QTest::mouseClick(saveSettingsButton, Qt::LeftButton);
+
+    auto okButton = dbSettingsDialog->findChild<QDialogButtonBox*>("buttonBox")->button(QDialogButtonBox::Ok);
+    QVERIFY(okButton);
+    QTest::mouseClick(okButton, Qt::LeftButton);
+
+    QTRY_COMPARE(m_dbWidget->getRemoteParams().size(), 1);
+    QVERIFY(m_dbWidget->getRemoteParams().first()->syncOnSave);
+
+    QSignalSpy dbSyncSpy(m_dbWidget.data(), &DatabaseWidget::databaseSyncCompleted);
+
+    auto* toolBar = m_mainWindow->findChild<QToolBar*>("toolBar");
+    auto* entryNewAction = m_mainWindow->findChild<QAction*>("actionEntryNew");
+    QWidget* entryNewWidget = toolBar->widgetForAction(entryNewAction);
+    QTest::mouseClick(entryNewWidget, Qt::LeftButton);
+
+    auto* editEntryWidget = m_dbWidget->findChild<EditEntryWidget*>("editEntryWidget");
+    auto* titleEdit = editEntryWidget->findChild<QLineEdit*>("titleEdit");
+    QTest::keyClicks(titleEdit, "syncOnSaveTestEntry");
+    auto* editEntryWidgetButtonBox = editEntryWidget->findChild<QDialogButtonBox*>("buttonBox");
+    QTest::mouseClick(editEntryWidgetButtonBox->button(QDialogButtonBox::Ok), Qt::LeftButton);
+
+    QTRY_VERIFY(m_db->isModified());
+
+    checkSaveDatabase();
+
+    QTRY_COMPARE(dbSyncSpy.count(), 1);
 }
 
 void TestGui::testOpenRemoteDatabase()

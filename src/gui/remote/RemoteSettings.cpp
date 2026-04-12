@@ -93,6 +93,7 @@ QString RemoteSettings::toConfig() const
         object["uploadCommand"] = params->uploadCommand;
         object["uploadCommandInput"] = params->uploadInput;
         object["uploadTimeoutMsec"] = params->uploadTimeoutMsec;
+        object["syncOnSave"] = params->syncOnSave;
         config << object;
     }
     QJsonDocument doc(config);
@@ -114,6 +115,7 @@ void RemoteSettings::fromConfig(const QString& data)
         params->uploadCommand = itemMap["uploadCommand"].toString();
         params->uploadInput = itemMap["uploadCommandInput"].toString();
         params->uploadTimeoutMsec = itemMap.value("uploadTimeoutMsec", 10000).toInt();
+        params->syncOnSave = itemMap.value("syncOnSave", false).toBool();
 
         m_remoteParams.insert(params->name, params);
     }

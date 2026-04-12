@@ -25,8 +25,12 @@ MockRemoteProcess::MockRemoteProcess(QObject* parent, QString dbPath)
 {
 }
 
-void MockRemoteProcess::start(const QString&)
+void MockRemoteProcess::start(const QString& program)
 {
+    m_command = program;
+    if (m_command.contains("upload") || m_command.contains("put")) {
+        m_uploadCalled = true;
+    }
     QFile::copy(m_dbPath, m_tempFileLocation);
 }
 

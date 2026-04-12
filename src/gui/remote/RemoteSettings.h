@@ -32,6 +32,7 @@ struct RemoteParams
     QString uploadCommand;
     QString uploadInput;
     int uploadTimeoutMsec;
+    bool syncOnSave = false;
 };
 Q_DECLARE_METATYPE(RemoteParams)
 
