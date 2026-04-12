@@ -281,6 +281,7 @@ private slots:
     void onGroupChanged();
     void onDatabaseModified();
     void onDatabaseNonDataChanged();
+    void onDatabaseSaved();
     void onAutosaveDelayTimeout();
     void connectDatabaseSignals();
     void loadDatabase(bool accepted);
@@ -344,6 +345,9 @@ private:
     // Autoreload
     bool m_blockAutoSave;
     bool m_reloading;
+
+    // Sync on save
+    bool m_syncInProgress = false;
 
     // Autosave delay
     QPointer<QTimer> m_autosaveTimer;

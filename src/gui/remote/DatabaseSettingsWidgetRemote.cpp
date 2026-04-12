@@ -50,6 +50,7 @@ DatabaseSettingsWidgetRemote::DatabaseSettingsWidgetRemote(QWidget* parent)
     connect(m_ui->uploadCommand, &QLineEdit::textChanged, setModified);
     connect(m_ui->inputForUpload, &QPlainTextEdit::textChanged, setModified);
     connect(m_ui->uploadTimeoutSec, QOverload<int>::of(&QSpinBox::valueChanged), setModified);
+    connect(m_ui->syncOnSaveCheckBox, &QCheckBox::toggled, setModified);
 }
 
 DatabaseSettingsWidgetRemote::~DatabaseSettingsWidgetRemote() = default;
@@ -106,6 +107,7 @@ void DatabaseSettingsWidgetRemote::saveCurrentSettings()
     params->uploadCommand = m_ui->uploadCommand->text();
     params->uploadInput = m_ui->inputForUpload->toPlainText();
     params->uploadTimeoutMsec = m_ui->uploadTimeoutSec->value() * 1000;
+    params->syncOnSave = m_ui->syncOnSaveCheckBox->isChecked();
 
     m_remoteSettings->addRemoteParams(params);
     updateSettingsList();
@@ -153,6 +155,7 @@ void DatabaseSettingsWidgetRemote::editCurrentSettings()
     m_ui->uploadCommand->setText(params->uploadCommand);
     m_ui->inputForUpload->setPlainText(params->uploadInput);
     m_ui->uploadTimeoutSec->setValue(params->uploadTimeoutMsec / 1000);
+    m_ui->syncOnSaveCheckBox->setChecked(params->syncOnSave);
     m_modified = false;
 }
 
@@ -175,6 +178,7 @@ void DatabaseSettingsWidgetRemote::clearFields()
     m_ui->uploadCommand->setText("");
     m_ui->inputForUpload->setPlainText("");
     m_ui->uploadTimeoutSec->setValue(10);
+    m_ui->syncOnSaveCheckBox->setChecked(false);
     m_modified = false;
 }
 

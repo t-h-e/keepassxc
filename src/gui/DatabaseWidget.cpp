@@ -1323,6 +1323,7 @@ void DatabaseWidget::connectDatabaseSignals()
     connect(m_db.data(), &Database::modified, this, &DatabaseWidget::databaseModified);
     connect(m_db.data(), &Database::modified, this, &DatabaseWidget::onDatabaseModified);
     connect(m_db.data(), &Database::databaseSaved, this, &DatabaseWidget::databaseSaved);
+    connect(m_db.data(), &Database::databaseSaved, this, &DatabaseWidget::onDatabaseSaved);
     connect(m_db.data(), &Database::databaseFileChanged, this, &DatabaseWidget::reloadDatabaseFile);
     connect(m_db.data(), &Database::databaseNonDataChanged, this, &DatabaseWidget::databaseNonDataChanged);
     connect(m_db.data(), &Database::databaseNonDataChanged, this, &DatabaseWidget::onDatabaseNonDataChanged);
@@ -1904,6 +1905,26 @@ void DatabaseWidget::onDatabaseNonDataChanged()
     if (!config()->get(Config::AutoSaveNonDataChanges).toBool()) {
         m_db->markAsModified();
     }
+}
+
+void DatabaseWidget::onDatabaseSaved()
+{
+    // Trigger remote sync for any remotes with syncOnSave enabled
+    // Guard against recursive syncs
+    if (m_syncInProgress) {
+        return;
+    }
+    m_syncInProgress = true;
+    // Use QTimer::singleShot to defer sync to next event loop iteration
+    // This ensures the current save operation completes fully before sync starts
+    QTimer::singleShot(0, this, [this]() {
+        for (auto* params : m_remoteSettings->getAllRemoteParams()) {
+            if (params->syncOnSave) {
+                syncWithRemote(params);
+            }
+        }
+        m_syncInProgress = false;
+    });
 }
 
 QString DatabaseWidget::getCurrentSearch()
