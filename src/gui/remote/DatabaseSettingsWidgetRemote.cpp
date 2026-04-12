@@ -18,6 +18,7 @@
 #include "DatabaseSettingsWidgetRemote.h"
 #include "ui_DatabaseSettingsWidgetRemote.h"
 
+#include "core/Database.h"
 #include "core/Global.h"
 #include "core/Metadata.h"
 
@@ -112,6 +113,17 @@ void DatabaseSettingsWidgetRemote::saveCurrentSettings()
     m_remoteSettings->addRemoteParams(params);
     updateSettingsList();
 
+    QByteArray salt = RemoteSettings::getOrCreateSalt(m_db);
+    QString dbUuid = m_db->uuid().toString();
+    if (!params->downloadCommand.isEmpty()) {
+        QString downloadHash = RemoteSettings::computeCommandHash(params->downloadCommand, params->downloadInput, salt);
+        RemoteSettings::saveTrustedHash(dbUuid, params->name, "download", downloadHash);
+    }
+    if (!params->uploadCommand.isEmpty()) {
+        QString uploadHash = RemoteSettings::computeCommandHash(params->uploadCommand, params->uploadInput, salt);
+        RemoteSettings::saveTrustedHash(dbUuid, params->name, "upload", uploadHash);
+    }
+
     auto item = findItemByName(name);
     m_ui->settingsListWidget->setCurrentItem(item);
     m_ui->removeSettingsButton->setEnabled(true);
@@ -196,7 +208,7 @@ void DatabaseSettingsWidgetRemote::testDownload()
         return;
     }
 
-    RemoteHandler::RemoteResult result = remoteHandler->download(params);
+    RemoteHandler::RemoteResult result = remoteHandler->download(m_db, params);
     if (!result.success) {
         m_ui->messageWidget->showMessage(tr("Download failed with error: %1").arg(result.errorMessage),
                                          MessageWidget::Error);

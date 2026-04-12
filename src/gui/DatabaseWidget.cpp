@@ -1172,7 +1172,7 @@ void DatabaseWidget::syncWithRemote(const RemoteParams* params)
     if (!params->downloadCommand.isEmpty()) {
         emit updateSyncProgress(25, tr("Downloading..."));
         // Start a download first then merge and upload in the callback
-        result = remoteHandler->download(params);
+        result = remoteHandler->download(m_db, params);
         if (result.success) {
             QString error;
             QSharedPointer<Database> remoteDb = QSharedPointer<Database>::create();
@@ -1215,7 +1215,7 @@ void DatabaseWidget::uploadAndFinishSync(const RemoteParams* params, RemoteHandl
     QScopedPointer<RemoteHandler> remoteHandler(new RemoteHandler(this));
     if (result.success && !params->uploadCommand.isEmpty()) {
         emit updateSyncProgress(75, tr("Uploading..."));
-        result = remoteHandler->upload(result.filePath, params);
+        result = remoteHandler->upload(m_db, result.filePath, params);
     }
 
     finishSync(params, result);

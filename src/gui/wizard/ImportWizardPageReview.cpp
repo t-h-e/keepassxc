@@ -250,7 +250,7 @@ QSharedPointer<Database> ImportWizardPageReview::importRemote(const QString& dow
     params->downloadCommand = downloadCommand;
     params->downloadInput = downloadInput;
 
-    auto result = m_remoteHandler->download(params);
+    auto result = m_remoteHandler->download(nullptr, params);
 
     if (!result.success) {
         m_ui->messageWidget->showMessage(result.errorMessage, KMessageWidget::Error, -1);

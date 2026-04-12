@@ -18,7 +18,8 @@
 #ifndef KEEPASSXC_REMOTEHANDLER_H
 #define KEEPASSXC_REMOTEHANDLER_H
 
-#include <QObject>
+#include <QSharedPointer>
+#include <functional>
 
 class Database;
 class RemoteProcess;
@@ -41,13 +42,19 @@ public:
         QString stdError;
     };
 
-    RemoteResult download(const RemoteParams* params);
-    RemoteResult upload(const QString& filePath, const RemoteParams* params);
+    RemoteResult download(const QSharedPointer<Database>& db, const RemoteParams* params);
+    RemoteResult upload(const QSharedPointer<Database>& db, const QString& filePath, const RemoteParams* params);
 
     // Used for testing only
     static void setRemoteProcessFunc(std::function<QScopedPointer<RemoteProcess>(QObject*)> func);
 
 private:
+    bool checkAndConfirmCommand(const QSharedPointer<Database>& db,
+                                const QString& remoteName,
+                                const QString& operation,
+                                const QString& command,
+                                const QString& input);
+
     static std::function<QScopedPointer<RemoteProcess>(QObject*)> m_createRemoteProcess;
     static QString m_tempFileLocation;
 
