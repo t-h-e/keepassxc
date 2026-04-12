@@ -45,15 +45,16 @@ public:
     RemoteResult download(const QSharedPointer<Database>& db, const RemoteParams* params);
     RemoteResult upload(const QSharedPointer<Database>& db, const QString& filePath, const RemoteParams* params);
 
+    static bool checkAndConfirmCommand(const QSharedPointer<Database>& db,
+                                       const QString& remoteName,
+                                       const QString& operation,
+                                       const QString& command,
+                                       const QString& input);
+
     // Used for testing only
     static void setRemoteProcessFunc(std::function<QScopedPointer<RemoteProcess>(QObject*)> func);
 
 private:
-    bool checkAndConfirmCommand(const QSharedPointer<Database>& db,
-                                const QString& remoteName,
-                                const QString& operation,
-                                const QString& command,
-                                const QString& input);
 
     static std::function<QScopedPointer<RemoteProcess>(QObject*)> m_createRemoteProcess;
     static QString m_tempFileLocation;

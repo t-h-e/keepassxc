@@ -8,7 +8,7 @@ RemoteTrustDialog::RemoteTrustDialog(QWidget* parent)
     , m_ui(new Ui::RemoteTrustDialog())
 {
     m_ui->setupUi(this);
-    m_ui->buttonBox->button(QDialogButtonBox::Yes)->setText(tr("Trust and Execute"));
+    m_ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Trust and Execute"));
 }
 
 RemoteTrustDialog::~RemoteTrustDialog() = default;

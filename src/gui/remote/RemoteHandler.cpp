@@ -83,17 +83,18 @@ bool RemoteHandler::checkAndConfirmCommand(const QSharedPointer<Database>& db,
 
 RemoteHandler::RemoteResult RemoteHandler::download(const QSharedPointer<Database>& db, const RemoteParams* params)
 {
-    return AsyncTask::runAndWaitForFuture([this, db, params] {
+    if (!checkAndConfirmCommand(db, params->name, "download", params->downloadCommand, params->downloadInput)) {
+        RemoteResult result;
+        result.success = false;
+        result.errorMessage = tr("Command not trusted by user.");
+        return result;
+    }
+
+    return AsyncTask::runAndWaitForFuture([params] {
         RemoteResult result;
         if (!params) {
             result.success = false;
             result.errorMessage = tr("Invalid download parameters provided.");
-            return result;
-        }
-
-        if (!checkAndConfirmCommand(db, params->name, "download", params->downloadCommand, params->downloadInput)) {
-            result.success = false;
-            result.errorMessage = tr("Command not trusted by user.");
             return result;
         }
 
@@ -140,17 +141,18 @@ RemoteHandler::RemoteResult RemoteHandler::download(const QSharedPointer<Databas
 RemoteHandler::RemoteResult
 RemoteHandler::upload(const QSharedPointer<Database>& db, const QString& filePath, const RemoteParams* params)
 {
-    return AsyncTask::runAndWaitForFuture([this, db, filePath, params] {
+    if (!checkAndConfirmCommand(db, params->name, "upload", params->uploadCommand, params->uploadInput)) {
+        RemoteResult result;
+        result.success = false;
+        result.errorMessage = tr("Command not trusted by user.");
+        return result;
+    }
+
+    return AsyncTask::runAndWaitForFuture([filePath, params] {
         RemoteResult result;
         if (!params) {
             result.success = false;
             result.errorMessage = tr("Invalid database pointer or upload parameters provided.");
-            return result;
-        }
-
-        if (!checkAndConfirmCommand(db, params->name, "upload", params->uploadCommand, params->uploadInput)) {
-            result.success = false;
-            result.errorMessage = tr("Command not trusted by user.");
             return result;
         }
 
