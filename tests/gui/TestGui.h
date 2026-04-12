@@ -43,6 +43,7 @@ private slots:
     void testRemoteSyncDatabaseSameKey();
     void testRemoteSyncDatabaseRequiresPassword();
     void testRemoteSyncOnSave();
+    void testRemoteSyncTrustVerification();
     void testOpenRemoteDatabase();
     void testAutoreloadDatabase();
     void testTabs();
