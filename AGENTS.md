@@ -64,10 +64,11 @@ ctest --test-dir build -R <TestName> -V
 ctest --test-dir build -R testgui -V
 ```
 
-### Translations (before releases)
+### Translations (before releases and feature commits)
 ```bash
 python ./release-tool.py i18n lupdate
 ```
+Run this before committing features that include UI changes to update translation strings.
 
 ## Code Style
 
