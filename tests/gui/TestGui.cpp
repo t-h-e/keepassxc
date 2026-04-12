@@ -543,6 +543,64 @@ void TestGui::testRemoteSyncOnSave()
     QTRY_COMPARE(dbSyncSpy.count(), 1);
 }
 
+void TestGui::testRemoteSyncTrustVerification()
+{
+    RemoteHandler::setRemoteProcessFunc([](QObject* parent) {
+        return QScopedPointer<RemoteProcess>(
+            new MockRemoteProcess(parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx")));
+    });
+
+    QString remoteName = "testTrustVerification";
+    QString downloadCommand = "rclone copy remote:Database.kdbx {TEMP_DATABASE}";
+    QString downloadInput = "";
+
+    triggerAction("actionDatabaseSettings");
+    auto dbSettingsDialog = m_dbWidget->findChild<DatabaseSettingsDialog*>("databaseSettingsDialog");
+    QVERIFY(dbSettingsDialog);
+    dbSettingsDialog->showRemoteSettings();
+
+    auto nameEdit = dbSettingsDialog->findChild<QLineEdit*>("nameLineEdit");
+    QVERIFY(nameEdit);
+    nameEdit->setText(remoteName);
+
+    auto downloadCommandEdit = dbSettingsDialog->findChild<QLineEdit*>("downloadCommand");
+    QVERIFY(downloadCommandEdit);
+    downloadCommandEdit->setText(downloadCommand);
+
+    auto saveSettingsButton = dbSettingsDialog->findChild<QPushButton*>("saveSettingsButton");
+    QVERIFY(saveSettingsButton);
+    QTest::mouseClick(saveSettingsButton, Qt::LeftButton);
+
+    auto okButton = dbSettingsDialog->findChild<QDialogButtonBox*>("buttonBox")->button(QDialogButtonBox::Ok);
+    QVERIFY(okButton);
+    QTest::mouseClick(okButton, Qt::LeftButton);
+
+    QTRY_COMPARE(m_dbWidget->getRemoteParams().size(), 1);
+
+    QString dbUuid = m_db->uuid().toString();
+    QVariantMap trustedCommands = config()->get(Config::RemoteTrustedCommands).toMap();
+    QVariantMap dbHashes = trustedCommands.value(dbUuid).toMap();
+    QVERIFY(dbHashes.contains(QString("%1_download").arg(remoteName)));
+    QVERIFY(!dbHashes.value(QString("%1_download").arg(remoteName)).toString().isEmpty());
+
+    QSignalSpy dbSyncSpy(m_dbWidget.data(), &DatabaseWidget::databaseSyncCompleted);
+
+    auto menuRemoteSync = m_mainWindow->findChild<QMenu*>("menuRemoteSync");
+    QVERIFY(menuRemoteSync);
+    menuRemoteSync->popup({0, 0});
+    QApplication::processEvents();
+    menuRemoteSync->close();
+
+    for (const auto remoteAction : menuRemoteSync->actions()) {
+        if (remoteAction->text() == remoteName) {
+            remoteAction->trigger();
+            break;
+        }
+    }
+
+    QTRY_COMPARE(dbSyncSpy.count(), 1);
+}
+
 void TestGui::testOpenRemoteDatabase()
 {
     // close current database
