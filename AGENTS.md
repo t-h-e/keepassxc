@@ -1,5 +1,30 @@
 # KeePassXC Agent Guidelines
 
+## Prerequisites
+
+### Required Dependencies
+- **CMake** >= 3.16
+- **C++20 compiler** (GCC 11+, Clang 14+, or MSVC 2022+)
+- **Qt** >= 5.15 (Qt 6 recommended)
+- **Botan** >= 2.11.0 (Botan 3.x preferred)
+  - Linux: Install `libbotan-3-dev` or `libbotan-2-dev`
+  - macOS: `brew install botan`
+  - Windows: Build from source or use vcpkg
+
+### Optional Dependencies (for full features)
+- `libargon2-dev` - Argon2 KDF
+- `libminizip-dev` - KeeShare feature
+- `libpcsclite-dev` - Smart card support
+- `libqrencode-dev` - QR code generation
+- `libsodium-dev` - Additional crypto
+
+### GUI Tests
+GUI tests require X11 display or virtual framebuffer:
+```bash
+# Run with virtual display
+xvfb-run ctest --test-dir build -R testgui -V
+```
+
 ## Build Commands
 
 ### Configure and Build
@@ -114,6 +139,7 @@ struct RemoteParams {
     QString uploadCommand;     // Command to upload database
     QString uploadInput;       // Stdin for upload command
     int uploadTimeoutMsec;     // Upload timeout (default: 10000)
+    bool syncOnSave = false;   // Auto-sync when database is saved
 };
 ```
 
@@ -152,6 +178,32 @@ void TestGui::testRemoteSyncDatabaseSameKey()
     });
     QSignalSpy dbSyncSpy(m_dbWidget, &DatabaseWidget::databaseSyncCompleted);
     prepareAndTriggerRemoteSync();
+    QTRY_COMPARE(dbSyncSpy.count(), 1);
+}
+```
+
+### Sync on Save Feature
+When `syncOnSave` is enabled for a remote configuration, the database will automatically sync with that remote after every save.
+
+**Implementation:**
+- `DatabaseWidget::onDatabaseSaved()` iterates through all remotes and calls `syncWithRemote()` for those with `syncOnSave=true`
+- The `Database::databaseSaved` signal triggers the sync
+- UI checkbox in `DatabaseSettingsWidgetRemote` allows toggling this per-remote
+
+**Testing:**
+```cpp
+void TestGui::testRemoteSyncOnSave()
+{
+    // Setup mock and enable syncOnSave
+    RemoteHandler::setRemoteProcessFunc([](QObject* parent) {
+        return QScopedPointer<RemoteProcess>(
+            new MockRemoteProcess(parent, testDataPath));
+    });
+    // ... configure remote with syncOnSave enabled ...
+    QSignalSpy dbSyncSpy(m_dbWidget, &DatabaseWidget::databaseSyncCompleted);
+    // Modify and save database
+    checkSaveDatabase();
+    // Verify sync was triggered
     QTRY_COMPARE(dbSyncSpy.count(), 1);
 }
 ```
