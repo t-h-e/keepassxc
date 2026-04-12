@@ -32,6 +32,7 @@
 #include <QSpinBox>
 #include <QTableWidget>
 #include <QTest>
+#include <QTimer>
 #include <QToolBar>
 
 #include "config-keepassx-tests.h"
@@ -63,6 +64,7 @@
 #include "gui/group/GroupView.h"
 #include "gui/remote/RemoteHandler.h"
 #include "gui/remote/RemoteSettings.h"
+#include "gui/remote/RemoteTrustDialog.h"
 #include "gui/tag/TagsEdit.h"
 #include "gui/wizard/NewDatabaseWizard.h"
 #include "keys/FileKey.h"
@@ -597,6 +599,95 @@ void TestGui::testRemoteSyncTrustVerification()
     }
 
     QTRY_COMPARE(dbSyncSpy.count(), 1);
+}
+
+void TestGui::testRemoteSyncTrustDialogShown()
+{
+    RemoteHandler::setRemoteProcessFunc([](QObject* parent) {
+        return QScopedPointer<RemoteProcess>(
+            new MockRemoteProcess(parent, QString(KEEPASSX_TEST_DATA_DIR).append("/SyncDatabase.kdbx")));
+    });
+
+    QString remoteName = "testTrustDialog";
+    QString downloadCommand = "rclone copy remote:Database.kdbx {TEMP_DATABASE}";
+
+    triggerAction("actionDatabaseSettings");
+    auto dbSettingsDialog = m_dbWidget->findChild<DatabaseSettingsDialog*>("databaseSettingsDialog");
+    QVERIFY(dbSettingsDialog);
+    dbSettingsDialog->showRemoteSettings();
+
+    auto nameEdit = dbSettingsDialog->findChild<QLineEdit*>("nameLineEdit");
+    QVERIFY(nameEdit);
+    nameEdit->setText(remoteName);
+
+    auto downloadCommandEdit = dbSettingsDialog->findChild<QLineEdit*>("downloadCommand");
+    QVERIFY(downloadCommandEdit);
+    downloadCommandEdit->setText(downloadCommand);
+
+    auto uploadCommandEdit = dbSettingsDialog->findChild<QLineEdit*>("uploadCommand");
+    QVERIFY(uploadCommandEdit);
+    uploadCommandEdit->setText("");
+
+    auto saveSettingsButton = dbSettingsDialog->findChild<QPushButton*>("saveSettingsButton");
+    QVERIFY(saveSettingsButton);
+    QTest::mouseClick(saveSettingsButton, Qt::LeftButton);
+
+    auto okButton = dbSettingsDialog->findChild<QDialogButtonBox*>("buttonBox")->button(QDialogButtonBox::Ok);
+    QVERIFY(okButton);
+    QTest::mouseClick(okButton, Qt::LeftButton);
+
+    QTRY_COMPARE(m_dbWidget->getRemoteParams().size(), 1);
+
+    QString dbUuid = m_db->uuid().toString();
+    QVariantMap trustedCommands = config()->get(Config::RemoteTrustedCommands).toMap();
+    QVariantMap dbHashes = trustedCommands.value(dbUuid).toMap();
+    dbHashes.remove(QString("%1_download").arg(remoteName));
+    trustedCommands[dbUuid] = dbHashes;
+    config()->set(Config::RemoteTrustedCommands, trustedCommands);
+
+    QSignalSpy dbSyncSpy(m_dbWidget.data(), &DatabaseWidget::databaseSyncCompleted);
+
+    auto menuRemoteSync = m_mainWindow->findChild<QMenu*>("menuRemoteSync");
+    QVERIFY(menuRemoteSync);
+    menuRemoteSync->popup({0, 0});
+    QApplication::processEvents();
+    menuRemoteSync->close();
+
+    QTimer::singleShot(0, [this, remoteName]() {
+        auto menu = m_mainWindow->findChild<QMenu*>("menuRemoteSync");
+        for (const auto action : menu->actions()) {
+            if (action->text() == remoteName) {
+                action->trigger();
+                break;
+            }
+        }
+    });
+
+    QTimer::singleShot(100, []() {
+        QWidget* modalWidget = QApplication::activeModalWidget();
+        if (!modalWidget) {
+            return;
+        }
+        auto trustDialog = qobject_cast<RemoteTrustDialog*>(modalWidget);
+        if (!trustDialog) {
+            return;
+        }
+        auto buttonBox = trustDialog->findChild<QDialogButtonBox*>("buttonBox");
+        if (!buttonBox) {
+            return;
+        }
+        auto okBtn = buttonBox->button(QDialogButtonBox::Ok);
+        if (!okBtn) {
+            return;
+        }
+        QTest::mouseClick(okBtn, Qt::LeftButton);
+    });
+
+    QTRY_COMPARE(dbSyncSpy.count(), 1);
+
+    trustedCommands = config()->get(Config::RemoteTrustedCommands).toMap();
+    dbHashes = trustedCommands.value(dbUuid).toMap();
+    QVERIFY(dbHashes.contains(QString("%1_download").arg(remoteName)));
 }
 
 void TestGui::testOpenRemoteDatabase()

@@ -44,6 +44,7 @@ private slots:
     void testRemoteSyncDatabaseRequiresPassword();
     void testRemoteSyncOnSave();
     void testRemoteSyncTrustVerification();
+    void testRemoteSyncTrustDialogShown();
     void testOpenRemoteDatabase();
     void testAutoreloadDatabase();
     void testTabs();
